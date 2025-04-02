@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 
 function ReportList({ searchQuery }) {
   const [reports, setReports] = useState({});
@@ -6,7 +6,6 @@ function ReportList({ searchQuery }) {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
-  const abortControllerRef = useRef(null); // useRef로 변경
 
   const BASE_URL = import.meta.env.VITE_ORACLE_REST_API;
   const TABLE_NAME = import.meta.env.VITE_TABLE_NAME;
@@ -19,7 +18,7 @@ function ReportList({ searchQuery }) {
     }
     params.append('offset', offset);
     if (searchQuery) {
-      params.append(searchQuery.category, searchQuery.query); // 카테고리와 쿼리 추가
+      params.append(searchQuery.category, searchQuery.query);
     }
     return `${BASE_URL}/${endpoint}?${params.toString()}`;
   };
@@ -27,22 +26,16 @@ function ReportList({ searchQuery }) {
   const fetchReports = async () => {
     if (!hasMore || isFetching) return;
 
-    if (abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-
-    const controller = new AbortController();
-    abortControllerRef.current = controller;
-
     setIsFetching(true);
     setLoading(true);
 
     try {
-      const response = await fetch(getApiUrl(), { signal: controller.signal });
+      const response = await fetch(getApiUrl());
       if (!response.ok) throw new Error('API 요청 실패');
 
       const { items, hasMore: apiHasMore } = await response.json();
 
+      // 데이터를 날짜별로 그룹화
       const groupedData = items.reduce((acc, item) => {
         const date = item.save_time.split('T')[0];
         if (!acc[date]) acc[date] = {};
@@ -56,15 +49,25 @@ function ReportList({ searchQuery }) {
         return acc;
       }, {});
 
-      setReports((prev) => (searchQuery && offset === 0 ? groupedData : { ...prev, ...groupedData }));
+      // 기존 데이터와 새 데이터를 병합
+      setReports((prev) => {
+        const merged = JSON.parse(JSON.stringify(prev)); // 깊은 복사
+        Object.entries(groupedData).forEach(([date, firms]) => {
+          if (!merged[date]) {
+            merged[date] = firms;
+          } else {
+            Object.entries(firms).forEach(([firm, reports]) => {
+              merged[date][firm] = [...(merged[date][firm] || []), ...reports];
+            });
+          }
+        });
+        return merged;
+      });
+
       setHasMore(apiHasMore);
       setOffset((prev) => prev + items.length);
     } catch (error) {
-      if (error.name === 'AbortError') {
-        console.log('🔄 이전 요청 취소됨');
-      } else {
-        console.error('❌ Error fetching reports:', error);
-      }
+      console.error('❌ Error fetching reports:', error);
     } finally {
       setIsFetching(false);
       setLoading(false);
@@ -72,27 +75,24 @@ function ReportList({ searchQuery }) {
   };
 
   useEffect(() => {
-    setReports({}); // 검색 쿼리 변경 시 기존 데이터 초기화
-    setOffset(0); // 오프셋 초기화
-    setHasMore(true); // 더 불러올 데이터 초기화
+    // 검색 쿼리가 변경되면 초기화
+    setReports({});
+    setOffset(0);
+    setHasMore(true);
     fetchReports();
-    return () => {
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
-      }
-    };
   }, [searchQuery]);
 
   useEffect(() => {
+    // 스크롤 이벤트 핸들러
     const handleScroll = () => {
-      if (
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 500 &&
-        !isFetching &&
-        hasMore
-      ) {
+      const scrollY = window.scrollY;
+      const triggerPoint = document.body.scrollHeight * 0.3;
+
+      if (scrollY >= triggerPoint && !isFetching && hasMore) {
         fetchReports();
       }
     };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [isFetching, hasMore]);
