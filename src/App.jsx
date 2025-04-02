@@ -8,23 +8,24 @@ import './index.css';
 
 function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false); // 오타 수정
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTopMenuOpen, setIsTopMenuOpen] = useState(false);
-  const [searchResults, setSearchResults] = useState(null);
+  const [searchQuery, setSearchQuery] = useState(null); // 검색 쿼리 상태 추가
 
   const toggleSearch = () => setIsSearchOpen(!isSearchOpen);
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
   const toggleMenuTop = () => setIsTopMenuOpen(!isTopMenuOpen);
 
-  const handleSearch = (results) => {
-    setSearchResults(results);
+  const handleSearch = (query, category) => {
+    setSearchQuery({ query, category }); // 검색 쿼리와 카테고리 저장
+    toggleSearch(); // 오버레이 닫기
   };
 
   return (
     <>
       <Header toggleSearch={toggleSearch} toggleMenu={toggleMenuTop} isTopMenuOpen={isTopMenuOpen} />
       <div className="subtitle" id="subtitle">현재 메뉴</div>
-      <ReportList searchResults={searchResults} />
+      <ReportList searchQuery={searchQuery} />
       <SearchOverlay isOpen={isSearchOpen} toggleSearch={toggleSearch} onSearch={handleSearch} />
       <BottomNav toggleSearch={toggleSearch} toggleMenu={toggleMenu} />
       <FloatingMenu isOpen={isMenuOpen} toggleMenu={toggleMenu} toggleSearch={toggleSearch} />

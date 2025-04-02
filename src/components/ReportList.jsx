@@ -1,54 +1,50 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from 'react';
 
-function ReportList({ searchResults, searchQuery }) {
+function ReportList({ searchQuery }) {
   const [reports, setReports] = useState({});
   const [loading, setLoading] = useState(false);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isFetching, setIsFetching] = useState(false);
-  const abortControllerRef = useState(null); // 🔥 이전 요청을 취소하기 위한 컨트롤러
+  const abortControllerRef = useRef(null); // useRef로 변경
 
-  // 환경 변수에서 API URL 및 테이블명 가져오기
   const BASE_URL = import.meta.env.VITE_ORACLE_REST_API;
   const TABLE_NAME = import.meta.env.VITE_TABLE_NAME;
 
   const getApiUrl = () => {
     const endpoint = `${TABLE_NAME}/search/`;
-
     const params = new URLSearchParams();
-    if (window.location.pathname.includes("global")) {
-      params.append("mkt_tp", "global");
+    if (window.location.pathname.includes('global')) {
+      params.append('mkt_tp', 'global');
     }
-    params.append("offset", offset);
+    params.append('offset', offset);
     if (searchQuery) {
-      params.append("query", searchQuery);
+      params.append(searchQuery.category, searchQuery.query); // 카테고리와 쿼리 추가
     }
-
     return `${BASE_URL}/${endpoint}?${params.toString()}`;
   };
 
   const fetchReports = async () => {
     if (!hasMore || isFetching) return;
-    
-    // 🔥 이전 요청이 있으면 강제 취소
+
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
-    
+
     const controller = new AbortController();
     abortControllerRef.current = controller;
-    
+
     setIsFetching(true);
     setLoading(true);
 
     try {
       const response = await fetch(getApiUrl(), { signal: controller.signal });
-      if (!response.ok) throw new Error("API 요청 실패");
+      if (!response.ok) throw new Error('API 요청 실패');
 
       const { items, hasMore: apiHasMore } = await response.json();
 
       const groupedData = items.reduce((acc, item) => {
-        const date = item.save_time.split("T")[0];
+        const date = item.save_time.split('T')[0];
         if (!acc[date]) acc[date] = {};
         if (!acc[date][item.firm_nm]) acc[date][item.firm_nm] = [];
         acc[date][item.firm_nm].push({
@@ -60,14 +56,14 @@ function ReportList({ searchResults, searchQuery }) {
         return acc;
       }, {});
 
-      setReports((prev) => ({ ...prev, ...groupedData }));
+      setReports((prev) => (searchQuery && offset === 0 ? groupedData : { ...prev, ...groupedData }));
       setHasMore(apiHasMore);
       setOffset((prev) => prev + items.length);
     } catch (error) {
-      if (error.name === "AbortError") {
-        console.log("🔄 이전 요청 취소됨");
+      if (error.name === 'AbortError') {
+        console.log('🔄 이전 요청 취소됨');
       } else {
-        console.error("❌ Error fetching reports:", error);
+        console.error('❌ Error fetching reports:', error);
       }
     } finally {
       setIsFetching(false);
@@ -76,13 +72,16 @@ function ReportList({ searchResults, searchQuery }) {
   };
 
   useEffect(() => {
+    setReports({}); // 검색 쿼리 변경 시 기존 데이터 초기화
+    setOffset(0); // 오프셋 초기화
+    setHasMore(true); // 더 불러올 데이터 초기화
     fetchReports();
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
     };
-  }, [searchQuery]); // 검색어 변경 시 API 호출
+  }, [searchQuery]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -94,9 +93,8 @@ function ReportList({ searchResults, searchQuery }) {
         fetchReports();
       }
     };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, [isFetching, hasMore]);
 
   return (

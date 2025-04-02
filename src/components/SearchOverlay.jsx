@@ -1,47 +1,38 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('title');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submitSearch = async () => {
-    if (!query.trim()) {
+  const submitSearch = useCallback(() => {
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+    const trimmedQuery = query.trim();
+    console.log('Query before submission:', trimmedQuery);
+
+    if (!trimmedQuery) {
       alert('검색어를 입력해주세요.');
+      setIsSubmitting(false);
       return;
     }
 
-    const apiUrl = `https://g76c46bf8e6ef65-oracledb.adb.ap-seoul-1.oraclecloudapps.com/ords/admin/data_main_daily_send/search/?${category}=${encodeURIComponent(query)}`;
+    onSearch(trimmedQuery, category);
+    setQuery('');
+    setTimeout(() => setIsSubmitting(false), 100); // 비동기 처리 후 플래그 해제
+  }, [query, category, isSubmitting, onSearch]);
 
-    try {
-      const response = await fetch(apiUrl);
-      const { items } = await response.json();
-
-      // 데이터 그룹화
-      const groupedData = items.reduce((acc, item) => {
-        const date = item.save_time.split('T')[0]; // 날짜 추출
-        if (!acc[date]) acc[date] = {};
-        if (!acc[date][item.firm_nm]) acc[date][item.firm_nm] = [];
-        acc[date][item.firm_nm].push({
-          id: item.report_id,
-          title: item.article_title,
-          writer: item.writer,
-          link: item.telegram_url || item.download_url || item.attach_url,
-        });
-        return acc;
-      }, {});
-
-      // 부모 컴포넌트로 검색 결과 전달
-      onSearch(groupedData);
-      toggleSearch(); // 검색 후 오버레이 닫기
-      setQuery(''); // 입력 필드 초기화
-    } catch (error) {
-      console.error('Error fetching search data:', error);
-      alert('검색 중 오류가 발생했습니다.');
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Enter 기본 동작 방지
+      submitSearch();
     }
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') submitSearch();
+  const handleButtonClick = (e) => {
+    e.preventDefault(); // 버튼 기본 동작 방지
+    submitSearch();
   };
 
   return (
@@ -71,7 +62,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button className="search-submit" onClick={submitSearch}>
+        <button className="search-submit" onClick={handleButtonClick}>
           검색
         </button>
         <button className="search-close" onClick={toggleSearch}>
