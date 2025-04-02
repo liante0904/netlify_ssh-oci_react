@@ -1,5 +1,7 @@
 [build]
+  command = "npm install vite && npm run build"
   publish = "dist"
+
 
 [[redirects]]
   from = "/manifest.json"

@@ -15,7 +15,7 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
         <div className={`menu-panel ${isTopMenuOpen ? 'open' : ''}`}>
           <div className="menu-title">메뉴</div>
           <a className="menu-item" href="/">최근 레포트</a>
-          <a className="menu-item" href="/report/global">글로벌 레포트</a>
+          <a className="menu-item" href="/global">글로벌 레포트</a>
         </div>
       </header>
     );

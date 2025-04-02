@@ -12,7 +12,7 @@ function FloatingMenu({ isOpen, toggleMenu, toggleSearch }) {
         <div className={`floating-menu ${isOpen ? 'open' : ''}`} id="floatingMenu">
           <div className="floating-menu-content">
             <a className="menu-item" href="/">🏠 홈</a>
-            <a className="menu-item" href="/report/global">글로벌 레포트</a>
+            <a className="menu-item" href="/global">글로벌 레포트</a>
           </div>
         </div>
       </>
