@@ -3,37 +3,36 @@ import { useState, useCallback } from 'react';
 function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('title');
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const submitSearch = useCallback(() => {
-    if (isSubmitting) return;
-
-    setIsSubmitting(true);
+  // 검색 실행 함수
+  const handleSearch = useCallback(() => {
     const trimmedQuery = query.trim();
     console.log('Query before submission:', trimmedQuery);
 
     if (!trimmedQuery) {
       alert('검색어를 입력해주세요.');
-      setIsSubmitting(false);
       return;
     }
 
-    onSearch(trimmedQuery, category);
-    setQuery('');
-    setTimeout(() => setIsSubmitting(false), 100); // 비동기 처리 후 플래그 해제
-  }, [query, category, isSubmitting, onSearch]);
+    onSearch(trimmedQuery, category); // 검색 실행
+    setQuery(''); // 입력 초기화
+  }, [query, category, onSearch]);
 
-  const handleKeyDown = (e) => {
+  // 엔터 키 핸들러
+  const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // Enter 기본 동작 방지
-      submitSearch();
+      e.preventDefault(); // 기본 동작 방지
+      handleSearch();
     }
-  };
+  }, [handleSearch]);
 
-  const handleButtonClick = (e) => {
+  // 버튼 클릭 핸들러
+  const handleButtonClick = useCallback((e) => {
     e.preventDefault(); // 버튼 기본 동작 방지
-    submitSearch();
-  };
+    handleSearch();
+  }, [handleSearch]);
+
+  if (!isOpen) return null; // 조건부 렌더링으로 불필요한 DOM 제거
 
   return (
     <div
