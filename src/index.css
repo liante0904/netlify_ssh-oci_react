@@ -97,7 +97,32 @@ header {
 .subtitle {
   font-size: 1.2em; font-weight: bold; color: #666; text-align: center; margin-bottom: 15px; margin-top: 15px;
 }
-.container { padding: 15px; }
+.report-list-wrapper {
+  position: relative;
+  min-height: 100vh; /* 콘텐츠가 너무 작아도 스크롤이 유지되도록 */
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #555;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  z-index: 1000;
+}
+
+.container {
+  padding-bottom: 60px; /* BottomNav와 겹치지 않도록 여백 추가 */
+}
+/* .container { padding: 15px; } */
+
 .date-group { margin-bottom: 25px; }
 .date-title { 
   font-size: 1.5em; font-weight: bold; margin-bottom: 12px; color: #333;
@@ -119,8 +144,9 @@ header {
   margin-bottom: 2px;
 }
 @media (min-width: 768px) { 
-  .container { max-width: 800px; margin: auto; }
+  .container { max-width: 800px; margin: auto;  }
 }
+
 .loading {
   position: fixed;
   top: 50%;
@@ -134,7 +160,6 @@ header {
   background-color: rgba(255, 255, 255, 0.8);
   border: 1px solid #ddd;
   border-radius: 8px;
-  display: none; /* 처음에는 숨겨짐 */
   z-index: 1000;
 }
 /* 검색 버튼 스타일 */
@@ -372,4 +397,37 @@ header {
 
 .floating-menu .menu-item:hover {
   background: #005bb5;
+}
+
+/* 기본 컨테이너 스타일 */
+.container {
+  width: 100%;
+  padding: 15px; /* 내부 여백 */
+  box-sizing: border-box;
+}
+
+/* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1200px; /* 데스크탑 최대 너비 */
+    margin: auto; /* 가운데 정렬 */
+  }
+}
+
+/* 모바일 화면 (최대 너비 1023px 이하일 때) */
+@media (max-width: 1023px) {
+  .container {
+    max-width: 800px; /* 모바일에서도 데스크탑처럼 마진 생성 */
+    margin: auto; /* 가운데 정렬 */
+    padding: 10px; /* 모바일에서 약간의 여백 추가 */
+  }
+}
+
+/* 화면 크기가 768px 이하일 때 */
+@media (max-width: 767px) {
+  .container {
+    max-width: 600px; /* 더 작은 화면에서는 최대 너비를 줄임 */
+    margin: auto;
+    padding: 10px;
+  }
 }
