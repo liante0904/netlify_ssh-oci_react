@@ -1,38 +1,40 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 
 function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('title');
+  const inputRef = useRef(null); // ✅ input DOM 참조
 
-  // 검색 실행 함수
+  // ✅ isOpen이 true가 될 때 input에 자동 포커스
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isOpen]);
+
   const handleSearch = useCallback(() => {
     const trimmedQuery = query.trim();
-    console.log('Query before submission:', trimmedQuery);
-
     if (!trimmedQuery) {
       alert('검색어를 입력해주세요.');
       return;
     }
-
-    onSearch(trimmedQuery, category); // 검색 실행
-    setQuery(''); // 입력 초기화
+    onSearch(trimmedQuery, category);
+    setQuery('');
   }, [query, category, onSearch]);
 
-  // 엔터 키 핸들러
   const handleKeyDown = useCallback((e) => {
     if (e.key === 'Enter') {
-      e.preventDefault(); // 기본 동작 방지
+      e.preventDefault();
       handleSearch();
     }
   }, [handleSearch]);
 
-  // 버튼 클릭 핸들러
   const handleButtonClick = useCallback((e) => {
-    e.preventDefault(); // 버튼 기본 동작 방지
+    e.preventDefault();
     handleSearch();
   }, [handleSearch]);
 
-  if (!isOpen) return null; // 조건부 렌더링으로 불필요한 DOM 제거
+  if (!isOpen) return null;
 
   return (
     <div
@@ -60,6 +62,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
+          ref={inputRef} // ✅ 여기 ref 연결
         />
         <button className="search-submit" onClick={handleButtonClick}>
           검색
