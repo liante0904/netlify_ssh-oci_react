@@ -5,6 +5,7 @@ function ReportList({ searchQuery }) {
   const [reports, setReports] = useState({});
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false); // ✅ 추가
 
   const BASE_URL = import.meta.env.VITE_ORACLE_REST_API;
   const TABLE_NAME = import.meta.env.VITE_TABLE_NAME;
@@ -25,6 +26,7 @@ function ReportList({ searchQuery }) {
   const fetchReports = async () => {
     if (!hasMore) return;
 
+    setIsLoading(true); // ✅ 로딩 시작
     try {
       const response = await fetch(getApiUrl());
       if (!response.ok) throw new Error('API 요청 실패');
@@ -77,6 +79,8 @@ function ReportList({ searchQuery }) {
       setOffset((prev) => prev + items.length);
     } catch (error) {
       console.error('❌ Error fetching reports:', error);
+    } finally {
+      setIsLoading(false); // ✅ 로딩 종료
     }
   };
 
@@ -90,9 +94,9 @@ function ReportList({ searchQuery }) {
   return (
     <div className="report-list-wrapper">
       <div className="container" id="report-container">
-        {Object.entries(reports).length === 0 ? (
-          <div className="no-data">데이터가 없습니다.</div>
-        ) : (
+        {offset === 0 && isLoading ? ( // ✅ 처음 로딩 시 오버레이만
+          <div className="loading-overlay">로딩 중...</div>
+        ) : Object.entries(reports).length === 0 ? null : (
           <InfiniteScroll
             dataLength={offset}
             next={fetchReports}
