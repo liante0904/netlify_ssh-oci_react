@@ -18,7 +18,6 @@ function App() {
 
   const handleSearch = (query, category) => {
     setSearchQuery({ query, category }); // 검색 쿼리와 카테고리 저장
-    toggleSearch(); // 오버레이 닫기
   };
 
   return (
