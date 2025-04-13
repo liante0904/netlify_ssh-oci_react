@@ -24,7 +24,6 @@ function App() {
   return (
     <>
       <Header toggleSearch={toggleSearch} toggleMenu={toggleMenuTop} isTopMenuOpen={isTopMenuOpen} />
-      <div className="subtitle" id="subtitle">현재 메뉴</div>
       <ReportList searchQuery={searchQuery} />
       <SearchOverlay isOpen={isSearchOpen} toggleSearch={toggleSearch} onSearch={handleSearch} />
       <BottomNav toggleSearch={toggleSearch} toggleMenu={toggleMenu} />
