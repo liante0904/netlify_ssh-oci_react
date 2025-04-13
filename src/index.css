@@ -39,7 +39,7 @@ header {
   right: 20px;
   transform: translateY(-50%);
   width: 40px;
-  height: 40px;
+  height: 25px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -119,9 +119,6 @@ header {
 }
 .menu-title {
   font-size: 1.2em; font-weight: bold; color: #007aff; margin-bottom: 10px;
-}
-.subtitle {
-  font-size: 1.2em; font-weight: bold; color: #666; text-align: center; margin-bottom: 15px; margin-top: 15px;
 }
 .report-list-wrapper {
   position: relative;
@@ -429,5 +426,12 @@ header {
     max-width: 600px; /* 더 작은 화면에서는 최대 너비를 줄임 */
     margin: auto;
     padding: 10px;
+  }
+}
+
+/* index.css 또는 FloatingMenu 관련 CSS 파일에 추가 */
+@media (max-width: 640px) {
+  .floating-nav {
+    display: none;
   }
 }
