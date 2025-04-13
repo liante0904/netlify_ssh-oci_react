@@ -5,9 +5,6 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
         <div className="title" onClick={() => (window.location.href = '/')}>
           🏠증권사 레포트 리스트
         </div>
-        <div className="search-button" onClick={toggleSearch}>
-          🔍
-        </div>
         <div className="hamburger-menu" onClick={toggleMenu}>
           <div></div>
           <div></div>
