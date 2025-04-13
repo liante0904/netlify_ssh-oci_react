@@ -36,7 +36,7 @@ function App() {
       />
       <Routes>
         <Route path="/" element={<ReportList searchQuery={searchQuery} />} />
-        <Route path="/global" element={<ReportList searchQuery={searchQuery} />} />
+        <Route path="/global" element={<ReportList/>} />
       </Routes>
       <SearchOverlay
         isOpen={isSearchOpen}

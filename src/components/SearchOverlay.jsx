@@ -9,9 +9,9 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const inputRef = useRef(null);
 
-  // 오버레이 열릴 때 상태 복원 및 디버깅
+  // 오버레이 열릴 때 상태 복원
   useEffect(() => {
-    console.log('SearchOverlay: isOpen changed to:', isOpen); // 디버깅
+    console.log('SearchOverlay: isOpen changed to:', isOpen);
     if (isOpen) {
       const urlQuery = searchParams.get('q') || '';
       const urlCategory = searchParams.get('category') || 'title';
@@ -21,7 +21,14 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
     }
   }, [isOpen, searchParams]);
 
-  // 포커스 관리
+  // 오버레이 닫힐 때 query 초기화 (버그 방지)
+  useEffect(() => {
+    if (!isOpen) {
+      setQuery('');
+    }
+  }, [isOpen]);
+
+  // 포커스 처리
   useEffect(() => {
     if (isOpen && inputRef.current && category !== 'company') {
       inputRef.current.focus();
@@ -34,12 +41,12 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
       alert('검색어를 입력해주세요.');
       return;
     }
-    console.log('SearchOverlay: Executing search:', { query: trimmedQuery, category }); // 디버깅
-    setSearchParams({ q: trimmedQuery, category });
-    onSearch({ query: trimmedQuery, category }); // App의 handleSearch에 맞게 객체 전달
-    setQuery('');
-    toggleSearch(); // 검색 후 오버레이 닫기
-  }, [query, category, onSearch, setSearchParams, toggleSearch]);
+
+    console.log('SearchOverlay: Executing search:', { query: trimmedQuery, category });
+    setSearchParams(() => new URLSearchParams({ q: trimmedQuery, category }));
+    onSearch({ query: trimmedQuery, category });
+    // setQuery('');  <- 제거됨
+  }, [query, category, onSearch, setSearchParams]);
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -61,7 +68,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
 
   const handleCategoryChange = (e) => {
     const newCategory = e.target.value;
-    console.log('SearchOverlay: Category changed to:', newCategory); // 디버깅
+    console.log('SearchOverlay: Category changed to:', newCategory);
     setCategory(newCategory);
     setQuery('');
     setSearchParams({});
@@ -69,7 +76,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
 
   const handleCompanyChange = (e) => {
     const selectedValue = e.target.value;
-    console.log('SearchOverlay: Company selected:', selectedValue); // 디버깅
+    console.log('SearchOverlay: Company selected:', selectedValue);
     setQuery(selectedValue);
     if (selectedValue) {
       setSearchParams({ q: selectedValue, category: 'company' });
@@ -81,7 +88,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   };
 
   if (!isOpen) {
-    console.log('SearchOverlay: Not rendering (isOpen is false)'); // 디버깅
+    console.log('SearchOverlay: Not rendering (isOpen is false)');
     return null;
   }
 
