@@ -69,8 +69,14 @@ function ReportList({ searchQuery }) {
     setReports({});
     setOffset(0);
     setHasMore(true);
-    fetchReports();
   }, [searchQuery]);
+  
+  useEffect(() => {
+    if (offset === 0) {
+      fetchReports();
+    }
+  }, [offset]);
+  
 
   const sortedDates = Object.keys(reports).sort((a, b) => new Date(b) - new Date(a));
 
