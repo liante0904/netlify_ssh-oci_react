@@ -25,15 +25,12 @@ function BottomNav({ toggleSearch, toggleMenu }) {
     <nav className="bottom-nav" style={{ display: isVisible ? 'flex' : 'none' }}>
       <button className="nav-button" onClick={() => (window.location.href = '/')}>
         <span>🏠</span>
-        <span>홈</span>
       </button>
       <button className="nav-button" onClick={toggleSearch}>
         <span>🔍</span>
-        <span>검색</span>
       </button>
       <button className="nav-button" onClick={toggleMenu}>
         <span>☰</span>
-        <span>메뉴</span>
       </button>
     </nav>
   );
