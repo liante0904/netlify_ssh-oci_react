@@ -1,13 +1,27 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import './SearchOverlay.css';
-import CompanySelect from './CompanySelect'; // 경로는 프로젝트 구조에 따라 조정
-
+import CompanySelect from './CompanySelect';
 
 function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('title');
+  const [searchParams, setSearchParams] = useSearchParams();
   const inputRef = useRef(null);
 
+  // 오버레이 열릴 때 상태 복원 및 디버깅
+  useEffect(() => {
+    console.log('SearchOverlay: isOpen changed to:', isOpen); // 디버깅
+    if (isOpen) {
+      const urlQuery = searchParams.get('q') || '';
+      const urlCategory = searchParams.get('category') || 'title';
+      setQuery(urlQuery);
+      setCategory(urlCategory);
+      console.log('SearchOverlay: Restored state:', { urlQuery, urlCategory });
+    }
+  }, [isOpen, searchParams]);
+
+  // 포커스 관리
   useEffect(() => {
     if (isOpen && inputRef.current && category !== 'company') {
       inputRef.current.focus();
@@ -16,48 +30,63 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
 
   const handleSearch = useCallback(() => {
     const trimmedQuery = query.trim();
-    if (!trimmedQuery) {
+    if (!trimmedQuery && category !== 'company') {
       alert('검색어를 입력해주세요.');
       return;
     }
-    onSearch(trimmedQuery, category);
+    console.log('SearchOverlay: Executing search:', { query: trimmedQuery, category }); // 디버깅
+    setSearchParams({ q: trimmedQuery, category });
+    onSearch({ query: trimmedQuery, category }); // App의 handleSearch에 맞게 객체 전달
     setQuery('');
-  }, [query, category, onSearch]);
+    toggleSearch(); // 검색 후 오버레이 닫기
+  }, [query, category, onSearch, setSearchParams, toggleSearch]);
 
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleSearch();
-    }
-  }, [handleSearch]);
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Enter') {
+        handleSearch();
+      }
+    },
+    [handleSearch]
+  );
 
-  const handleButtonClick = useCallback((e) => {
-    e.preventDefault();
-    handleSearch();
-  }, [handleSearch]);
+  const handleButtonClick = useCallback(
+    (buttonName) => {
+      if (buttonName === 'search') {
+        handleSearch();
+      }
+    },
+    [handleSearch]
+  );
 
   const handleCategoryChange = (e) => {
-    setCategory(e.target.value);
+    const newCategory = e.target.value;
+    console.log('SearchOverlay: Category changed to:', newCategory); // 디버깅
+    setCategory(newCategory);
     setQuery('');
+    setSearchParams({});
   };
 
   const handleCompanyChange = (e) => {
-    const selectedIndex = e.target.value;
-    setQuery(selectedIndex);
-    if (selectedIndex !== '') {
-      onSearch(selectedIndex, 'company'); // ✅ 자동 호출
+    const selectedValue = e.target.value;
+    console.log('SearchOverlay: Company selected:', selectedValue); // 디버깅
+    setQuery(selectedValue);
+    if (selectedValue) {
+      setSearchParams({ q: selectedValue, category: 'company' });
+      onSearch({ query: selectedValue, category: 'company' });
+      toggleSearch();
+    } else {
+      setSearchParams({});
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log('SearchOverlay: Not rendering (isOpen is false)'); // 디버깅
+    return null;
+  }
 
   return (
-    <div
-      className="search-overlay"
-      id="searchOverlay"
-      style={{ display: isOpen ? 'flex' : 'none' }}
-      onClick={toggleSearch}
-    >
+    <div className="search-overlay" id="searchOverlay" onClick={toggleSearch}>
       <div className="search-container" onClick={(e) => e.stopPropagation()}>
         <select
           id="searchCategory"
@@ -85,15 +114,14 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
           />
         )}
 
-        {/* ✅ 검색 버튼은 'company'일 때 숨김 */}
         {category !== 'company' && (
-          <button className="search-submit" onClick={handleButtonClick}>
+          <button
+            className="search-submit"
+            onClick={() => handleButtonClick('search')}
+          >
             검색
           </button>
         )}
-        {/* <button className="search-close" onClick={toggleSearch}>
-          ×
-        </button> */}
       </div>
     </div>
   );

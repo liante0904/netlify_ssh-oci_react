@@ -1,81 +1,96 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import './Header.css';
 
 function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
-    const [activeButton, setActiveButton] = useState('recent'); // 최근 버튼 기본 활성화
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
 
-    const handleButtonClick = (buttonName) => {
-        setActiveButton(buttonName);
-        if (buttonName === 'recent') window.location.href = '/';
-        if (buttonName === 'global') window.location.href = '/global';
-        if (buttonName === 'search') toggleSearch();
-    };
+  const isRecent = location.pathname === '/';
+  const isGlobal = location.pathname.includes('global');
 
-    return (
-        <>
-            <header>
-                {/* 첫 번째 줄 */}
-                <div className="header-top">
-                    <div className="title" onClick={() => (window.location.href = '/')}>
-                        🏠증권사 레포트 리스트
-                    </div>
-                    <div className="hamburger-menu" onClick={toggleMenu}>
-                        <div></div>
-                        <div></div>
-                        <div></div>
-                    </div>
-                </div>
+  const handleButtonClick = (buttonName) => {
+    if (buttonName === 'recent') {
+      navigate({ pathname: '/', search: searchParams.toString() });
+    } else if (buttonName === 'global') {
+      navigate({ pathname: '/global', search: searchParams.toString() });
+    } else if (buttonName === 'search') {
+      console.log('Header: Search button clicked, calling toggleSearch'); // 디버깅
+      toggleSearch();
+    }
+  };
 
-                {/* 두 번째 줄 - 네비게이션 */}
-                <div className="header-nav">
-                    <button
-                        className={`nav-button ${activeButton === 'recent' ? 'active' : ''}`}
-                        onClick={() => handleButtonClick('recent')}
-                    >
-                        최근
-                    </button>
-                    <button
-                        className={`nav-button ${activeButton === 'global' ? 'active' : ''}`}
-                        onClick={() => handleButtonClick('global')}
-                    >
-                        글로벌
-                    </button>
-                    <button
-                        className={`nav-button ${activeButton === 'search' ? 'active' : ''}`}
-                        onClick={() => handleButtonClick('search')}
-                    >
-                        검색
-                    </button>
-                </div>
-            </header>
+  return (
+    <>
+      <header>
+        <div className="header-top">
+          <div
+            className="title"
+            onClick={() =>
+              navigate({ pathname: '/', search: searchParams.toString() })
+            }
+          >
+            🏠증권사 레포트 리스트
+          </div>
+          <div className="hamburger-menu" onClick={toggleMenu}>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
+        </div>
 
-            {/* 오버레이 (메뉴 열렸을 때만 보임) */}
-            {isTopMenuOpen && (
-                <div
-                    className="menu-overlay"
-                    onClick={toggleMenu}
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        width: '100vw',
-                        height: '100vh',
-                        zIndex: 9,
-                    }}
-                >
-                    <div
-                        className={`menu-panel ${isTopMenuOpen ? 'open' : ''}`}
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ zIndex: 10 }}
-                    >
-                        <div className="menu-title">메뉴</div>
-                        <a className="menu-item" href="/">최근 레포트</a>
-                        <a className="menu-item" href="/global">글로벌 레포트</a>
-                    </div>
-                </div>
-            )}
-        </>
-    );
+        <div className="header-nav">
+          <button
+            className={`nav-button ${isRecent ? 'active' : ''}`}
+            onClick={() => handleButtonClick('recent')}
+          >
+            최근
+          </button>
+          <button
+            className={`nav-button ${isGlobal ? 'active' : ''}`}
+            onClick={() => handleButtonClick('global')}
+          >
+            글로벌
+          </button>
+          <button
+            className="nav-button"
+            onClick={() => handleButtonClick('search')}
+          >
+            검색
+          </button>
+        </div>
+      </header>
+
+      {isTopMenuOpen && (
+        <div className="menu-overlay" onClick={toggleMenu}>
+          <div
+            className="menu-panel open"
+            onClick={(e) => e.stopPropagation()}
+            style={{ zIndex: 10 }}
+          >
+            <div className="menu-title">메뉴</div>
+            <a
+              className="menu-item"
+              onClick={() =>
+                navigate({ pathname: '/', search: searchParams.toString() })
+              }
+            >
+              최근 레포트
+            </a>
+            <a
+              className="menu-item"
+              onClick={() =>
+                navigate({ pathname: '/global', search: searchParams.toString() })
+              }
+            >
+              글로벌 레포트
+            </a>
+          </div>
+        </div>
+      )}
+    </>
+  );
 }
 
 export default Header;

@@ -1,7 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useLocation } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 function ReportList({ searchQuery }) {
+  const location = useLocation();
   const [reports, setReports] = useState({});
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
@@ -12,7 +14,7 @@ function ReportList({ searchQuery }) {
 
   const buildApiUrl = useCallback(() => {
     const params = new URLSearchParams();
-    if (window.location.pathname.includes('global')) {
+    if (location.pathname.includes('global')) {
       params.append('mkt_tp', 'global');
     }
     params.append('offset', offset);
@@ -20,7 +22,7 @@ function ReportList({ searchQuery }) {
       params.append(searchQuery.category, searchQuery.query);
     }
     return `${BASE_URL}/${TABLE_NAME}/search/?${params.toString()}`;
-  }, [offset, searchQuery]);
+  }, [offset, searchQuery, location.pathname]);
 
   const mergeReports = useCallback((prev, newItems) => {
     const updated = { ...prev };
@@ -65,18 +67,19 @@ function ReportList({ searchQuery }) {
     }
   }, [hasMore, buildApiUrl, mergeReports]);
 
+  // ✅ URL 변경(탭 전환)시 데이터 초기화
   useEffect(() => {
     setReports({});
     setOffset(0);
     setHasMore(true);
-  }, [searchQuery]);
-  
+  }, [searchQuery, location.pathname]);  // ⬅ 여기서 pathname 감지 추가
+
+  // 최초 로딩 또는 초기화 후 offset이 0일 때 API 호출
   useEffect(() => {
     if (offset === 0) {
       fetchReports();
     }
   }, [offset]);
-  
 
   const sortedDates = Object.keys(reports).sort((a, b) => new Date(b) - new Date(a));
 

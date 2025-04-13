@@ -2,14 +2,15 @@
 header {
   background: #007aff;
   color: white;
-  padding: 20px;
+  padding: 15px; /* 패딩 축소로 전체 크기 줄임 */
   text-align: left;
-  font-size: 1.3em;
+  font-size: 1.2em; /* 헤더 폰트 크기 약간 축소 */
   position: relative;
-  border-radius: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 15px; /* 모서리 반경 축소 */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
-  flex-direction: column; /* 두 줄로 배치 */
+  flex-direction: column;
+  gap: 1px; /* 상단과 네비게이션 간격 축소 */
 }
 
 /* 첫 줄 스타일 */
@@ -30,45 +31,56 @@ header {
 /* 햄버거 메뉴 스타일 */
 .hamburger-menu {
   position: relative;
-  width: 40px;
-  height: 25px;
+  width: 40px; /* 햄버거 버튼 크기 축소 */
+  height: 30px; /* 높이 축소 */
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .hamburger-menu div {
-  width: 25px; 
-  height: 3px; 
-  background: white; 
-  border-radius: 1px; 
+  width: 28px; /* 바 너비 축소 */
+  height: 3px; /* 바 두께 약간 축소 */
+  background: white;
+  border-radius: 1px;
 }
 
 /* 두 번째 줄 네비게이션 스타일 */
 .header-nav {
   display: flex;
-  justify-content: center; /* 가운데 정렬 */
-  gap: 20px; /* 버튼 간격 */
+  justify-content: center;
+  gap: 20px; /* 버튼 간격 축소 */
 }
 
+/* 네비게이션 버튼 스타일 */
 .nav-button {
   background-color: transparent;
   border: none;
   color: white;
-  font-size: 1em;
+  font-size: 1.1em; /* 네비게이션 글씨 크기 약간 축소 */
   cursor: pointer;
+  padding: 6px 12px; /* 패딩 축소로 버튼 크기 조정 */
+  border-radius: 6px; /* 모서리 반경 축소 */
+  transition: all 0.3s ease; /* 부드러운 전환 유지 */
 }
 
 .nav-button:hover {
-  text-decoration: underline; /* 호버 시 밑줄 표시 */
+  background-color: rgba(255, 255, 255, 0.2); /* 호버 시 미묘한 배경색 유지 */
+  transform: translateY(-1px); /* 올라가는 효과 축소 */
 }
 
 .nav-button.active {
-  font-weight: bold; /* 활성화된 버튼은 볼드 처리 */
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.3); /* 활성 배경색 유지 */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 그림자 약간 축소 */
 }
 
+/* 메뉴 아이템 스타일 */
 .menu-item {
   color: white;
 }
 
 .menu-item:hover {
-    text-decoration : bold
+  font-weight: bold; /* 호버 시 굵은 글씨 유지 */
 }
