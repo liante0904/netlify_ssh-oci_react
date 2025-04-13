@@ -1,0 +1,74 @@
+/* 헤더 스타일 */
+header {
+  background: #007aff;
+  color: white;
+  padding: 20px;
+  text-align: left;
+  font-size: 1.3em;
+  position: relative;
+  border-radius: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column; /* 두 줄로 배치 */
+}
+
+/* 첫 줄 스타일 */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* 제목 스타일 */
+.title {
+  font-weight: bold;
+  color: white;
+  cursor: pointer;
+  margin: 0;
+}
+
+/* 햄버거 메뉴 스타일 */
+.hamburger-menu {
+  position: relative;
+  width: 40px;
+  height: 25px;
+  cursor: pointer;
+}
+
+.hamburger-menu div {
+  width: 25px; 
+  height: 3px; 
+  background: white; 
+  border-radius: 1px; 
+}
+
+/* 두 번째 줄 네비게이션 스타일 */
+.header-nav {
+  display: flex;
+  justify-content: center; /* 가운데 정렬 */
+  gap: 20px; /* 버튼 간격 */
+}
+
+.nav-button {
+  background-color: transparent;
+  border: none;
+  color: white;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.nav-button:hover {
+  text-decoration: underline; /* 호버 시 밑줄 표시 */
+}
+
+.nav-button.active {
+  font-weight: bold; /* 활성화된 버튼은 볼드 처리 */
+}
+
+.menu-item {
+  color: white;
+}
+
+.menu-item:hover {
+    text-decoration : bold
+}

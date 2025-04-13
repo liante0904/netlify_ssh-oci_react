@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import './SearchOverlay.css';
 import CompanySelect from './CompanySelect'; // 경로는 프로젝트 구조에 따라 조정
 
 
@@ -90,9 +91,9 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
             검색
           </button>
         )}
-        <button className="search-close" onClick={toggleSearch}>
+        {/* <button className="search-close" onClick={toggleSearch}>
           ×
-        </button>
+        </button> */}
       </div>
     </div>
   );
