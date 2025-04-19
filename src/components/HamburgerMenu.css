@@ -1,0 +1,153 @@
+/* 메뉴 오버레이 스타일 */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4); /* index.css의 반투명 스타일 참조 */
+  z-index: 9;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: none;
+}
+
+.menu-overlay.open {
+  opacity: 1;
+  display: block;
+}
+
+/* 메뉴 패널 스타일 */
+.menu-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 300px;
+  max-width: 90vw;
+  height: 100vh;
+  background: #ffffff; /* index.css의 report 배경과 동일 */
+  box-shadow: -8px 0 16px rgba(0, 0, 0, 0.15); /* index.css의 box-shadow 참조 */
+  border-radius: 12px 0 0 12px; /* index.css의 report와 유사한 둥근 모서리 */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  z-index: 10;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.menu-panel.open {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 메뉴 타이틀 스타일 */
+.menu-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  color: #007aff; /* index.css의 menu-title 색상 */
+  margin-bottom: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #d1d1d6; /* index.css의 report 보더 참조 */
+}
+
+/* 메뉴 아이템 스타일 */
+.menu-item {
+  color: #007aff; /* index.css의 menu-item 색상 */
+  font-weight: bold;
+  text-decoration: none;
+  font-size: 1.1em;
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 15px; /* index.css의 menu-item 둥근 모서리 */
+  background-color: #f0f0f5; /* index.css의 menu-item 배경 */
+  text-align: center;
+  transition: background-color 0.3s ease, transform 0.2s ease; /* index.css의 전환 */
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.menu-item:hover {
+  background-color: #e0e0e5; /* index.css의 menu-item 호버 */
+  transform: translateY(-2px); /* index.css의 floating-button 스타일 참조 */
+}
+
+.menu-item:active {
+  transform: scale(0.98); /* index.css의 floating-button 스타일 참조 */
+}
+
+/* 아이콘 스타일 */
+.menu-item .icon {
+  margin-right: 8px;
+  font-size: 20px; /* index.css의 nav-button span 크기 참조 */
+  vertical-align: middle;
+}
+
+/* 메뉴 아이템 애니메이션 */
+.menu-panel.open .menu-item {
+  animation: slideIn 0.3s ease forwards;
+}
+
+.menu-panel .menu-item:nth-child(1) { animation-delay: 0.1s; }
+.menu-panel .menu-item:nth-child(2) { animation-delay: 0.15s; }
+.menu-panel .menu-item:nth-child(3) { animation-delay: 0.2s; }
+.menu-panel .menu-item:nth-child(4) { animation-delay: 0.25s; }
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 증권사 선택 스타일 */
+.company-select {
+  background-color: #f0f0f5; /* index.css의 menu-item 배경 */
+  color: #007aff; /* index.css의 menu-item 색상 */
+  border: none;
+  padding: 10px 15px; /* index.css의 menu-item 패딩 */
+  border-radius: 15px; /* index.css의 menu-item 둥근 모서리 */
+  font-size: 1.1em; /* index.css의 menu-item 폰트 크기 */
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  margin: 10px 0;
+  transition: background-color 0.3s ease, box-shadow 0.2s ease;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="#007aff" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 15px center;
+  padding-right: 40px;
+  text-align: center;
+}
+
+.company-select:hover {
+  background-color: #e0e0e5; /* index.css의 menu-item 호버 */
+}
+
+.company-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #007aff; /* index.css의 company-select 포커스 */
+}
+
+/* 모바일 화면 (최대 너비 1023px 이하일 때) */
+@media (max-width: 1023px) {
+  .menu-panel {
+    width: 280px;
+  }
+}
+
+/* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
+@media (min-width: 1024px) {
+  .menu-panel {
+    width: 350px;
+  }
+}
