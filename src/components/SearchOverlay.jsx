@@ -8,25 +8,25 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const [category, setCategory] = useState('title');
   const [searchParams, setSearchParams] = useSearchParams();
   const inputRef = useRef(null);
+  const isInitialMount = useRef(true);
 
   // 오버레이 열릴 때 상태 복원
   useEffect(() => {
     console.log('SearchOverlay: isOpen changed to:', isOpen);
-    if (isOpen) {
+    if (isOpen && isInitialMount.current) {
       const urlQuery = searchParams.get('q') || '';
       const urlCategory = searchParams.get('category') || 'title';
       setQuery(urlQuery);
       setCategory(urlCategory);
       console.log('SearchOverlay: Restored state:', { urlQuery, urlCategory });
+      isInitialMount.current = false;
     }
-  }, [isOpen, searchParams]);
-
-  // 오버레이 닫힐 때 query 초기화 (버그 방지)
-  useEffect(() => {
     if (!isOpen) {
       setQuery('');
+      setCategory('title');
+      isInitialMount.current = true; // 다음 오버레이 열림 시 초기화
     }
-  }, [isOpen]);
+  }, [isOpen, searchParams]);
 
   // 포커스 처리
   useEffect(() => {
@@ -43,9 +43,9 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
     }
 
     console.log('SearchOverlay: Executing search:', { query: trimmedQuery, category });
-    setSearchParams(() => new URLSearchParams({ q: trimmedQuery, category }));
+    setSearchParams({ q: trimmedQuery, category });
     onSearch({ query: trimmedQuery, category });
-    // setQuery('');  <- 제거됨
+    // toggleSearch() 제거: 검색 후 오버레이 유지
   }, [query, category, onSearch, setSearchParams]);
 
   const handleKeyDown = useCallback(
@@ -66,26 +66,32 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
     [handleSearch]
   );
 
-  const handleCategoryChange = (e) => {
-    const newCategory = e.target.value;
-    console.log('SearchOverlay: Category changed to:', newCategory);
-    setCategory(newCategory);
-    setQuery('');
-    setSearchParams({});
-  };
+  const handleCategoryChange = useCallback(
+    (e) => {
+      const newCategory = e.target.value;
+      console.log('SearchOverlay: Category changed to:', newCategory);
+      setCategory(newCategory);
+      setQuery('');
+      setSearchParams({}, { replace: true }); // 즉시 URL 파라미터 초기화, 히스토리 대체
+    },
+    [setSearchParams]
+  );
 
-  const handleCompanyChange = (e) => {
-    const selectedValue = e.target.value;
-    console.log('SearchOverlay: Company selected:', selectedValue);
-    setQuery(selectedValue);
-    if (selectedValue) {
-      setSearchParams({ q: selectedValue, category: 'company' });
-      onSearch({ query: selectedValue, category: 'company' });
-      toggleSearch();
-    } else {
-      setSearchParams({});
-    }
-  };
+  const handleCompanyChange = useCallback(
+    (e) => {
+      const selectedValue = e.target.value;
+      console.log('SearchOverlay: Company selected:', selectedValue);
+      setQuery(selectedValue);
+      if (selectedValue) {
+        setSearchParams({ q: selectedValue, category: 'company' }, { replace: true });
+        onSearch({ query: selectedValue, category: 'company' });
+        // toggleSearch() 제거: 회사 선택 후 오버레이 유지
+      } else {
+        setSearchParams({}, { replace: true });
+      }
+    },
+    [onSearch, setSearchParams]
+  );
 
   if (!isOpen) {
     console.log('SearchOverlay: Not rendering (isOpen is false)');
