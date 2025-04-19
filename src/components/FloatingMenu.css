@@ -1,0 +1,133 @@
+/* 플로팅 메뉴 */
+.floating-menu {
+  position: fixed;
+  bottom: 100px;
+  right: 20px;
+  display: none;
+  flex-direction: column;
+  background: #ffffff; /* 불투명한 흰색 배경 */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); /* 부드러운 그림자 */
+  border-radius: 16px; /* 둥근 모서리 */
+  max-width: 280px; /* 최대 너비 제한 */
+  min-width: 200px; /* 최소 너비 */
+  max-height: 70vh; /* 화면 높이의 70%로 제한 */
+  overflow-y: auto; /* 긴 메뉴 대비 스크롤 */
+  z-index: 1000;
+  opacity: 0; /* 애니메이션 초기 상태 */
+  transform: translateY(20px); /* 아래에서 올라오는 효과 */
+  transition: opacity 0.3s ease, transform 0.3s ease; /* 부드러운 전환 */
+}
+
+.floating-menu.open {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0); /* 열릴 때 원위치 */
+}
+
+.floating-menu-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* 항목 간 간격 증가 */
+  padding: 16px; /* 넉넉한 내부 여백 */
+}
+
+.floating-menu .menu-item {
+  background: linear-gradient(135deg, #007aff 0%, #005bb5 100%); /* 그라디언트 배경 */
+  color: white;
+  padding: 12px 20px; /* 터치 친화적 패딩 */
+  border-radius: 10px; /* 둥근 모서리 */
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px; /* 가독성 높은 글꼴 크기 */
+  font-weight: 500; /* 약간 굵은 글꼴 */
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden; /* 리플 효과 대비 */
+}
+
+/* 호버 효과 */
+.floating-menu .menu-item:hover {
+  background: linear-gradient(135deg, #005bb5 0%, #003f7f 100%); /* 어두운 그라디언트 */
+  transform: translateY(-2px); /* 살짝 올라가는 효과 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 추가 */
+}
+
+/* 활성 상태 (터치/클릭 시) */
+.floating-menu .menu-item:active {
+  transform: scale(0.98); /* 살짝 눌리는 효과 */
+}
+
+/* 항목별 애니메이션 */
+.floating-menu.open .menu-item {
+  animation: slideIn 0.3s ease forwards;
+}
+
+/* 각 항목에 지연 효과 적용 */
+.floating-menu .menu-item:nth-child(1) { animation-delay: 0.1s; }
+.floating-menu .menu-item:nth-child(2) { animation-delay: 0.15s; }
+.floating-menu .menu-item:nth-child(3) { animation-delay: 0.2s; }
+.floating-menu .menu-item:nth-child(4) { animation-delay: 0.25s; }
+
+/* 슬라이드 인 애니메이션 */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 640px) {
+  .floating-menu {
+    right: 16px; /* 화면 가장자리 여백 축소 */
+    bottom: 80px; /* 플로팅 버튼과의 간격 조정 */
+    max-width: 90vw; /* 화면 너비의 90% */
+  }
+
+  .floating-menu .menu-item {
+    padding: 14px 18px; /* 터치 영역 확대 */
+    font-size: 15px; /* 약간 작은 글꼴로 조정 */
+  }
+}
+
+/* 플로팅 버튼 스타일 (기존 스타일 유지 및 개선) */
+.floating-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.floating-button {
+  background-color: #007aff;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 56px;
+  height: 56px;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.floating-button:hover {
+  background-color: #005bb5;
+  transform: scale(1.1);
+}
+
+.floating-button:active {
+  transform: scale(0.95);
+}
+
+/* 오버레이 스타일 */
+.floating-menu-overlay {
+  background: rgba(0, 0, 0, 0.3); /* 반투명 검은색 배경 */
+  transition: opacity 0.3s ease;
+}

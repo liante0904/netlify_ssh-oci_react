@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import './FloatingMenu.css';
 
 function FloatingMenu({ isOpen, toggleMenu, toggleSearch }) {
   // 메뉴가 열렸을 때 외부 클릭으로 닫기
@@ -21,14 +22,18 @@ function FloatingMenu({ isOpen, toggleMenu, toggleSearch }) {
 
       {/* 메뉴가 열려 있을 때만 외부 레이어 보이게 */}
       {isOpen && (
-        <div className="floating-menu-overlay" onClick={handleOverlayClick} style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          zIndex: 9,
-        }}>
+        <div
+          className="floating-menu-overlay"
+          onClick={handleOverlayClick}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            zIndex: 9,
+          }}
+        >
           <div
             className={`floating-menu ${isOpen ? 'open' : ''}`}
             id="floatingMenu"
@@ -36,8 +41,15 @@ function FloatingMenu({ isOpen, toggleMenu, toggleSearch }) {
             style={{ zIndex: 10 }} // 메뉴가 오버레이 위에 보이도록
           >
             <div className="floating-menu-content">
-              <a className="menu-item" href="/">🏠 홈</a>
-              <a className="menu-item" href="/global">글로벌 레포트</a>
+              <a className="menu-item" href="/">
+                <span className="icon">🏠</span> 홈
+              </a>
+              <a className="menu-item" href="/global">
+                <span className="icon">🌍</span> 글로벌 레포트
+              </a>
+              <a className="menu-item" href="/company">
+                <span className="icon">🏢</span> 증권사별 보기
+              </a>
             </div>
           </div>
         </div>
