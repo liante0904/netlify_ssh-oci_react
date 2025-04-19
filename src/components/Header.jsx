@@ -1,24 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import './Header.css';
 
 function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isSearchActive, setIsSearchActive] = useState(false);
 
   const isRecent = location.pathname === '/';
   const isGlobal = location.pathname.includes('global');
 
   const handleButtonClick = (buttonName) => {
-    if (buttonName === 'recent') {
-      navigate({ pathname: '/' }); // 파라미터 없이 이동
-    } else if (buttonName === 'global') {
-      navigate({ pathname: '/global' }); // 파라미터 없이 이동
-    } else if (buttonName === 'search') {
-      // 현재 경로 그대로, 파라미터 제거
-      navigate({ pathname: location.pathname });
-      toggleSearch(); // 오버레이 열기
+    // 검색 버튼이 아닌 경우 검색 비활성화
+    if (buttonName !== 'search') {
+      setIsSearchActive(false);
     }
+
+    if (buttonName === 'recent') {
+      navigate({ pathname: '/' }); // 최근 탭으로 이동
+    } else if (buttonName === 'global') {
+      navigate({ pathname: '/global' }); // 글로벌 탭으로 이동
+    } else if (buttonName === 'search') {
+      setIsSearchActive(true); // 검색 버튼 활성화
+      navigate({ pathname: '/' }); // 검색은 항상 최근(전체) 탭에서 수행
+      toggleSearch(); // 검색 오버레이 열기
+    }
+  };
+
+  // toggleSearch를 래핑하여 검색 오버레이 닫힐 때 isSearchActive 초기화
+  const wrappedToggleSearch = () => {
+    toggleSearch();
+    setIsSearchActive(false); // 오버레이 닫힐 때 검색 버튼 비활성화
   };
 
   return (
@@ -40,19 +52,19 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
 
         <div className="header-nav">
           <button
-            className={`nav-button ${isRecent ? 'active' : ''}`}
+            className={`nav-button ${isRecent && !isSearchActive ? 'active' : ''}`}
             onClick={() => handleButtonClick('recent')}
           >
             최근
           </button>
           <button
-            className={`nav-button ${isGlobal ? 'active' : ''}`}
+            className={`nav-button ${isGlobal && !isSearchActive ? 'active' : ''}`}
             onClick={() => handleButtonClick('global')}
           >
             글로벌
           </button>
           <button
-            className="nav-button"
+            className={`nav-button ${isSearchActive ? 'active' : ''}`}
             onClick={() => handleButtonClick('search')}
           >
             검색
