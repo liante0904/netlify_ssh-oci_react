@@ -2,16 +2,16 @@
 header {
   background: #007aff;
   color: white;
-  padding: 15px 0; /* 상하 패딩 유지, 좌우 패딩 제거 */
+  padding: 15px 0;
   text-align: left;
-  font-size: 1.2em; /* 헤더 폰트 크기 약간 축소 */
+  font-size: 1.2em;
   position: relative;
-  border-radius: 15px; /* 모서리 반경 축소 */
+  border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 1px; /* 상단과 네비게이션 간격 축소 */
-  width: 100%; /* 전체 너비 유지 */
+  gap: 1px;
+  width: 100%;
 }
 
 /* 첫 줄 스타일 */
@@ -19,7 +19,7 @@ header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 12px; /* .nav-button의 padding과 유사하게 좌우 12px 추가 */
+  padding: 0 12px;
 }
 
 /* 제목 스타일 */
@@ -28,33 +28,36 @@ header {
   color: white;
   cursor: pointer;
   margin: 0;
-  padding: 6px 0; /* .nav-button의 상하 패딩과 유사 */
+  padding: 6px 0;
 }
 
 /* 햄버거 메뉴 스타일 */
 .hamburger-menu {
   position: relative;
-  width: 35px; /* 기본 크기 유지 */
-  height: 24px; /* 높이 증가 (20px → 24px) */
+  width: 35px;
+  height: 24px;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 2px 0; /* 수직 여백 추가 */
+  padding: 2px 0;
+  z-index: 1000;
+  pointer-events: auto;
 }
 
 .hamburger-menu div {
-  width: 30px; /* 바 너비 유지 */
-  height: 3px; /* 바 두께 유지 */
+  width: 30px;
+  height: 3px;
   background: white;
   border-radius: 1px;
+  transition: all 0.3s ease;
 }
 
 /* 두 번째 줄 네비게이션 스타일 */
 .header-nav {
   display: flex;
   justify-content: center;
-  gap: 20px; /* 버튼 간격 축소 */
+  gap: 20px;
 }
 
 /* 네비게이션 버튼 스타일 */
@@ -62,58 +65,83 @@ header {
   background-color: transparent;
   border: none;
   color: white;
-  font-size: 1.1em; /* 네비게이션 글씨 크기 약간 축소 */
+  font-size: 1.1em;
   cursor: pointer;
-  padding: 6px 12px; /* 패딩 축소로 버튼 크기 조정 */
-  border-radius: 6px; /* 모서리 반경 축소 */
-  transition: all 0.3s ease; /* 부드러운 전환 유지 */
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px; /* 모든 버튼 높이 통일 */
 }
 
 .nav-button:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* 호버 시 미묘한 배경색 유지 */
-  transform: translateY(-1px); /* 올라가는 효과 축소 */
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
 }
 
 .nav-button.active {
   font-weight: bold;
-  background-color: rgba(255, 255, 255, 0.3); /* 활성 배경색 유지 */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* 그림자 약간 축소 */
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* 메뉴 아이템 스타일 */
-.menu-item {
+/* 헤더의 증권사 선택 스타일 */
+.nav-button.company-select {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   color: white;
+  font-size: 1.1em;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+  width: auto;
+  height: 32px; /* nav-button과 높이 맞춤 */
+  box-sizing: border-box;
+  line-height: 1; /* 텍스트 세로 정렬 */
 }
 
-.menu-item:hover {
-  font-weight: bold; /* 호버 시 굵은 글씨 유지 */
+.nav-button.company-select:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
-/* 데스크탑 화면 (최소 너비 1200px 이상일 때) */
-@media (min-width: 1200px) {
+.nav-button.company-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
+/* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
+@media (min-width: 1024px) {
   header {
-    max-width: 100%; /* 최대 너비 제한 제거 */
-    margin: auto; /* 가운데 정렬 */
+    max-width: 100%;
+    margin: auto;
   }
 
   .header-top {
-    padding: 0 12px; /* .nav-button의 padding과 동일 */
+    padding: 0 12px;
   }
 
   .title {
-    margin: 0px 120px;
-    padding: 6px 0; /* .nav-button의 상하 패딩과 유사 */
+    margin: 0 120px;
+    padding: 6px 0;
   }
 
   .hamburger-menu {
-    width: 40px; /* 데스크탑에서 약간 더 크게 */
-    height: 28px; /* 높이 조정 */
-    padding: 2px 0; /* 수직 여백 */
-    margin: 0 120px; /* 좌우 여백 추가 */
+    width: 40px;
+    height: 28px;
+    padding: 2px 0;
+    margin: 0 120px;
   }
 
   .hamburger-menu div {
-    width: 34px; /* 바 너비 증가 */
-    height: 4px; /* 바 두께 증가 */
+    width: 34px;
+    height: 4px;
   }
 }

@@ -1,37 +1,82 @@
 import React, { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import HamburgerMenu from './HamburgerMenu';
+import CompanySelect from './CompanySelect';
 import './Header.css';
 
-function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
+function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isSearchActive, setIsSearchActive] = useState(false);
+  const [query, setQuery] = useState(searchParams.get('q') || '');
 
   const isRecent = location.pathname === '/';
   const isGlobal = location.pathname.includes('global');
+  const isCompany = location.pathname.startsWith('/company');
+
+  const firm_names = [
+    "LS증권", "신한증권", "NH투자증권", "하나증권", "KB증권", "삼성증권",
+    "상상인증권", "신영증권", "미래에셋증권", "현대차증권", "키움증권", "DS투자증권",
+    "유진투자증권", "한국투자증권", "다올투자증권", "토스증권", "리딩투자증권", "대신증권",
+    "IM증권", "DB금융투자", "메리츠증권", "한화투자증권", "한양증권", "BNK투자증권",
+    "교보증권", "IBK투자증권"
+  ];
 
   const handleButtonClick = (buttonName) => {
-    // 검색 버튼이 아닌 경우 검색 비활성화
     if (buttonName !== 'search') {
       setIsSearchActive(false);
+      setQuery('');
+      setSearchParams({}, { replace: true });
     }
-
     if (buttonName === 'recent') {
-      navigate({ pathname: '/' }); // 최근 탭으로 이동
+      navigate({ pathname: '/' });
     } else if (buttonName === 'global') {
-      navigate({ pathname: '/global' }); // 글로벌 탭으로 이동
+      navigate({ pathname: '/global' });
     } else if (buttonName === 'search') {
-      setIsSearchActive(true); // 검색 버튼 활성화
-      navigate({ pathname: '/' }); // 검색은 항상 최근(전체) 탭에서 수행
-      toggleSearch(); // 검색 오버레이 열기
+      setIsSearchActive(true);
+      setQuery('');
+      navigate({ pathname: '/' });
+      toggleSearch();
     }
   };
 
-  // toggleSearch를 래핑하여 검색 오버레이 닫힐 때 isSearchActive 초기화
-  const wrappedToggleSearch = () => {
-    toggleSearch();
-    setIsSearchActive(false); // 오버레이 닫힐 때 검색 버튼 비활성화
+  const handleCompanyChange = (e) => {
+    const selectedValue = e.target.value; // <option>의 value (인덱스)
+    const company = selectedValue ? firm_names[selectedValue] : '';
+    console.log('Header: 선택된 회사:', { selectedValue, company });
+
+    setQuery(selectedValue);
+    setIsSearchActive(true);
+
+    if (selectedValue) {
+      setSearchParams({ q: selectedValue, category: 'company' }, { replace: true });
+      if (typeof onSearch === 'function') {
+        onSearch({ query: selectedValue, category: 'company' }); // query에 selectedValue 전달
+      } else {
+        console.warn('onSearch is not a function');
+      }
+    } else {
+      setSearchParams({}, { replace: true });
+      if (typeof onSearch === 'function') {
+        onSearch({ query: '', category: 'company' });
+      }
+    }
+
+    navigate({ pathname: '/' });
+    // toggleSearch();
   };
+
+  React.useEffect(() => {
+    const urlQuery = searchParams.get('q') || '';
+    const urlCategory = searchParams.get('category') || '';
+    if (urlCategory === 'company') {
+      setQuery(urlQuery);
+      setIsSearchActive(true);
+    } else {
+      setQuery('');
+    }
+  }, [searchParams]);
 
   return (
     <>
@@ -39,9 +84,13 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
         <div className="header-top">
           <div
             className="title"
-            onClick={() => navigate({ pathname: '/' })}
+            onClick={() => {
+              setQuery('');
+              setSearchParams({}, { replace: true });
+              navigate({ pathname: '/' });
+            }}
           >
-            🏠증권사 레포트 리스트
+            🏠 증권사 레포트 리스트
           </div>
           <div className="hamburger-menu" onClick={toggleMenu}>
             <div></div>
@@ -52,7 +101,7 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
 
         <div className="header-nav">
           <button
-            className={`nav-button ${isRecent && !isSearchActive ? 'active' : ''}`}
+            className={`nav-button ${isRecent && !isSearchActive && !isCompany ? 'active' : ''}`}
             onClick={() => handleButtonClick('recent')}
           >
             최근
@@ -63,6 +112,11 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
           >
             글로벌
           </button>
+          <CompanySelect
+            value={query}
+            onChange={handleCompanyChange}
+            className="nav-button company-select"
+          />
           <button
             className={`nav-button ${isSearchActive ? 'active' : ''}`}
             onClick={() => handleButtonClick('search')}
@@ -72,29 +126,12 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen }) {
         </div>
       </header>
 
-      {isTopMenuOpen && (
-        <div className="menu-overlay" onClick={toggleMenu}>
-          <div
-            className="menu-panel open"
-            onClick={(e) => e.stopPropagation()}
-            style={{ zIndex: 10 }}
-          >
-            <div className="menu-title">메뉴</div>
-            <a
-              className="menu-item"
-              onClick={() => navigate({ pathname: '/' })}
-            >
-              최근 레포트
-            </a>
-            <a
-              className="menu-item"
-              onClick={() => navigate({ pathname: '/global' })}
-            >
-              글로벌 레포트
-            </a>
-          </div>
-        </div>
-      )}
+      <HamburgerMenu
+        isOpen={isTopMenuOpen}
+        toggleMenu={toggleMenu}
+        selectedCompany={query}
+        setSelectedCompany={setQuery}
+      />
     </>
   );
 }

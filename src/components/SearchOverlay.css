@@ -6,7 +6,7 @@
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  display: flex; /* 항상 flex로 설정, JSX에서 렌더링 제어 */
+  display: flex;
   justify-content: center;
   align-items: flex-end; /* 검색창이 하단에 위치 */
   z-index: 1000;
@@ -29,18 +29,30 @@
   align-items: center;
   gap: 10px;
   width: 80%;
-  max-width: 600px;
+  max-width: 500px; /* 부모 컨테이너 너비를 약간 줄임 */
 }
 
 /* 검색 입력 필드 */
 .search-input {
-  flex: 1;
   padding: 8px;
   font-size: 1em;
   border: 1px solid #d1d1d6;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 140px; /* 기존보다 줄임 */
+  width: 200px; /* 고정 너비로 설정하여 줄임 */
+  box-sizing: border-box; /* 패딩과 보더 포함 */
+}
+
+/* 모바일 화면에서 입력 필드 너비 조정 */
+@media screen and (max-width: 600px) {
+  .search-input {
+    width: 150px; /* 모바일에서 더 좁게 */
+  }
+
+  .search-container {
+    max-width: 90%; /* 모바일에서 컨테이너 너비 조정 */
+    flex-wrap: wrap; /* 요소가 넘치면 줄바꿈 */
+  }
 }
 
 /* 검색 버튼 */

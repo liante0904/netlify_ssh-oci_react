@@ -1,5 +1,5 @@
 // src/components/CompanySelect.jsx
-
+import './CompanySelect.css';
 const firm_names = [
     "LS증권", "신한증권", "NH투자증권", "하나증권", "KB증권", "삼성증권",
     "상상인증권", "신영증권", "미래에셋증권", "현대차증권", "키움증권", "DS투자증권",

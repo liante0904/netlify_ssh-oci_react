@@ -11,20 +11,22 @@ function App() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isTopMenuOpen, setIsTopMenuOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState(null);
+  const [searchQuery, setSearchQuery] = useState({ query: '', category: '' });
 
   const toggleSearch = () => {
-    console.log('toggleSearch called, current isSearchOpen:', isSearchOpen); // 디버깅
+    console.log('toggleSearch called, current isSearchOpen:', isSearchOpen);
     setIsSearchOpen((prev) => {
-      console.log('Setting isSearchOpen to:', !prev); // 디버깅
+      console.log('Setting isSearchOpen to:', !prev);
       return !prev;
     });
   };
+
   const toggleMenuTop = () => setIsTopMenuOpen((prev) => !prev);
   const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-  const handleSearch = (query) => {
-    console.log('handleSearch called with query:', query); // 디버깅
-    setSearchQuery(query);
+
+  const handleSearch = ({ query, category }) => {
+    console.log('handleSearch called with:', { query, category });
+    setSearchQuery({ query, category });
   };
 
   return (
@@ -33,10 +35,11 @@ function App() {
         toggleSearch={toggleSearch}
         toggleMenu={toggleMenuTop}
         isTopMenuOpen={isTopMenuOpen}
+        onSearch={handleSearch}
       />
       <Routes>
         <Route path="/" element={<ReportList searchQuery={searchQuery} />} />
-        <Route path="/global" element={<ReportList/>} />
+        <Route path="/global" element={<ReportList searchQuery={searchQuery} />} />
       </Routes>
       <SearchOverlay
         isOpen={isSearchOpen}
