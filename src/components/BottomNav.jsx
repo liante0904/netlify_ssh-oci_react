@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import './BottomNav.css'; // Assuming you have a CSS file for styles
 
 function BottomNav({ toggleSearch, toggleMenu }) {
   const [isVisible, setIsVisible] = useState(true);

@@ -80,27 +80,18 @@
   }
 }
 
-/* 모바일 최적화 */
-@media (max-width: 640px) {
-  .floating-menu {
-    right: 16px; /* 화면 가장자리 여백 축소 */
-    bottom: 80px; /* 플로팅 버튼과의 간격 조정 */
-    max-width: 90vw; /* 화면 너비의 90% */
-  }
-
-  .floating-menu .menu-item {
-    padding: 14px 18px; /* 터치 영역 확대 */
-    font-size: 15px; /* 약간 작은 글꼴로 조정 */
-  }
-}
-
 /* 플로팅 버튼 스타일 (기존 스타일 유지 및 개선) */
+
+/* 플로팅 네비게이션 스타일 */
 .floating-nav {
+  position: fixed;
+  bottom: 75px;
+  right: 20px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
+  z-index: 1000;
 }
-
 .floating-button {
   background-color: #007aff;
   color: white;
@@ -130,4 +121,27 @@
 .floating-menu-overlay {
   background: rgba(0, 0, 0, 0.3); /* 반투명 검은색 배경 */
   transition: opacity 0.3s ease;
+}
+
+
+/* index.css 또는 FloatingMenu 관련 CSS 파일에 추가 */
+@media (max-width: 640px) {
+  .floating-nav {
+    display: none;
+  }
+}
+
+
+/* 모바일 최적화 */
+@media (max-width: 640px) {
+  .floating-menu {
+    right: 16px; /* 화면 가장자리 여백 축소 */
+    bottom: 80px; /* 플로팅 버튼과의 간격 조정 */
+    max-width: 90vw; /* 화면 너비의 90% */
+  }
+
+  .floating-menu .menu-item {
+    padding: 14px 18px; /* 터치 영역 확대 */
+    font-size: 15px; /* 약간 작은 글꼴로 조정 */
+  }
 }

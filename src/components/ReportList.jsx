@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import './ReportList.css'; // Assuming you have a CSS file for styles
 
 function ReportList({ searchQuery }) {
   const location = useLocation();
