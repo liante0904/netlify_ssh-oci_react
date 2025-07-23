@@ -24,6 +24,7 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
   ];
 
   const handleButtonClick = (buttonName) => {
+    onSearch({ query: '', category: '' }); // ✅ 검색 상태 초기화
     if (buttonName !== 'search') {
       setIsSearchActive(false);
       setQuery('');

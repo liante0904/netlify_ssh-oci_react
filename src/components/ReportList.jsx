@@ -52,6 +52,10 @@ function ReportList({ searchQuery }) {
     if (!hasMore) return;
     setIsLoading(true);
 
+    const scrollContainer = document.getElementById('report-container');
+    const prevScrollHeight = scrollContainer?.scrollHeight || 0;
+    const prevScrollTop = scrollContainer?.scrollTop || 0;
+
     try {
       const res = await fetch(buildApiUrl());
       if (!res.ok) throw new Error('API 요청 실패');
@@ -64,12 +68,19 @@ function ReportList({ searchQuery }) {
     } catch (err) {
       console.error('❌ Error fetching reports:', err);
     } finally {
+      setTimeout(() => {
+        const newScrollHeight = scrollContainer?.scrollHeight || 0;
+        if (scrollContainer) {
+          scrollContainer.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight);
+        }
+      }, 0);
       setIsLoading(false);
     }
   }, [hasMore, buildApiUrl, mergeReports]);
 
   // ✅ URL 변경(탭 전환)시 데이터 초기화
   useEffect(() => {
+    window.scrollTo(0, 0); // 페이지 상단으로 스크롤 이동
     setReports({});
     setOffset(0);
     setHasMore(true);
