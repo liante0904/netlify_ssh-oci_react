@@ -84,6 +84,8 @@ function ReportList({ searchQuery }) {
     setReports({});
     setOffset(0);
     setHasMore(true);
+    // ✅ 무조건 fetchReports 재호출
+    fetchReports();
   }, [searchQuery, location.pathname]);  // ⬅ 여기서 pathname 감지 추가
 
   // 최초 로딩 또는 초기화 후 offset이 0일 때 API 호출
