@@ -97,6 +97,21 @@ function ReportList({ searchQuery }) {
     }
   }, [offset]);
 
+  useEffect(() => {
+    const reportDates = Object.keys(reports);
+    if (reportDates.length === 0) return;
+
+    const allCollapsed = reportDates.every(date => dateToggles[date] === true);
+
+    if (allCollapsed) {
+      if (hasMore && !isLoading) {
+        fetchReports();
+      }
+    }
+  }, [dateToggles, reports, hasMore, isLoading, fetchReports]);
+
+  
+
   const toggleDate = (date) => {
     setDateToggles(prev => ({ ...prev, [date]: !prev[date] }));
   };
@@ -123,7 +138,6 @@ function ReportList({ searchQuery }) {
             dataLength={offset}
             next={fetchReports}
             hasMore={hasMore}
-            loader={<div className="loading-overlay">로딩 중...</div>}
             scrollThreshold={0.6}
           >
             {sortedDates.map((date) => (
@@ -154,6 +168,7 @@ function ReportList({ searchQuery }) {
             ))}
           </InfiniteScroll>
         )}
+        {isLoading && hasMore && <div className="loading-overlay">로딩 중...</div>}
       </div>
     </div>
   );
