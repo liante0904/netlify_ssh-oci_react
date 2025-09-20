@@ -1,9 +1,47 @@
 .date-group { margin-bottom: 25px; }
 .date-title { 
   font-size: 1.5em; font-weight: bold; margin-bottom: 12px; color: #333;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
 }
 .company-group { margin-bottom: 20px; }
-.company-title { font-size: 1.3em; font-weight: bold; margin-bottom: 10px; color: #007aff; cursor: pointer; }
+.company-title { 
+  font-size: 1.3em; font-weight: bold; margin-bottom: 10px; color: #007aff; cursor: pointer; 
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.date-title::before, .company-title::before {
+  content: '';
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBkPSJNNy40MSA4LjU5TDEyIDEzLjE3bDQuNTktNC41OEwxOCAxMGwtNiA2LTYtNiAxLjQxLTEuNDF6Ii8+PHBhdGggZmlsbD0ibm9uZSIgZD0iTTAgMGgyNHYyNEgwVjB6Ii8+PC9zdmc+");
+  background-size: contain;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease-in-out;
+}
+
+.date-title.expanded::before, .company-title.expanded::before {
+  transform: rotate(180deg);
+}
+
+.company-group-wrapper, .report-wrapper {
+  max-height: 10000px; /* A large enough value */
+  overflow: hidden;
+  transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
+  opacity: 1;
+}
+
+.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
 .report { 
   border: 1px solid #d1d1d6; border-radius: 12px; padding: 12px 16px; margin: 8px 0; 
   background: white; font-size: 1.15em; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);

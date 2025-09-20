@@ -9,6 +9,8 @@ function ReportList({ searchQuery }) {
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [dateToggles, setDateToggles] = useState({});
+  const [firmToggles, setFirmToggles] = useState({});
 
   const BASE_URL = import.meta.env.VITE_ORACLE_REST_API;
   const TABLE_NAME = import.meta.env.VITE_TABLE_NAME;
@@ -95,6 +97,20 @@ function ReportList({ searchQuery }) {
     }
   }, [offset]);
 
+  const toggleDate = (date) => {
+    setDateToggles(prev => ({ ...prev, [date]: !prev[date] }));
+  };
+
+  const toggleFirm = (date, firm) => {
+    setFirmToggles(prev => ({
+      ...prev,
+      [date]: {
+        ...prev[date],
+        [firm]: !prev[date]?.[firm]
+      }
+    }));
+  };
+
   const sortedDates = Object.keys(reports).sort((a, b) => new Date(b) - new Date(a));
 
   return (
@@ -112,20 +128,28 @@ function ReportList({ searchQuery }) {
           >
             {sortedDates.map((date) => (
               <div className="date-group" key={date}>
-                <div className="date-title">{date}</div>
-                {Object.entries(reports[date]).map(([firm, firmReports]) => (
-                  <div className="company-group" key={firm}>
-                    <div className="company-title">{firm}</div>
-                    {firmReports.map(({ id, title, writer, link }) => (
-                      <div className="report" key={id}>
-                        <a href={link} target="_blank" rel="noopener noreferrer">
-                          {title}
-                        </a>
-                        <p>작성자: {writer}</p>
+                <div className={`date-title ${!dateToggles[date] ? 'expanded' : ''}`} onClick={() => toggleDate(date)}>
+                  {date}
+                </div>
+                <div className={`company-group-wrapper ${dateToggles[date] ? 'collapsed' : ''}`}>
+                  {Object.entries(reports[date]).map(([firm, firmReports]) => (
+                    <div className="company-group" key={firm}>
+                      <div className={`company-title ${!firmToggles[date]?.[firm] ? 'expanded' : ''}`} onClick={() => toggleFirm(date, firm)}>
+                        {firm}
                       </div>
-                    ))}
-                  </div>
-                ))}
+                      <div className={`report-wrapper ${firmToggles[date]?.[firm] ? 'collapsed' : ''}`}>
+                        {firmReports.map(({ id, title, writer, link }) => (
+                          <div className="report" key={id}>
+                            <a href={link} target="_blank" rel="noopener noreferrer">
+                              {title}
+                            </a>
+                            <p>작성자: {writer}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </InfiniteScroll>
