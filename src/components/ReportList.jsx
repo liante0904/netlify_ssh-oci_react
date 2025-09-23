@@ -55,8 +55,8 @@ function ReportList({ searchQuery }) {
     return updated;
   }, []);
 
-  const fetchReports = useCallback(async () => {
-    if (!hasMore) return;
+  const fetchReports = useCallback(async (reset = false) => {
+    if (!hasMore && !reset) return; // Only return if not resetting and no more data
     setIsLoading(true);
 
     const scrollContainer = document.getElementById('report-container');
@@ -83,7 +83,7 @@ function ReportList({ searchQuery }) {
       }, 0);
       setIsLoading(false);
     }
-  }, [hasMore, buildApiUrl, mergeReports]);
+  }, [buildApiUrl, mergeReports, hasMore]); // hasMore is still a dependency for subsequent fetches
 
   // ✅ URL 변경(탭 전환)시 데이터 초기화
   useEffect(() => {
@@ -92,8 +92,8 @@ function ReportList({ searchQuery }) {
     setOffset(0);
     setHasMore(true);
     // ✅ 무조건 fetchReports 재호출
-    fetchReports();
-  }, [searchQuery, location.pathname]);  // ⬅ 여기서 pathname 감지 추가
+    fetchReports(true); // Pass true to force fetch even if hasMore is false
+  }, [searchQuery, location.pathname, fetchReports]);  // ⬅ 여기서 pathname 감지 추가
 
   // 최초 로딩 또는 초기화 후 offset이 0일 때 API 호출
   useEffect(() => {
