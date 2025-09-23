@@ -56,7 +56,10 @@ function ReportList({ searchQuery }) {
   }, []);
 
   const fetchReports = useCallback(async (reset = false) => {
-    if (!hasMore && !reset) return; // Only return if not resetting and no more data
+    // When reset is true, we want to fetch regardless of current hasMore state
+    // Otherwise, only fetch if hasMore is true
+    if (!hasMore && !reset) return;
+
     setIsLoading(true);
 
     const scrollContainer = document.getElementById('report-container');
@@ -78,29 +81,30 @@ function ReportList({ searchQuery }) {
       setTimeout(() => {
         const newScrollHeight = scrollContainer?.scrollHeight || 0;
         if (scrollContainer) {
-          scrollContainer.scrollTop = prevScrollTop + (newScrollHeight - prevScrollHeight);
+          scrollContainer.scrollTop = prevScrollTop + (newScrollHeight - prevScrollTop);
         }
       }, 0);
       setIsLoading(false);
     }
-  }, [buildApiUrl, mergeReports, hasMore]); // hasMore is still a dependency for subsequent fetches
+  }, [hasMore, buildApiUrl, mergeReports]); // hasMore is a dependency for subsequent fetches
 
   // ✅ URL 변경(탭 전환)시 데이터 초기화
   useEffect(() => {
     window.scrollTo(0, 0); // 페이지 상단으로 스크롤 이동
     setReports({});
     setOffset(0);
-    setHasMore(true);
+    setHasMore(true); // Ensure hasMore is true for a fresh start
     // ✅ 무조건 fetchReports 재호출
-    fetchReports(true); // Pass true to force fetch even if hasMore is false
-  }, [searchQuery, location.pathname, fetchReports]);  // ⬅ 여기서 pathname 감지 추가
+    // Call fetchReports directly, it will use the updated state from above
+    fetchReports(true); // Pass true to force fetch even if hasMore was false
+  }, [searchQuery, location.pathname]); // Only trigger on search query or path changes
 
   // 최초 로딩 또는 초기화 후 offset이 0일 때 API 호출
   useEffect(() => {
-    if (offset === 0) {
+    if (offset === 0 && !isLoading) {
       fetchReports();
     }
-  }, [offset]);
+  }, [offset, isLoading, fetchReports]);
 
   useEffect(() => {
     const reportDates = Object.keys(reports);
