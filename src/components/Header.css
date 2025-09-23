@@ -58,6 +58,7 @@ header {
   display: flex;
   justify-content: center;
   gap: 20px;
+  padding: 5px 0;
 }
 
 /* 네비게이션 버튼 스타일 */
@@ -76,45 +77,8 @@ header {
   height: 32px; /* 모든 버튼 높이 통일 */
 }
 
-.nav-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-1px);
-}
-
-.nav-button.active {
-  font-weight: bold;
-  background-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* 헤더의 증권사 선택 스타일 */
-.nav-button.company-select {
-  background-color: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  font-size: 1.1em;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  appearance: none;
-  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-  padding-right: 30px;
-  width: auto;
-  height: 32px; /* nav-button과 높이 맞춤 */
-  box-sizing: border-box;
-  line-height: 1; /* 텍스트 세로 정렬 */
-}
-
-.nav-button.company-select:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.nav-button.company-select:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+.company-select-wrapper {
+  display: none; /* Hidden by default, shown in mobile media query */
 }
 
 /* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
@@ -143,5 +107,69 @@ header {
   .hamburger-menu div {
     width: 34px;
     height: 4px;
+  }
+
+  .company-select-wrapper {
+    display: block; /* Show on desktop */
+  }
+
+  .company-select-wrapper .nav-button.company-select {
+    display: flex; /* Ensure it behaves like other nav buttons */
+  }
+}
+
+/* 모바일 화면 (최대 너비 1023px 이하일 때) */
+@media (max-width: 1023px) {
+  .header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px; /* Reduced horizontal padding */
+  }
+
+  .header-top .title {
+    flex-grow: 1; /* Allow title to take available space */
+    font-size: 1em; /* Smaller font size for mobile title */
+  }
+
+  .header-top .company-select-wrapper {
+    display: block; /* Show on mobile header-top */
+    flex-shrink: 1; /* Allow it to shrink */
+    margin-right: 5px; /* Reduced space before hamburger */
+  }
+
+  .header-top .company-select-wrapper .nav-button.company-select {
+    width: auto; /* Allow width to adjust */
+    max-width: 90px; /* Further reduced max width for mobile header-top */
+    font-size: 0.9em; /* Smaller font size */
+    padding: 4px 8px; /* Smaller padding */
+    height: 28px; /* Smaller height */
+  }
+
+  .hamburger-menu {
+    width: 30px; /* Smaller hamburger menu */
+    height: 20px;
+    padding: 2px 0;
+  }
+
+  .hamburger-menu div {
+    width: 25px; /* Adjust bar width */
+    height: 2px; /* Adjust bar height */
+  }
+
+  .header-nav {
+    flex-wrap: nowrap; /* Ensure buttons stay on one line */
+    justify-content: space-around; /* Distribute space evenly */
+    gap: 5px; /* Smaller gap for mobile nav buttons */
+    padding: 5px 10px;
+    overflow-x: auto; /* Enable horizontal scrolling if needed */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-button {
+    flex-shrink: 0; /* Prevent buttons from shrinking too much */
+    font-size: 0.9em; /* Smaller font size for nav buttons */
+    padding: 4px 8px; /* Smaller padding */
+    height: 28px; /* Smaller height */
   }
 }

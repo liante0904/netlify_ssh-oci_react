@@ -17,14 +17,19 @@ function ReportList({ searchQuery }) {
 
   const buildApiUrl = useCallback(() => {
     const params = new URLSearchParams();
+    let apiUrl = `${BASE_URL}/${TABLE_NAME}/search/`;
+
     if (location.pathname.includes('global')) {
       params.append('mkt_tp', 'global');
+    } else if (location.pathname.includes('industry')) {
+      apiUrl = `https://g76c46bf8e6ef65-oracledb.adb.ap-seoul-1.oraclecloudapps.com/ords/admin/data_main_daily_send/industry`;
     }
+
     params.append('offset', offset);
-    if (searchQuery) {
+    if (searchQuery.query && searchQuery.category) {
       params.append(searchQuery.category, searchQuery.query);
     }
-    return `${BASE_URL}/${TABLE_NAME}/search/?${params.toString()}`;
+    return `${apiUrl}?${params.toString()}`;
   }, [offset, searchQuery, location.pathname]);
 
   const mergeReports = useCallback((prev, newItems) => {

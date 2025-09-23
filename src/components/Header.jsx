@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import CompanySelect from './CompanySelect';
@@ -10,9 +10,22 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [isSearchActive, setIsSearchActive] = useState(false);
   const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1023);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 1023);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   const isRecent = location.pathname === '/';
   const isGlobal = location.pathname.includes('global');
+  const isIndustry = location.pathname.includes('industry');
   const isCompany = location.pathname.startsWith('/company');
 
   const firm_names = [
@@ -34,6 +47,8 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
       navigate({ pathname: '/' });
     } else if (buttonName === 'global') {
       navigate({ pathname: '/global' });
+    } else if (buttonName === 'industry') {
+      navigate({ pathname: '/industry' });
     } else if (buttonName === 'search') {
       setIsSearchActive(true);
       setQuery('');
@@ -68,7 +83,7 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
     // toggleSearch();
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     const urlQuery = searchParams.get('q') || '';
     const urlCategory = searchParams.get('category') || '';
     if (urlCategory === 'company') {
@@ -93,6 +108,15 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
           >
             🏠 증권사 레포트 리스트
           </div>
+          {isMobile && (
+            <div className="company-select-wrapper">
+              <CompanySelect
+                value={query}
+                onChange={handleCompanyChange}
+                className="nav-button company-select"
+              />
+            </div>
+          )}
           <div className="hamburger-menu" onClick={toggleMenu}>
             <div></div>
             <div></div>
@@ -113,11 +137,21 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
           >
             글로벌
           </button>
-          <CompanySelect
-            value={query}
-            onChange={handleCompanyChange}
-            className="nav-button company-select"
-          />
+          <button
+            className={`nav-button ${isIndustry && !isSearchActive ? 'active' : ''}`}
+            onClick={() => handleButtonClick('industry')}
+          >
+            산업
+          </button>
+          {!isMobile && (
+            <div className="company-select-wrapper">
+              <CompanySelect
+                value={query}
+                onChange={handleCompanyChange}
+                className="nav-button company-select"
+              />
+            </div>
+          )}
           <button
             className={`nav-button ${isSearchActive ? 'active' : ''}`}
             onClick={() => handleButtonClick('search')}
