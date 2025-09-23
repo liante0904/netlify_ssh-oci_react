@@ -77,6 +77,47 @@ header {
   height: 32px; /* 모든 버튼 높이 통일 */
 }
 
+.nav-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+.nav-button.active {
+  font-weight: bold;
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* 헤더의 증권사 선택 스타일 */
+.nav-button.company-select {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  font-size: 1.1em;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="white" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 30px;
+  width: auto;
+  height: 32px; /* nav-button과 높이 맞춤 */
+  box-sizing: border-box;
+  line-height: 1; /* 텍스트 세로 정렬 */
+}
+
+.nav-button.company-select:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button.company-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.5);
+}
+
 .company-select-wrapper {
   display: none; /* Hidden by default, shown in mobile media query */
 }
