@@ -13,7 +13,9 @@ function App() {
   const [isTopMenuOpen, setIsTopMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState({ query: '', category: '' });
   const [isNavVisible, setIsNavVisible] = useState(true);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const lastScrollY = useRef(window.scrollY);
+  const headerRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -38,6 +40,26 @@ function App() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const updateHeaderHeight = () => {
+      if (headerRef.current) {
+        setHeaderHeight(headerRef.current.offsetHeight);
+      }
+    };
+
+    updateHeaderHeight();
+    const resizeObserver = new ResizeObserver(updateHeaderHeight);
+    if (headerRef.current) {
+      resizeObserver.observe(headerRef.current);
+    }
+
+    return () => {
+      if (headerRef.current) {
+        resizeObserver.unobserve(headerRef.current);
+      }
+    };
+  }, []);
+
   const toggleSearch = () => {
     setIsSearchOpen((prev) => !prev);
   };
@@ -52,17 +74,20 @@ function App() {
   return (
     <Router>
       <Header
+        ref={headerRef}
         isNavVisible={isNavVisible}
         toggleSearch={toggleSearch}
         toggleMenu={toggleMenuTop}
         isTopMenuOpen={isTopMenuOpen}
         onSearch={handleSearch}
       />
-      <Routes>
-        <Route path="/" element={<ReportList searchQuery={searchQuery} />} />
-        <Route path="/global" element={<ReportList searchQuery={searchQuery} />} />
-        <Route path="/industry" element={<ReportList searchQuery={searchQuery} />} />
-      </Routes>
+      <main className="main-content" style={{ paddingTop: headerHeight }}>
+        <Routes>
+          <Route path="/" element={<ReportList searchQuery={searchQuery} />} />
+          <Route path="/global" element={<ReportList searchQuery={searchQuery} />} />
+          <Route path="/industry" element={<ReportList searchQuery={searchQuery} />} />
+        </Routes>
+      </main>
       <SearchOverlay
         isOpen={isSearchOpen}
         toggleSearch={toggleSearch}

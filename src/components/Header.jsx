@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import CompanySelect from './CompanySelect';
 import './Header.css';
 
-function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, isNavVisible }) {
+const Header = forwardRef(({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, isNavVisible }, ref) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -96,7 +96,7 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, isNavVisibl
 
   return (
     <>
-      <header className={!isNavVisible ? 'nav-hidden' : ''}>
+      <header ref={ref} className={!isNavVisible && isMobile ? 'nav-hidden' : ''}>
         <div className="header-top">
           <div
             className="title"
@@ -169,6 +169,6 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, isNavVisibl
       />
     </>
   );
-}
+});
 
 export default Header;

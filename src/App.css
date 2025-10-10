@@ -40,3 +40,11 @@
 .read-the-docs {
   color: #888;
 }
+
+
+
+.main-content {
+
+  padding-bottom: 80px; /* 바텀 네비게이션 높이만큼 여백 추가 */
+
+}
