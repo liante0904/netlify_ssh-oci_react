@@ -50,6 +50,9 @@ function FloatingMenu({ isOpen, toggleMenu, toggleSearch }) {
               <a className="menu-item" href="/company">
                 <span className="icon">🏢</span> 증권사별 보기
               </a>
+              <a className="menu-item" onClick={() => window.location.reload()} style={{ cursor: 'pointer' }}>
+                <span className="icon">🔄</span> 새로고침
+              </a>
             </div>
           </div>
         </div>
