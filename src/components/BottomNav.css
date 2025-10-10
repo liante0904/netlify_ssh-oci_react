@@ -3,14 +3,19 @@
   bottom: 0;
   left: 0;
   width: 100%;
-  display: none; /* 기본적으로 숨김 */
+  display: flex;
   justify-content: space-around;
   background-color: #007aff;
   padding: 10px 0;
   padding-bottom: calc(10px + env(safe-area-inset-bottom));
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
-  transition: transform 0.3s ease;
+  transition: transform 0.3s ease-in-out;
   transform: translateY(0);
+  z-index: 100;
+}
+
+.bottom-nav.hidden {
+  transform: translateY(100%);
 }
 
 .nav-button {

@@ -4,7 +4,7 @@ import HamburgerMenu from './HamburgerMenu';
 import CompanySelect from './CompanySelect';
 import './Header.css';
 
-function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
+function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, isNavVisible }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -96,7 +96,7 @@ function Header({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch }) {
 
   return (
     <>
-      <header>
+      <header className={!isNavVisible ? 'nav-hidden' : ''}>
         <div className="header-top">
           <div
             className="title"

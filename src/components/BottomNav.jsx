@@ -1,29 +1,8 @@
-import { useEffect, useState } from 'react';
-import './BottomNav.css'; // Assuming you have a CSS file for styles
+import './BottomNav.css';
 
-function BottomNav({ toggleSearch, toggleMenu }) {
-  const [isVisible, setIsVisible] = useState(true);
-  let lastScrollY = window.scrollY;
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      const isDesktop = window.innerWidth >= 1024;
-
-      if (isDesktop) {
-        setIsVisible(false);
-      } else {
-        setIsVisible(currentScrollY <= lastScrollY);
-      }
-      lastScrollY = currentScrollY;
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
+function BottomNav({ isNavVisible, toggleSearch, toggleMenu }) {
   return (
-    <nav className="bottom-nav" style={{ display: isVisible ? 'flex' : 'none' }}>
+    <nav className={`bottom-nav ${isNavVisible ? '' : 'hidden'}`}>
       <button className="nav-button" onClick={() => (window.location.href = '/')}>
         <span>🏠</span>
       </button>
