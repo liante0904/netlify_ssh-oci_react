@@ -22,7 +22,7 @@ function ReportList({ searchQuery }) {
     if (location.pathname.includes('global')) {
       params.append('mkt_tp', 'global');
     } else if (location.pathname.includes('industry')) {
-      apiUrl = `https://g76c46bf8e6ef65-oracledb.adb.ap-seoul-1.oraclecloudapps.com/ords/admin/data_main_daily_send/industry`;
+      params.append('mkt_tp', 'industry');
     }
 
     params.append('offset', offset);
