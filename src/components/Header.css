@@ -3,6 +3,7 @@ header {
   background: #007aff;
   color: white;
   padding: 15px 0;
+  padding-top: calc(15px + env(safe-area-inset-top));
   text-align: left;
   font-size: 1.2em;
   position: relative;
