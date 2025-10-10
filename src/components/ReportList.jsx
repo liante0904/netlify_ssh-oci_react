@@ -17,18 +17,26 @@ function ReportList({ searchQuery }) {
 
   const buildApiUrl = useCallback(() => {
     const params = new URLSearchParams();
-    let apiUrl = `${BASE_URL}/${TABLE_NAME}/search/`;
+    let apiUrl = `${BASE_URL}/${TABLE_NAME}`;
 
+    // pathname에 따라 URL 구조 다르게
     if (location.pathname.includes('global')) {
+      apiUrl += '/search/';
       params.append('mkt_tp', 'global');
     } else if (location.pathname.includes('industry')) {
-      params.append('mkt_tp', 'industry');
+      apiUrl += '/industry';
+      // industry는 search 제거
+    } else {
+      apiUrl += '/search/';
     }
 
+    // 공통 파라미터
     params.append('offset', offset);
+
     if (searchQuery.query && searchQuery.category) {
       params.append(searchQuery.category, searchQuery.query);
     }
+
     return `${apiUrl}?${params.toString()}`;
   }, [offset, searchQuery, location.pathname]);
 
