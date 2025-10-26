@@ -77,8 +77,10 @@ function App() {
         ref={headerRef}
         isNavVisible={isNavVisible}
         toggleSearch={toggleSearch}
-        toggleMenu={toggleMenuTop}
+        toggleMenuTop={toggleMenuTop}
         isTopMenuOpen={isTopMenuOpen}
+        toggleFloatingMenu={toggleMenu} // Pass the floating menu toggle
+        isFloatingMenuOpen={isMenuOpen} // Pass the floating menu state
         onSearch={handleSearch}
       />
       <main className="main-content" style={{ paddingTop: headerHeight }}>

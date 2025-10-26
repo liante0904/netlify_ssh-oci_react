@@ -4,7 +4,15 @@ import HamburgerMenu from './HamburgerMenu';
 import CompanySelect from './CompanySelect';
 import './Header.css';
 
-const Header = forwardRef(({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, isNavVisible }, ref) => {
+const Header = forwardRef(({
+  toggleSearch,
+  toggleMenuTop,
+  isTopMenuOpen,
+  toggleFloatingMenu,
+  isFloatingMenuOpen,
+  onSearch,
+  isNavVisible
+}, ref) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,6 +45,12 @@ const Header = forwardRef(({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, 
   ];
 
   const handleButtonClick = (buttonName) => {
+    if (isTopMenuOpen) {
+      toggleMenuTop();
+    }
+    if (isFloatingMenuOpen) {
+      toggleFloatingMenu();
+    }
     onSearch({ query: '', category: '' }); // ✅ 검색 상태 초기화
     if (buttonName !== 'search') {
       setIsSearchActive(false);
@@ -101,6 +115,12 @@ const Header = forwardRef(({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, 
           <div
             className="title"
             onClick={() => {
+              if (isTopMenuOpen) {
+                toggleMenuTop();
+              }
+              if (isFloatingMenuOpen) {
+                toggleFloatingMenu();
+              }
               setQuery('');
               setSearchParams({}, { replace: true });
               navigate({ pathname: '/' });
@@ -117,7 +137,7 @@ const Header = forwardRef(({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, 
               />
             </div>
           )}
-          <div className="hamburger-menu" onClick={toggleMenu}>
+          <div className="hamburger-menu" onClick={toggleMenuTop}>
             <div></div>
             <div></div>
             <div></div>
@@ -163,9 +183,10 @@ const Header = forwardRef(({ toggleSearch, toggleMenu, isTopMenuOpen, onSearch, 
 
       <HamburgerMenu
         isOpen={isTopMenuOpen}
-        toggleMenu={toggleMenu}
+        toggleMenu={toggleMenuTop}
         selectedCompany={query}
         setSelectedCompany={setQuery}
+        handleHeaderClick={handleButtonClick}
       />
     </>
   );

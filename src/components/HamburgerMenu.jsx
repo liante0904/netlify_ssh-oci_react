@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './HamburgerMenu.css';
 
-function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany }) {
+function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany, handleHeaderClick }) {
   const navigate = useNavigate();
 
   // 가정: 증권사 목록
@@ -31,9 +31,8 @@ function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany
             <a
               className="menu-item"
               onClick={() => {
-                setSelectedCompany('');
-                navigate({ pathname: '/' });
-                toggleMenu();
+                handleHeaderClick('recent');
+                // toggleMenu(); // handleHeaderClick에서 처리
               }}
             >
               <span className="icon">🏠</span> 최근 레포트
@@ -41,12 +40,19 @@ function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany
             <a
               className="menu-item"
               onClick={() => {
-                setSelectedCompany('');
-                navigate({ pathname: '/global' });
-                toggleMenu();
+                handleHeaderClick('global');
+                // toggleMenu(); // handleHeaderClick에서 처리
               }}
             >
               <span className="icon">🌍</span> 글로벌 레포트
+            </a>
+            <a
+              className="menu-item"
+              onClick={() => {
+                handleHeaderClick('industry');
+              }}
+            >
+              <span className="icon">🏭</span> 산업 레포트
             </a>
             <div className="menu-title">증권사별 보기</div>
             <select
