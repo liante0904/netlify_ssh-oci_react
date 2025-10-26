@@ -185,7 +185,7 @@ const Header = forwardRef(({
         isOpen={isTopMenuOpen}
         toggleMenu={toggleMenuTop}
         selectedCompany={query}
-        setSelectedCompany={setQuery}
+        handleCompanyChange={handleCompanyChange}
         handleHeaderClick={handleButtonClick}
       />
     </>

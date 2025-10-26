@@ -1,22 +1,12 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import CompanySelect from './CompanySelect'; // CompanySelect 임포트
 import './HamburgerMenu.css';
 
-function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany, handleHeaderClick }) {
-  const navigate = useNavigate();
+function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, handleCompanyChange, handleHeaderClick }) {
 
-  // 가정: 증권사 목록
-  const companies = ['모두', '삼성증권', '현대차증권', 'KB증권'];
-
-  const handleCompanyChange = (e) => {
-    const company = e.target.value;
-    setSelectedCompany(company);
-    if (company === '모두') {
-      navigate({ pathname: '/' });
-    } else {
-      navigate({ pathname: `/company/${company}` });
-    }
-    toggleMenu();
+  const handleSelectChange = (e) => {
+    handleCompanyChange(e); // Header로부터 받은 함수 호출
+    toggleMenu(); // 메뉴 닫기
   };
 
   return (
@@ -32,7 +22,6 @@ function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany
               className="menu-item"
               onClick={() => {
                 handleHeaderClick('recent');
-                // toggleMenu(); // handleHeaderClick에서 처리
               }}
             >
               <span className="icon">🏠</span> 최근 레포트
@@ -41,7 +30,6 @@ function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany
               className="menu-item"
               onClick={() => {
                 handleHeaderClick('global');
-                // toggleMenu(); // handleHeaderClick에서 처리
               }}
             >
               <span className="icon">🌍</span> 글로벌 레포트
@@ -55,17 +43,9 @@ function HamburgerMenu({ isOpen, toggleMenu, selectedCompany, setSelectedCompany
               <span className="icon">🏭</span> 산업 레포트
             </a>
             <div className="menu-title">증권사별 보기</div>
-            <select
-              className="company-select"
-              value={selectedCompany}
-              onChange={handleCompanyChange}
-            >
-              {companies.map((company) => (
-                <option key={company} value={company}>
-                  {company}
-                </option>
-              ))}
-            </select>
+            <div className="menu-item-select">
+              <CompanySelect value={selectedCompany} onChange={handleSelectChange} />
+            </div>
           </div>
         </div>
       )}
