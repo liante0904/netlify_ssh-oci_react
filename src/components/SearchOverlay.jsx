@@ -99,7 +99,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   }
 
   return (
-    <div className="search-overlay" id="searchOverlay" onClick={toggleSearch}>
+    <div className={`search-overlay ${isOpen ? 'visible' : ''}`} id="searchOverlay" onClick={toggleSearch}>
       <div className="search-container" onClick={(e) => e.stopPropagation()}>
         <select
           id="searchCategory"
