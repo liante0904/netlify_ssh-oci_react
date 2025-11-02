@@ -1,3 +1,31 @@
+
+:root {
+  --background-color: #f0f0f5;
+  --text-color: #213547;
+  --primary-color: #007aff;
+  --secondary-background-color: #e0e0e5;
+  --card-background-color: #ffffff;
+  --card-shadow-color: rgba(0, 0, 0, 0.2);
+  --loading-background-color: rgba(255, 255, 255, 0.8);
+  --loading-text-color: #555;
+  --loading-border-color: #ddd;
+}
+
+html[data-theme='dark'] {
+  --background-color: #1a1a1a;
+  --text-color: rgba(255, 255, 255, 0.87);
+  --primary-color: #007aff;
+  --secondary-background-color: #333333;
+  --card-background-color: #2a2a2a;
+  --card-shadow-color: rgba(0, 0, 0, 0.5);
+  --loading-background-color: rgba(0, 0, 0, 0.8);
+  --loading-text-color: #eee;
+  --loading-border-color: #444;
+}
+
+
+
+
 html, body {
   margin: 0;
   padding: 0;
@@ -7,7 +35,9 @@ html, body {
 body { 
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 1em; 
-  background-color: #f0f0f5; 
+  background-color: var(--background-color); 
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .home-logo {
@@ -31,16 +61,16 @@ body {
 }
 
 .menu-item {
-  color: #007aff; font-weight: bold; text-decoration: none; font-size: 1.1em; margin: 10px 0;
-  padding: 10px 15px; border-radius: 15px; background-color: #f0f0f5; text-align: center;
+  color: var(--primary-color); font-weight: bold; text-decoration: none; font-size: 1.1em; margin: 10px 0;
+  padding: 10px 15px; border-radius: 15px; background-color: var(--background-color); text-align: center;
   transition: background-color 0.3s;
   width: 100%; box-sizing: border-box; 
 }
 .menu-item:hover {
-  background-color: #e0e0e5;
+  background-color: var(--secondary-background-color);
 }
 .menu-title {
-  font-size: 1.2em; font-weight: bold; color: #007aff; margin-bottom: 10px;
+  font-size: 1.2em; font-weight: bold; color: var(--primary-color); margin-bottom: 10px;
 }
 .report-list-wrapper {
   position: relative;
@@ -56,9 +86,9 @@ body {
   padding: 20px;
   font-size: 1.5em;
   font-weight: bold;
-  color: #555;
-  background-color: rgba(255, 255, 255, 0.8);
-  border: 1px solid #ddd;
+  color: var(--loading-text-color);
+  background-color: var(--loading-background-color);
+  border: 1px solid var(--loading-border-color);
   border-radius: 8px;
   z-index: 1000;
 }

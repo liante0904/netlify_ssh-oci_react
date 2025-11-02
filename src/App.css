@@ -35,6 +35,10 @@
 
 .card {
   padding: 2em;
+  background-color: var(--card-background-color);
+  box-shadow: 0 2px 5px var(--card-shadow-color);
+  border-radius: 8px;
+  transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 .read-the-docs {

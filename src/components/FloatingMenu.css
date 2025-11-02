@@ -124,12 +124,7 @@
 }
 
 
-/* index.css 또는 FloatingMenu 관련 CSS 파일에 추가 */
-@media (max-width: 640px) {
-  .floating-nav {
-    display: none;
-  }
-}
+
 
 
 /* 모바일 최적화 */

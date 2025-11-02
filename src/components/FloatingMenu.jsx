@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import './FloatingMenu.css';
 
-function FloatingMenu({ isOpen, toggleMenu, toggleSearch }) {
+function FloatingMenu({ isOpen, toggleMenu, toggleSearch, theme, toggleTheme, isFloatingNavVisible }) {
   // 메뉴가 열렸을 때 외부 클릭으로 닫기
   const handleOverlayClick = () => {
     if (isOpen) {
@@ -11,14 +11,19 @@ function FloatingMenu({ isOpen, toggleMenu, toggleSearch }) {
 
   return (
     <>
-      <nav className="floating-nav" style={{ zIndex: 10 }}>
-        <button className="floating-button search-fab" onClick={toggleSearch}>
-          🔍
-        </button>
-        <button className="floating-button menu-fab" onClick={toggleMenu}>
-          ☰
-        </button>
-      </nav>
+      {isFloatingNavVisible && (
+        <nav className="floating-nav" style={{ zIndex: 10 }}>
+          <button className="floating-button theme-fab" onClick={toggleTheme}>
+            {theme === 'light' ? '🌙' : '☀️'}
+          </button>
+          <button className="floating-button search-fab" onClick={toggleSearch}>
+            🔍
+          </button>
+          <button className="floating-button menu-fab" onClick={toggleMenu}>
+            ☰
+          </button>
+        </nav>
+      )}
 
       {/* 메뉴가 열려 있을 때만 외부 레이어 보이게 */}
       {isOpen && (
