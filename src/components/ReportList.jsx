@@ -102,6 +102,8 @@ function ReportList({ searchQuery }) {
     setReports({});
     setOffset(0);
     setHasMore(true); // Ensure hasMore is true for a fresh start
+    setDateToggles({});
+    setFirmToggles({});
   }, [searchQuery, location.pathname]); // Only trigger on search query or path changes
 
   // 최초 로딩 또는 초기화 후 offset이 0일 때 API 호출
