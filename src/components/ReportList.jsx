@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import ShareMenu from './ShareMenu';
 import './ReportList.css'; // Assuming you have a CSS file for styles
 
 function ReportList({ searchQuery }) {
@@ -11,6 +12,11 @@ function ReportList({ searchQuery }) {
   const [isLoading, setIsLoading] = useState(false);
   const [dateToggles, setDateToggles] = useState({});
   const [firmToggles, setFirmToggles] = useState({});
+  
+  // 공유 메뉴 상태
+  const [isShareOpen, setIsShareOpen] = useState(false);
+  const [selectedReport, setSelectedReport] = useState(null);
+  const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
   const BASE_URL = import.meta.env.VITE_ORACLE_REST_API;
   const TABLE_NAME = import.meta.env.VITE_TABLE_NAME;
@@ -38,7 +44,7 @@ function ReportList({ searchQuery }) {
     }
 
     return `${apiUrl}?${params.toString()}`;
-  }, [offset, searchQuery, location.pathname]);
+  }, [offset, searchQuery, location.pathname, BASE_URL, TABLE_NAME]);
 
   const mergeReports = useCallback((prev, newItems) => {
     const updated = { ...prev };
@@ -64,14 +70,11 @@ function ReportList({ searchQuery }) {
   }, []);
 
   const fetchReports = useCallback(async (reset = false) => {
-    // When reset is true, we want to fetch regardless of current hasMore state
-    // Otherwise, only fetch if hasMore is true
     if (!hasMore && !reset) return;
 
     setIsLoading(true);
 
     const scrollContainer = document.getElementById('report-container');
-    const prevScrollHeight = scrollContainer?.scrollHeight || 0;
     const prevScrollTop = scrollContainer?.scrollTop || 0;
 
     try {
@@ -94,19 +97,17 @@ function ReportList({ searchQuery }) {
       }, 0);
       setIsLoading(false);
     }
-  }, [hasMore, buildApiUrl, mergeReports]); // hasMore is a dependency for subsequent fetches
+  }, [hasMore, buildApiUrl, mergeReports]);
 
-  // ✅ URL 변경(탭 전환)시 데이터 초기화
   useEffect(() => {
-    window.scrollTo(0, 0); // 페이지 상단으로 스크롤 이동
+    window.scrollTo(0, 0);
     setReports({});
     setOffset(0);
-    setHasMore(true); // Ensure hasMore is true for a fresh start
+    setHasMore(true);
     setDateToggles({});
     setFirmToggles({});
-  }, [searchQuery, location.pathname]); // Only trigger on search query or path changes
+  }, [searchQuery, location.pathname]);
 
-  // 최초 로딩 또는 초기화 후 offset이 0일 때 API 호출
   useEffect(() => {
     if (offset === 0 && !isLoading) {
       fetchReports();
@@ -125,8 +126,6 @@ function ReportList({ searchQuery }) {
       }
     }
   }, [dateToggles, reports, hasMore, isLoading, fetchReports]);
-
-  
 
   const toggleDate = (date) => {
     setDateToggles(prev => ({ ...prev, [date]: !prev[date] }));
@@ -170,10 +169,31 @@ function ReportList({ searchQuery }) {
                       <div className={`report-wrapper ${firmToggles[date]?.[firm] ? 'collapsed' : ''}`}>
                         {firmReports.map(({ id, title, writer, link }) => (
                           <div className="report" key={id}>
-                            <a href={link} target="_blank" rel="noopener noreferrer">
-                              {title}
-                            </a>
-                            <p>작성자: {writer}</p>
+                            <div className="report-content">
+                              <a href={link} target="_blank" rel="noopener noreferrer">
+                                {title}
+                              </a>
+                              <p>작성자: {writer}</p>
+                            </div>
+                            <button 
+                              className="share-button" 
+                              onClick={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const shareUrl = `${window.location.origin}/share?id=${id}`;
+                                
+                                setMenuPosition({ 
+                                  top: rect.bottom + window.scrollY, 
+                                  left: rect.left + rect.width / 2 
+                                });
+                                setSelectedReport({ title, firm, shareUrl, writer });
+                                setIsShareOpen(true);
+                              }}
+                              title="공유하기"
+                            >
+                              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                              </svg>
+                            </button>
                           </div>
                         ))}
                       </div>
@@ -186,6 +206,13 @@ function ReportList({ searchQuery }) {
         )}
         {isLoading && hasMore && <div className="loading-overlay">로딩 중...</div>}
       </div>
+
+      <ShareMenu 
+        isOpen={isShareOpen} 
+        onClose={() => setIsShareOpen(false)} 
+        reportData={selectedReport}
+        position={menuPosition}
+      />
     </div>
   );
 }
