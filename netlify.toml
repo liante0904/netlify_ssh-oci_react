@@ -3,6 +3,11 @@
   publish = "dist"
 
 [[redirects]]
+  from = "/share-proxy/*"
+  to = "/.netlify/functions/proxy"
+  status = 200
+
+[[redirects]]
   from = "/share"
   to = "/.netlify/functions/share"
   status = 200

@@ -29,6 +29,13 @@ export const handler = async (event) => {
     const title = report.article_title || '증권사 리포트';
     const company = report.firm_nm || '증권사';
     const pdfUrl = report.telegram_url || report.download_url || report.attach_url || SITE_URL;
+
+    // DS투자증권 등 레퍼러 체크하는 도메인 처리
+    let finalRedirectUrl = pdfUrl;
+    if (pdfUrl.includes('ds-sec.co.kr')) {
+      const fileName = `[${company}] ${title}.pdf`;
+      finalRedirectUrl = `${SITE_URL}/share-proxy/report.pdf?url=${encodeURIComponent(pdfUrl)}&filename=${encodeURIComponent(fileName)}`;
+    }
     
     // 증권사 로고 매칭 (추후 실제 로고 URL로 보강 필요)
     // 현재는 기본 아이콘을 사용하거나, 사이트의 기본 로고를 사용합니다.
@@ -48,7 +55,7 @@ export const handler = async (event) => {
         
         <!-- 일반 사용자 리다이렉트 -->
         <script>
-          window.location.href = "${pdfUrl}";
+          window.location.href = "${finalRedirectUrl}";
         </script>
         <title>${title}</title>
       </head>

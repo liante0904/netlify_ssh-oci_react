@@ -167,35 +167,44 @@ function ReportList({ searchQuery }) {
                         {firm}
                       </div>
                       <div className={`report-wrapper ${firmToggles[date]?.[firm] ? 'collapsed' : ''}`}>
-                        {firmReports.map(({ id, title, writer, link }) => (
-                          <div className="report" key={id}>
-                            <div className="report-content">
-                              <a href={link} target="_blank" rel="noopener noreferrer">
-                                {title}
-                              </a>
-                              <p>작성자: {writer}</p>
+                        {firmReports.map(({ id, title, writer, link }) => {
+                          // DS투자증권 등 레퍼러 체크 도메인 처리
+                          const isDsSec = link && link.includes('ds-sec.co.kr');
+                          const fileName = `[${firm}] ${title}.pdf`;
+                          const finalLink = isDsSec 
+                            ? `${window.location.origin}/share-proxy/report.pdf?url=${encodeURIComponent(link)}&filename=${encodeURIComponent(fileName)}`
+                            : link;
+                          
+                          return (
+                            <div className="report" key={id}>
+                              <div className="report-content">
+                                <a href={finalLink} target="_blank" rel="noopener noreferrer">
+                                  {title}
+                                </a>
+                                <p>작성자: {writer}</p>
+                              </div>
+                              <button 
+                                className="share-button" 
+                                onClick={(e) => {
+                                  const rect = e.currentTarget.getBoundingClientRect();
+                                  const shareUrl = `${window.location.origin}/share?id=${id}`;
+                                  
+                                  setMenuPosition({ 
+                                    top: rect.bottom + window.scrollY, 
+                                    left: rect.left + rect.width / 2 
+                                  });
+                                  setSelectedReport({ title, firm, shareUrl, writer });
+                                  setIsShareOpen(true);
+                                }}
+                                title="공유하기"
+                              >
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                                </svg>
+                              </button>
                             </div>
-                            <button 
-                              className="share-button" 
-                              onClick={(e) => {
-                                const rect = e.currentTarget.getBoundingClientRect();
-                                const shareUrl = `${window.location.origin}/share?id=${id}`;
-                                
-                                setMenuPosition({ 
-                                  top: rect.bottom + window.scrollY, 
-                                  left: rect.left + rect.width / 2 
-                                });
-                                setSelectedReport({ title, firm, shareUrl, writer });
-                                setIsShareOpen(true);
-                              }}
-                              title="공유하기"
-                            >
-                              <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-                              </svg>
-                            </button>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
