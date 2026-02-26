@@ -90,18 +90,74 @@ body {
 
 .loading-overlay {
   position: fixed;
-  top: 50%;
+  top: 50%; /* 기본: 중앙 정렬 */
   left: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
-  padding: 20px;
-  font-size: 1.5em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 30px;
   font-weight: bold;
-  color: var(--loading-text-color);
-  background-color: var(--loading-background-color);
-  border: 1px solid var(--loading-border-color);
-  border-radius: 8px;
-  z-index: 1000;
+  font-size: 0.9em;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  z-index: 2000;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+/* 모바일에서 검색 로딩 시에만 상단으로 이동 */
+@media (max-width: 1023px) {
+  .loading-overlay.search-loading {
+    top: 20px;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* 토스트 메시지 기본 스타일 */
+.toast-container {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background-color: #333;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 25px;
+  font-size: 0.9em;
+  z-index: 3000;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  opacity: 0;
+  pointer-events: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.toast-container.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* 회전하는 스피너 추가 */
+.loading-overlay::before {
+  content: '';
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: loading-spin 0.8s infinite linear;
+}
+
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* 기존 바 애니메이션 제거 */
+@keyframes loading-bar {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .container {

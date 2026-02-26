@@ -6,9 +6,18 @@ import CompanySelect from './CompanySelect';
 function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('title');
+  const [toast, setToast] = useState({ visible: false, message: '' });
   const [searchParams, setSearchParams] = useSearchParams();
   const inputRef = useRef(null);
   const isInitialMount = useRef(true);
+
+  // 토스트 도우미
+  const showToast = useCallback((message) => {
+    setToast({ visible: true, message });
+    setTimeout(() => {
+      setToast({ visible: false, message: '' });
+    }, 2000);
+  }, []);
 
   // 오버레이 열릴 때 상태 복원
   useEffect(() => {
@@ -38,7 +47,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   const handleSearch = useCallback(() => {
     const trimmedQuery = query.trim();
     if (!trimmedQuery && category !== 'company') {
-      alert('검색어를 입력해주세요.');
+      showToast('검색어를 입력해주세요.');
       return;
     }
 
@@ -46,7 +55,7 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
     setSearchParams({ q: trimmedQuery, category });
     onSearch({ query: trimmedQuery, category });
     // toggleSearch() 제거: 검색 후 오버레이 유지
-  }, [query, category, onSearch, setSearchParams]);
+  }, [query, category, onSearch, setSearchParams, showToast]);
 
   const handleKeyDown = useCallback(
     (e) => {
@@ -99,44 +108,51 @@ function SearchOverlay({ isOpen, toggleSearch, onSearch }) {
   }
 
   return (
-    <div className={`search-overlay ${isOpen ? 'visible' : ''}`} id="searchOverlay" onClick={toggleSearch}>
-      <div className="search-container" onClick={(e) => e.stopPropagation()}>
-        <select
-          id="searchCategory"
-          className="search-category"
-          value={category}
-          onChange={handleCategoryChange}
-        >
-          <option value="title">제목</option>
-          <option value="writer">작성자</option>
-          <option value="company">증권사</option>
-        </select>
-
-        {category === 'company' ? (
-          <CompanySelect value={query} onChange={handleCompanyChange} />
-        ) : (
-          <input
-            type="text"
-            id="searchInput"
-            placeholder="검색어 입력..."
-            className="search-input"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyDown}
-            ref={inputRef}
-          />
-        )}
-
-        {category !== 'company' && (
-          <button
-            className="search-submit"
-            onClick={() => handleButtonClick('search')}
+    <>
+      <div className={`search-overlay ${isOpen ? 'visible' : ''}`} id="searchOverlay" onClick={toggleSearch}>
+        <div className="search-container" onClick={(e) => e.stopPropagation()}>
+          <select
+            id="searchCategory"
+            className="search-category"
+            value={category}
+            onChange={handleCategoryChange}
           >
-            검색
-          </button>
-        )}
+            <option value="title">제목</option>
+            <option value="writer">작성자</option>
+            <option value="company">증권사</option>
+          </select>
+
+          {category === 'company' ? (
+            <CompanySelect value={query} onChange={handleCompanyChange} />
+          ) : (
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="검색어 입력..."
+              className="search-input"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyDown={handleKeyDown}
+              ref={inputRef}
+            />
+          )}
+
+          {category !== 'company' && (
+            <button
+              className="search-submit"
+              onClick={() => handleButtonClick('search')}
+            >
+              검색
+            </button>
+          )}
+        </div>
       </div>
-    </div>
+      
+      {/* 토스트 알림 */}
+      <div className={`toast-container ${toast.visible ? 'visible' : ''}`}>
+        {toast.message}
+      </div>
+    </>
   );
 }
 

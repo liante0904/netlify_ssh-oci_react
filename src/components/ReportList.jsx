@@ -148,11 +148,13 @@ function ReportList({ searchQuery }) {
 
   const sortedDates = Object.keys(reports).sort((a, b) => new Date(b) - new Date(a));
 
+  const isSearchActive = !!(searchQuery.query || searchQuery.category === 'company');
+
   return (
     <div className="report-list-wrapper">
       <div className="container" id="report-container">
         {offset === 0 && isLoading ? (
-          <div className="loading-overlay">로딩 중...</div>
+          <div className={`loading-overlay ${isSearchActive ? 'search-loading' : ''}`}>로딩 중...</div>
         ) : sortedDates.length === 0 ? null : (
           <InfiniteScroll
             dataLength={offset}
@@ -218,7 +220,7 @@ function ReportList({ searchQuery }) {
             ))}
           </InfiniteScroll>
         )}
-        {isLoading && hasMore && <div className="loading-overlay">로딩 중...</div>}
+        {isLoading && hasMore && <div className={`loading-overlay ${isSearchActive ? 'search-loading' : ''}`}>로딩 중...</div>}
       </div>
 
       <ShareMenu 
