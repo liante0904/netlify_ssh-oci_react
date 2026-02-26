@@ -72,6 +72,17 @@ body {
 .menu-title {
   font-size: 1.2em; font-weight: bold; color: var(--primary-color); margin-bottom: 10px;
 }
+.main-content {
+  /* 헤더 높이가 계산되기 전 기본 여백 확보 (Layout Shift 방지) */
+  padding-top: 110px; 
+}
+
+@media (min-width: 1024px) {
+  .main-content {
+    padding-top: 130px; /* 데스크탑은 좀 더 넓게 */
+  }
+}
+
 .report-list-wrapper {
   position: relative;
   min-height: 100vh; /* 콘텐츠가 너무 작아도 스크롤이 유지되도록 */
