@@ -47,6 +47,7 @@ function ReportList({ searchQuery }) {
   }, [offset, searchQuery, location.pathname, BASE_URL, TABLE_NAME]);
 
   const mergeReports = useCallback((prev, newItems) => {
+    // 1. 전체 상태 깊은 복사 (날짜별 객체까지)
     const updated = { ...prev };
 
     for (const item of newItems) {
@@ -59,11 +60,24 @@ function ReportList({ searchQuery }) {
         link: item.telegram_url || item.download_url || item.attach_url,
       };
 
-      if (!updated[date]) updated[date] = {};
-      if (!updated[date][firm]) updated[date][firm] = [];
+      // 2. 해당 날짜 객체 복사
+      if (!updated[date]) {
+        updated[date] = {};
+      } else {
+        updated[date] = { ...updated[date] };
+      }
+
+      // 3. 해당 증권사 배열 복사
+      if (!updated[date][firm]) {
+        updated[date][firm] = [];
+      } else {
+        updated[date][firm] = [...updated[date][firm]];
+      }
 
       const exists = updated[date][firm].some((r) => r.id === report.id);
-      if (!exists) updated[date][firm].push(report);
+      if (!exists) {
+        updated[date][firm].push(report);
+      }
     }
 
     return updated;
@@ -73,9 +87,6 @@ function ReportList({ searchQuery }) {
     if (!hasMore && !reset) return;
 
     setIsLoading(true);
-
-    const scrollContainer = document.getElementById('report-container');
-    const prevScrollTop = scrollContainer?.scrollTop || 0;
 
     try {
       const res = await fetch(buildApiUrl());
@@ -89,12 +100,6 @@ function ReportList({ searchQuery }) {
     } catch (err) {
       console.error('❌ Error fetching reports:', err);
     } finally {
-      setTimeout(() => {
-        const newScrollHeight = scrollContainer?.scrollHeight || 0;
-        if (scrollContainer) {
-          scrollContainer.scrollTop = prevScrollTop + (newScrollHeight - prevScrollTop);
-        }
-      }, 0);
       setIsLoading(false);
     }
   }, [hasMore, buildApiUrl, mergeReports]);

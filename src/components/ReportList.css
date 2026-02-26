@@ -31,15 +31,16 @@
 }
 
 .company-group-wrapper, .report-wrapper {
-  max-height: 10000px; /* A large enough value */
-  overflow: hidden;
+  max-height: 100000px; /* 충분히 큰 값으로 상향 */
+  overflow: visible;    /* 펼쳐진 상태에서는 내용이 잘리지 않도록 */
   transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
   opacity: 1;
 }
 
 .collapsed {
-  max-height: 0;
-  opacity: 0;
+  max-height: 0 !important;
+  opacity: 0 !important;
+  overflow: hidden !important; /* 닫혔을 때만 내용 숨김 */
 }
 
 .report { 
