@@ -197,7 +197,7 @@ function ReportList({ searchQuery }) {
                                   const shareUrl = `${window.location.origin}/share?id=${id}`;
                                   
                                   setMenuPosition({ 
-                                    top: rect.bottom + window.scrollY, 
+                                    top: rect.bottom, 
                                     left: rect.left + rect.width / 2 
                                   });
                                   setSelectedReport({ title, firm, shareUrl, writer });
