@@ -72,7 +72,6 @@ function CompanySelect({ value, onChange }) {
                 placeholder="찾으시는 증권사를 입력하세요" 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                autoFocus
               />
             </div>
           </div>
