@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import ShareMenu from './ShareMenu';
 import './ReportList.css'; // Assuming you have a CSS file for styles
 
@@ -12,6 +14,7 @@ function ReportList({ searchQuery }) {
   const [isLoading, setIsLoading] = useState(false);
   const [dateToggles, setDateToggles] = useState({});
   const [firmToggles, setFirmToggles] = useState({});
+  const [summaryToggles, setSummaryToggles] = useState({});
   
   // 공유 메뉴 상태
   const [isShareOpen, setIsShareOpen] = useState(false);
@@ -58,6 +61,7 @@ function ReportList({ searchQuery }) {
         title: item.article_title,
         writer: item.writer,
         link: item.telegram_url || item.download_url || item.attach_url,
+        gemini_summary: item.gemini_summary,
       };
 
       // 2. 해당 날짜 객체 복사
@@ -111,6 +115,7 @@ function ReportList({ searchQuery }) {
     setHasMore(true);
     setDateToggles({});
     setFirmToggles({});
+    setSummaryToggles({});
   }, [searchQuery, location.pathname]);
 
   useEffect(() => {
@@ -146,6 +151,10 @@ function ReportList({ searchQuery }) {
     }));
   };
 
+  const toggleSummary = (id) => {
+    setSummaryToggles(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   const sortedDates = Object.keys(reports).sort((a, b) => new Date(b) - new Date(a));
 
   const isSearchActive = !!(searchQuery.query || searchQuery.category === 'company');
@@ -174,7 +183,7 @@ function ReportList({ searchQuery }) {
                         {firm}
                       </div>
                       <div className={`report-wrapper ${firmToggles[date]?.[firm] ? 'collapsed' : ''}`}>
-                        {firmReports.map(({ id, title, writer, link }) => {
+                        {firmReports.map(({ id, title, writer, link, gemini_summary }) => {
                           // DS투자증권 등 레퍼러 체크 도메인 처리
                           const isDsSec = link && link.includes('ds-sec.co.kr');
                           const fileName = `[${firm}] ${title}.pdf`;
@@ -182,33 +191,73 @@ function ReportList({ searchQuery }) {
                             ? `${window.location.origin}/share-proxy/report.pdf?url=${encodeURIComponent(link)}&filename=${encodeURIComponent(fileName)}`
                             : link;
                           
+                          const hasSummary = gemini_summary && gemini_summary.trim() !== "" && gemini_summary.trim() !== " ";
+                          const isSummaryExpanded = summaryToggles[id];
+
                           return (
-                            <div className="report" key={id}>
-                              <div className="report-content">
-                                <a href={finalLink} target="_blank" rel="noopener noreferrer">
-                                  {title}
-                                </a>
-                                <p>작성자: {writer}</p>
+                            <div className={`report-container-item ${hasSummary ? 'has-summary' : ''}`} key={id}>
+                              <div className="report">
+                                <div className="report-content">
+                                  <div className="report-header">
+                                    <a href={finalLink} target="_blank" rel="noopener noreferrer">
+                                      {title}
+                                    </a>
+                                    {hasSummary && (
+                                      <span className="ai-badge" onClick={() => toggleSummary(id)}>
+                                        AI 요약
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p>작성자: {writer}</p>
+                                  {hasSummary && (
+                                    <button 
+                                      className={`summary-toggle-btn ${isSummaryExpanded ? 'active' : ''}`}
+                                      onClick={() => toggleSummary(id)}
+                                    >
+                                      {isSummaryExpanded ? '요약 닫기' : 'AI 요약 보기'}
+                                      <svg className="chevron-icon" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                        <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+                                      </svg>
+                                    </button>
+                                  )}
+                                </div>
+                                <button 
+                                  className="share-button" 
+                                  onClick={(e) => {
+                                    const rect = e.currentTarget.getBoundingClientRect();
+                                    const shareUrl = `${window.location.origin}/share?id=${id}`;
+                                    
+                                    setMenuPosition({ 
+                                      top: rect.bottom, 
+                                      left: rect.left + rect.width / 2 
+                                    });
+                                    setSelectedReport({ title, firm, shareUrl, writer });
+                                    setIsShareOpen(true);
+                                  }}
+                                  title="공유하기"
+                                >
+                                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
+                                  </svg>
+                                </button>
                               </div>
-                              <button 
-                                className="share-button" 
-                                onClick={(e) => {
-                                  const rect = e.currentTarget.getBoundingClientRect();
-                                  const shareUrl = `${window.location.origin}/share?id=${id}`;
-                                  
-                                  setMenuPosition({ 
-                                    top: rect.bottom, 
-                                    left: rect.left + rect.width / 2 
-                                  });
-                                  setSelectedReport({ title, firm, shareUrl, writer });
-                                  setIsShareOpen(true);
-                                }}
-                                title="공유하기"
-                              >
-                                <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                  <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/>
-                                </svg>
-                              </button>
+                              {hasSummary && (
+                                <div className={`summary-content ${isSummaryExpanded ? 'expanded' : 'collapsed'}`}>
+                                  <div className="summary-inner">
+                                    <div className="summary-title-row">
+                                      <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--primary-color)" style={{marginRight: '6px'}}>
+                                        <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
+                                      </svg>
+                                      AI 핵심 요약
+                                    </div>
+                                    <div className="summary-text">
+                                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {gemini_summary}
+                                      </ReactMarkdown>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           );
                         })}
