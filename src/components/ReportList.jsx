@@ -54,7 +54,7 @@ function ReportList({ searchQuery }) {
     const updated = { ...prev };
 
     for (const item of newItems) {
-      const date = item.save_time.split('T')[0];
+      const date = item.reg_dt;
       const firm = item.firm_nm;
       const report = {
         id: item.report_id,
