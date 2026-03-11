@@ -43,7 +43,7 @@
 
 .menu-panel.open {
   opacity: 1;
-  transform: translateX(0);
+  transform: none; /* translateX(0) 대신 none을 사용해야 자식의 position: fixed가 전체 화면을 기준으로 동작합니다 */
 }
 
 /* 메뉴 타이틀 스타일 */
