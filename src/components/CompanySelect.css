@@ -35,12 +35,12 @@
   right: 0;
   bottom: 0;
   background-color: white;
-  z-index: 5000;
+  z-index: 9999;
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   /* iOS PWA Safe Area 대응 */
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: env(safe-area-inset-top, 20px);
 }
 
 .grid-overlay-header {
@@ -177,16 +177,29 @@
 
 @media (min-width: 768px) {
   .firm-checkerboard {
-    grid-template-columns: repeat(6, 1fr);
-    max-width: 800px;
+    grid-template-columns: repeat(5, 1fr);
+    max-width: 850px;
     margin: 0 auto;
+    gap: 16px;
   }
   
   .grid-overlay-header {
-    max-width: 800px;
+    max-width: 850px;
     margin: 0 auto;
     width: 100%;
     border-bottom: none;
+    padding: 30px 20px 20px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .firm-checkerboard {
+    grid-template-columns: repeat(6, 1fr);
+    max-width: 1000px;
+  }
+  
+  .grid-overlay-header {
+    max-width: 1000px;
   }
 }
 
