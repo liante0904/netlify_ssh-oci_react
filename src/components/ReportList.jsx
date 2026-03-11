@@ -50,8 +50,37 @@ function ReportList({ searchQuery }) {
     // 1. 전체 상태 깊은 복사 (날짜별 객체까지)
     const updated = { ...prev };
 
+    // Oracle 날짜 포맷(예: 10-MAR-26)을 YYYY-MM-DD로 변환하는 헬퍼 함수
+    const parseOracleDate = (dateStr) => {
+      if (!dateStr || dateStr === ' ') return 'Unknown';
+      
+      // 이미 ISO 형식(YYYY-MM-DD...)인 경우
+      if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
+        return dateStr.split('T')[0];
+      }
+
+      // DD-MON-YY 형식 처리 (예: 10-MAR-26)
+      const months = {
+        JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
+        JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12'
+      };
+      
+      const parts = dateStr.split('-');
+      if (parts.length === 3) {
+        const day = parts[0].padStart(2, '0');
+        const month = months[parts[1].toUpperCase()] || '01';
+        const year = '20' + parts[2]; // 2000년대 가정
+        return `${year}-${month}-${day}`;
+      }
+      
+      return dateStr.split('T')[0];
+    };
+
     for (const item of newItems) {
-      const date = item.save_time.split('T')[0];
+      // reg_dt가 있으면 우선 사용, 없으면 save_time 사용
+      const rawDate = item.reg_dt || item.save_time;
+      const date = parseOracleDate(rawDate);
+      
       const firm = item.firm_nm;
       const report = {
         id: item.report_id,
