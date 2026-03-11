@@ -53,30 +53,38 @@ function ReportList({ searchQuery }) {
     // 1. 전체 상태 깊은 복사 (날짜별 객체까지)
     const updated = { ...prev };
 
-    // Oracle 날짜 포맷(예: 10-MAR-26)을 YYYY-MM-DD로 변환하는 헬퍼 함수
+    // Oracle 날짜 포맷을 YYYY-MM-DD로 변환하는 헬퍼 함수
     const parseOracleDate = (dateStr) => {
-      if (!dateStr || dateStr === ' ') return 'Unknown';
+      if (!dateStr || dateStr === ' ' || dateStr === null) return 'Unknown';
       
-      // 이미 ISO 형식(YYYY-MM-DD...)인 경우
-      if (dateStr.includes('-') && dateStr.split('-')[0].length === 4) {
-        return dateStr.split('T')[0];
+      // 시간 부분 제거 (T 혹은 공백 기준)
+      const dateOnly = dateStr.toString().split('T')[0].split(' ')[0].trim();
+
+      // 1. YYYYMMDD 형식 처리 (예: 20260310)
+      if (/^\d{8}$/.test(dateOnly)) {
+        return `${dateOnly.substring(0, 4)}-${dateOnly.substring(4, 6)}-${dateOnly.substring(6, 8)}`;
       }
 
-      // DD-MON-YY 형식 처리 (예: 10-MAR-26)
+      // 2. DD-MON-YY 형식 처리 (예: 10-MAR-26)
       const months = {
         JAN: '01', FEB: '02', MAR: '03', APR: '04', MAY: '05', JUN: '06',
         JUL: '07', AUG: '08', SEP: '09', OCT: '10', NOV: '11', DEC: '12'
       };
       
-      const parts = dateStr.split('-');
-      if (parts.length === 3) {
+      const parts = dateOnly.split('-');
+      if (parts.length === 3 && isNaN(parts[1])) {
         const day = parts[0].padStart(2, '0');
         const month = months[parts[1].toUpperCase()] || '01';
-        const year = '20' + parts[2]; // 2000년대 가정
+        const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
         return `${year}-${month}-${day}`;
       }
+
+      // 3. 이미 YYYY-MM-DD 형식인 경우
+      if (/^\d{4}-\d{2}-\d{2}/.test(dateOnly)) {
+        return dateOnly;
+      }
       
-      return dateStr.split('T')[0];
+      return dateOnly;
     };
 
     for (const item of newItems) {
@@ -184,7 +192,8 @@ function ReportList({ searchQuery }) {
     setSummaryToggles(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const sortedDates = Object.keys(reports).sort((a, b) => new Date(b) - new Date(a));
+  // 문자열 비교를 통해 확실한 내림차순(최신순) 정렬 보장
+  const sortedDates = Object.keys(reports).sort((a, b) => b.localeCompare(a));
 
   const isSearchActive = !!(searchQuery.query || searchQuery.category === 'company');
 
