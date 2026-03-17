@@ -54,8 +54,27 @@ function ReportList({ searchQuery }) {
     const updated = { ...prev };
 
     for (const item of newItems) {
-      const date = item.reg_dt;
-      const firm = item.firm_nm;
+      let rawDate = item.reg_dt ? item.reg_dt.trim() : 'Unknown';
+      let date = rawDate;
+      
+      // YYYYMMDD -> YYYY-MM-DD
+      if (rawDate.length === 8 && /^\d+$/.test(rawDate)) {
+        date = `${rawDate.substring(0, 4)}-${rawDate.substring(4, 6)}-${rawDate.substring(6, 8)}`;
+      } else {
+        // YYYY-MM-DD HH:mm:ss 또는 ISO8601 형식에서 날짜만 추출
+        const match = rawDate.match(/^(\d{4}-\d{2}-\d{2})/);
+        if (match) {
+          date = match[1];
+        } else {
+          // 기타 형식 (예: 2024.03.17)에서 날짜 추출 시도
+          const altMatch = rawDate.match(/^(\d{4}[./]\d{2}[./]\d{2})/);
+          if (altMatch) {
+            date = altMatch[1].replace(/\./g, '-').replace(/\//g, '-');
+          }
+        }
+      }
+      
+      const firm = item.firm_nm ? item.firm_nm.trim() : 'Unknown';
       const report = {
         id: item.report_id,
         title: item.article_title,
@@ -155,7 +174,7 @@ function ReportList({ searchQuery }) {
     setSummaryToggles(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const sortedDates = Object.keys(reports).sort((a, b) => new Date(b) - new Date(a));
+  const sortedDates = Object.keys(reports).sort((a, b) => b.localeCompare(a));
 
   const isSearchActive = !!(searchQuery.query || searchQuery.category === 'company');
 
