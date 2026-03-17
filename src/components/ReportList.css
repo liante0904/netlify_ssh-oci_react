@@ -134,7 +134,7 @@
 }
 
 .summary-content.expanded {
-  max-height: 1000px;
+  max-height: 5000px; /* 대폭 상향하여 긴 요약문도 잘리지 않게 함 */
   opacity: 1;
   padding-bottom: 8px;
 }
