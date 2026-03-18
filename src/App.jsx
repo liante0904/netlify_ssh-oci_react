@@ -75,21 +75,22 @@ function App() {
   }, []);
 
   useEffect(() => {
+    const headerNode = headerRef.current;
     const updateHeaderHeight = () => {
-      if (headerRef.current) {
-        setHeaderHeight(headerRef.current.offsetHeight);
+      if (headerNode) {
+        setHeaderHeight(headerNode.offsetHeight);
       }
     };
 
     updateHeaderHeight();
     const resizeObserver = new ResizeObserver(updateHeaderHeight);
-    if (headerRef.current) {
-      resizeObserver.observe(headerRef.current);
+    if (headerNode) {
+      resizeObserver.observe(headerNode);
     }
 
     return () => {
-      if (headerRef.current) {
-        resizeObserver.unobserve(headerRef.current);
+      if (headerNode) {
+        resizeObserver.unobserve(headerNode);
       }
     };
   }, []);
@@ -133,7 +134,6 @@ function App() {
       <BottomNav 
         isNavVisible={isNavVisible} 
         toggleSearch={toggleSearch} 
-        toggleMenu={toggleMenu} 
         toggleFloatingNav={toggleFloatingNav}
       />
       <FloatingMenu

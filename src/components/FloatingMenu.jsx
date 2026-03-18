@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import './FloatingMenu.css';
 
 function FloatingMenu({ isOpen, toggleMenu, toggleSearch, theme, toggleTheme, isFloatingNavVisible }) {

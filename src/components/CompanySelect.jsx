@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import './CompanySelect.css';
 
 const firm_names = [
@@ -19,7 +19,6 @@ const firm_colors = {
 function CompanySelect({ value, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const overlayRef = useRef(null);
 
   const selectedName = value !== "" ? firm_names[value] : "증권사 필터";
 

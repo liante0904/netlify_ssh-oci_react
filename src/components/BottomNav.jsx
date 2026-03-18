@@ -1,6 +1,6 @@
 import './BottomNav.css';
 
-function BottomNav({ isNavVisible, toggleSearch, toggleMenu, toggleFloatingNav }) {
+function BottomNav({ isNavVisible, toggleSearch, toggleFloatingNav }) {
   return (
     <nav className={`bottom-nav ${isNavVisible ? '' : 'hidden'}`}>
       <button className="nav-button" onClick={() => (window.location.href = '/')}>
