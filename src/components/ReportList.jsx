@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import ReactMarkdown from 'react-markdown';
@@ -16,6 +16,8 @@ function ReportList({ searchQuery }) {
   const [firmToggles, setFirmToggles] = useState({});
   const [summaryToggles, setSummaryToggles] = useState({});
   
+  const abortControllerRef = useRef(null);
+
   // 공유 메뉴 상태
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -106,26 +108,37 @@ function ReportList({ searchQuery }) {
     return updated;
   }, []);
 
-  const fetchReports = useCallback(async (reset = false) => {
-    if (!hasMore && !reset) return;
+  const fetchReports = useCallback(async (isInitial = false) => {
+    if (!hasMore && !isInitial) return;
+    if (isLoading && !isInitial) return;
+
+    // 새로운 요청 시 이전 요청 취소 (레이스 컨디션 방지)
+    if (isInitial && abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    if (isInitial) abortControllerRef.current = controller;
 
     setIsLoading(true);
 
     try {
-      const res = await fetch(buildApiUrl());
+      const res = await fetch(buildApiUrl(), { signal: controller.signal });
       if (!res.ok) throw new Error('API 요청 실패');
 
       const { items, hasMore: apiHasMore } = await res.json();
 
-      setReports((prev) => mergeReports(prev, items));
-      setOffset((prev) => prev + items.length);
+      setReports((prev) => mergeReports(isInitial ? {} : prev, items));
+      setOffset((prev) => (isInitial ? items.length : prev + items.length));
       setHasMore(apiHasMore);
     } catch (err) {
+      if (err.name === 'AbortError') return;
       console.error('❌ Error fetching reports:', err);
     } finally {
-      setIsLoading(false);
+      if (!isInitial || abortControllerRef.current === controller) {
+        setIsLoading(false);
+      }
     }
-  }, [hasMore, buildApiUrl, mergeReports]);
+  }, [hasMore, isLoading, buildApiUrl, mergeReports]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -138,10 +151,10 @@ function ReportList({ searchQuery }) {
   }, [searchQuery, location.pathname]);
 
   useEffect(() => {
-    if (offset === 0 && !isLoading) {
-      fetchReports();
+    if (offset === 0) {
+      fetchReports(true);
     }
-  }, [offset, isLoading, fetchReports]);
+  }, [offset, fetchReports]);
 
   useEffect(() => {
     const reportDates = Object.keys(reports);
