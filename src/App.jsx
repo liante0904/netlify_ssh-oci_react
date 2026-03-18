@@ -14,7 +14,6 @@ function App() {
   const [searchQuery, setSearchQuery] = useState({ query: '', category: '' });
   const [isNavVisible, setIsNavVisible] = useState(true);
   const [isFloatingNavVisible, setIsFloatingNavVisible] = useState(true);
-  const [headerHeight, setHeaderHeight] = useState(0);
   const lastScrollY = useRef(window.scrollY);
   const headerRef = useRef(null);
 
@@ -78,7 +77,7 @@ function App() {
     const headerNode = headerRef.current;
     const updateHeaderHeight = () => {
       if (headerNode) {
-        setHeaderHeight(headerNode.offsetHeight);
+        document.documentElement.style.setProperty('--header-height', `${headerNode.offsetHeight}px`);
       }
     };
 
@@ -119,7 +118,7 @@ function App() {
         onSearch={handleSearch}
       />
       
-      <main className="main-content" style={{ paddingTop: headerHeight }}>
+      <main className="main-content">
         <Routes>
           <Route path="/" element={<ReportList searchQuery={searchQuery} />} />
           <Route path="/global" element={<ReportList searchQuery={searchQuery} />} />

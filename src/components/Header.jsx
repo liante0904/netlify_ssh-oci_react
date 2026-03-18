@@ -45,28 +45,35 @@ const Header = forwardRef(({
   ];
 
   const handleButtonClick = (buttonName) => {
-    if (isTopMenuOpen) {
-      toggleMenuTop();
-    }
-    if (isFloatingMenuOpen) {
-      toggleFloatingMenu();
-    }
-    onSearch({ query: '', category: '' }); // ✅ 검색 상태 초기화
+    // 1. 공통 메뉴/검색 상태 초기화
+    if (isTopMenuOpen) toggleMenuTop();
+    if (isFloatingMenuOpen) toggleFloatingMenu();
+    
+    // 2. 검색 상태 초기화 (검색 버튼 클릭 시에도 일단 초기화 후 활성화)
+    onSearch({ query: '', category: '' });
+    setIsSearchActive(buttonName === 'search');
+    
     if (buttonName !== 'search') {
-      setIsSearchActive(false);
       setQuery('');
       setSearchParams({}, { replace: true });
     }
-    if (buttonName === 'recent') {
-      navigate({ pathname: '/' });
-    } else if (buttonName === 'global') {
-      navigate({ pathname: '/global' });
-    } else if (buttonName === 'industry') {
-      navigate({ pathname: '/industry' });
-    } else if (buttonName === 'search') {
-      setIsSearchActive(true);
+
+    // 3. 경로 매핑 처리
+    const PATH_MAP = {
+      recent: '/',
+      global: '/global',
+      industry: '/industry',
+      search: '/'
+    };
+
+    const targetPath = PATH_MAP[buttonName];
+    if (targetPath) {
+      navigate({ pathname: targetPath });
+    }
+
+    // 4. 검색 버튼 전용 로직
+    if (buttonName === 'search') {
       setQuery('');
-      navigate({ pathname: '/' });
       toggleSearch();
     }
   };
