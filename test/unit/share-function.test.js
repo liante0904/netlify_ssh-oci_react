@@ -5,7 +5,7 @@
  *   node test/unit/share-function.test.js
  */
 
-import { buildReportSearchUrl } from '../../netlify/functions/share.js';
+import { buildReportSearchUrl, isSocialPreviewBot } from '../../netlify/functions/share.js';
 
 let passed = 0;
 let failed = 0;
@@ -69,6 +69,13 @@ assertEqual(
   'https://ssh-oci.duckdns.org/external/api/search/?report_id=abc%20123',
   'report_id is encoded'
 );
+
+console.log('\n--- share.js preview crawler detection ---');
+
+assertEqual(isSocialPreviewBot('facebookexternalhit/1.1'), true, 'Facebook crawler receives OG page');
+assertEqual(isSocialPreviewBot('TelegramBot (like TwitterBot)'), true, 'Telegram crawler receives OG page');
+assertEqual(isSocialPreviewBot('Mozilla/5.0 (Linux; Android 14; KAKAOTALK 25.7.3)'), false, 'Kakao in-app browser receives loading page');
+assertEqual(isSocialPreviewBot('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), false, 'mobile browser receives loading page');
 
 console.log(`\nResult: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

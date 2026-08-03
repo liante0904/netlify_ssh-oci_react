@@ -55,6 +55,13 @@ export function buildReportSearchUrl(reportId, env = process.env) {
   return `${reportApiUrl.replace(/\/$/, '')}/search/?report_id=${encodeURIComponent(reportId)}`;
 }
 
+// 카카오톡 인앱 브라우저 UA에도 `KAKAOTALK`가 들어간다. 이를 미리보기
+// 크롤러로 취급하면 로딩 화면을 그릴 기회 없이 PDF로 바로 이동한다.
+// 실제 링크 미리보기 크롤러만 OG 응답을 받도록 명시적인 봇 식별자만 사용한다.
+export function isSocialPreviewBot(userAgent = '') {
+  return /facebookexternalhit|facebot|twitterbot|slackbot|telegrambot|discordbot|linkedinbot|googlebot|bingbot|yandexbot|kakaotalk-scrap/i.test(userAgent);
+}
+
 export const handler = async (event) => {
   const { id, warmup } = event.queryStringParameters || {};
 
@@ -73,7 +80,7 @@ export const handler = async (event) => {
 
   // ★ 변경: 봇이 아닌 일반 사용자에게는 즉시 로딩 페이지를 반환하고,
   //   실제 데이터 처리는 비동기로 진행하여 리다이렉트
-  const isBot = /kakaotalk|telegram|facebook|twitter|slack|bot|crawler|spider/i.test(userAgent);
+  const isBot = isSocialPreviewBot(userAgent);
 
   if (!isBot) {
     // 일반 사용자: 즉시 로딩 페이지 반환 (스켈레톤 UI + 자동 리다이렉트)
@@ -277,40 +284,48 @@ function generateLoadingPage(reportId, requestOrigin) {
     <p class="loading-text">리포트를 불러오는 중입니다...</p>
   </div>
   <script>
-    // 페이지 로드 후 즉시 리다이렉트 시작
+    // 첫 화면이 실제로 한 프레임 이상 그려진 다음 조회를 시작한다.
+    // 모바일 WebView는 즉시 완료된 fetch의 navigation 때문에 스켈레톤을
+    // 페인트하기 전에 페이지를 교체할 수 있다.
     (function() {
       var id = "${reportId}";
       var origin = "${requestOrigin}";
       var apiUrl = origin + "/.netlify/functions/share-redirect?id=" + encodeURIComponent(id);
-      
-      // fetch로 실제 리다이렉트 URL을 받아서 이동
-      fetch(apiUrl)
-        .then(function(res) {
-          if (res.redirected) {
-            window.location.href = res.url;
-          } else if (res.ok) {
-            return res.text();
-          } else {
-            throw new Error('Failed to load report');
-          }
-        })
-        .then(function(body) {
-          // JSON 응답에서 URL 추출 시도
-          try {
-            var data = JSON.parse(body);
-            if (data.url) {
-              window.location.href = data.url;
+
+      function loadReport() {
+        // fetch로 실제 리다이렉트 URL을 받아서 이동
+        fetch(apiUrl)
+          .then(function(res) {
+            if (res.redirected) {
+              window.location.href = res.url;
+            } else if (res.ok) {
+              return res.text();
             } else {
-              document.querySelector('.loading-text').textContent = '리포트를 찾을 수 없습니다.';
+              throw new Error('Failed to load report');
             }
-          } catch(e) {
-            document.querySelector('.loading-text').textContent = '리포트 로딩 중 오류가 발생했습니다.';
-          }
-        })
-        .catch(function(err) {
-          document.querySelector('.loading-text').textContent = '네트워크 오류가 발생했습니다.';
-          console.error('Redirect fetch error:', err);
-        });
+          })
+          .then(function(body) {
+            // JSON 응답에서 URL 추출 시도
+            try {
+              var data = JSON.parse(body);
+              if (data.url) {
+                window.location.href = data.url;
+              } else {
+                document.querySelector('.loading-text').textContent = '리포트를 찾을 수 없습니다.';
+              }
+            } catch(e) {
+              document.querySelector('.loading-text').textContent = '리포트 로딩 중 오류가 발생했습니다.';
+            }
+          })
+          .catch(function(err) {
+            document.querySelector('.loading-text').textContent = '네트워크 오류가 발생했습니다.';
+            console.error('Redirect fetch error:', err);
+          });
+      }
+
+      requestAnimationFrame(function() {
+        requestAnimationFrame(loadReport);
+      });
     })();
   </script>
 </body>
