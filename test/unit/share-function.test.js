@@ -5,7 +5,7 @@
  *   node test/unit/share-function.test.js
  */
 
-import { buildReportSearchUrl, isSocialPreviewBot } from '../../netlify/functions/share.js';
+import { buildReportSearchUrl, isSocialPreviewBot, selectOriginalDocumentUrl } from '../../netlify/functions/share.js';
 
 let passed = 0;
 let failed = 0;
@@ -76,6 +76,17 @@ assertEqual(isSocialPreviewBot('facebookexternalhit/1.1'), true, 'Facebook crawl
 assertEqual(isSocialPreviewBot('TelegramBot (like TwitterBot)'), true, 'Telegram crawler receives OG page');
 assertEqual(isSocialPreviewBot('Mozilla/5.0 (Linux; Android 14; KAKAOTALK 25.7.3)'), false, 'Kakao in-app browser receives loading page');
 assertEqual(isSocialPreviewBot('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), false, 'mobile browser receives loading page');
+
+console.log('\n--- share.js DB Securities document selection ---');
+
+assertEqual(
+  selectOriginalDocumentUrl({
+    pdf_file_url: 'https://whub.dbsec.co.kr/streamdocs/v4/documents/example',
+    telegram_url: 'https://whub.dbsec.co.kr/pv/gate?q=valid-token',
+  }),
+  'https://whub.dbsec.co.kr/pv/gate?q=valid-token',
+  'DB Securities gate URL takes precedence over StreamDocs document URL'
+);
 
 console.log(`\nResult: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

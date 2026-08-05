@@ -36,6 +36,20 @@ function hasKnownReportApiPath(url) {
   }
 }
 
+function selectOriginalDocumentUrl(report = {}) {
+  const pdfUrl = report.pdf_file_url;
+  const telegramUrl = report.telegram_url;
+
+  // DB증권의 StreamDocs 직접 문서 URL은 인앱 브라우저에서 JSON 오류를 낼 수
+  // 있다. 같은 리포트에 저장된 pv/gate URL이 있으면 이를 공급사 진입점으로 쓴다.
+  if (/whub\.dbsec\.co\.kr\/streamdocs\//i.test(pdfUrl || '') && /whub\.dbsec\.co\.kr\/pv\/gate\?/i.test(telegramUrl || '')) {
+    return telegramUrl;
+  }
+
+  return [pdfUrl, telegramUrl, report.source_url]
+    .find(url => url && url.startsWith('http') && !url.includes('netlify.app'));
+}
+
 function buildReportSearchUrl(reportId, env = process.env) {
   const explicitReportApiUrl = env.VITE_REPORT_API_URL;
   const apiBaseUrl = (explicitReportApiUrl || env.VITE_API_URL || DEFAULT_API_BASE_URL).replace(/\/$/, '');
@@ -102,12 +116,7 @@ export const handler = async (event) => {
     }
 
     // 1. 원본 PDF URL 추출
-    const candidates = [
-      report.pdf_file_url,
-      report.telegram_url,
-      report.source_url,
-    ];
-    let pdfUrl = candidates.find(u => u && u.startsWith('http') && !u.includes('netlify.app'));
+    let pdfUrl = selectOriginalDocumentUrl(report);
 
     if (!pdfUrl) {
       return {
