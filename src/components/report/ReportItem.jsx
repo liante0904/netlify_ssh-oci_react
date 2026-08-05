@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { getDirectUrl, prefetchPdf } from '../../utils/reportLinks';
+import { getArchiveDownloadUrl, getDirectUrl, prefetchPdf } from '../../utils/reportLinks';
 import { useReport } from '../../context/useReport';
 
 const ReportItem = ({ 
@@ -40,6 +40,8 @@ const ReportItem = ({
   };
   
   const finalLink = getDirectUrl(report);
+  const canDownloadArchive = report.pdf_archive?.archive_status === 'ARCHIVED'
+    && Boolean(report.pdf_archive?.storage_key);
 
   const handleViewerClick = () => {
     if (firm === '현대차증권' && pdf_file_url) {
@@ -280,6 +282,18 @@ const ReportItem = ({
               작성자: {writer} <span className="writer-search-icon">🔍</span>
             </p>
             <div className="report-actions">
+              {canDownloadArchive && (
+                <a
+                  className="viewer-button archive-download-button"
+                  href={getArchiveDownloadUrl(id)}
+                  title="Google Drive 아카이브 PDF 다운로드"
+                  aria-label="아카이브 PDF 다운로드"
+                >
+                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                  </svg>
+                </a>
+              )}
               <button 
                 className="viewer-button" 
                 onClick={handleViewerClick}

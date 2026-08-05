@@ -12,6 +12,7 @@ jest.mock('../../src/context/useReport', () => ({
 // utils 모킹
 jest.mock('../../src/utils/reportLinks', () => ({
   getDirectUrl: jest.fn(() => 'https://example.com/direct'),
+  getArchiveDownloadUrl: jest.fn((reportId) => `https://api.example.com/external/api/reports/${reportId}/archive-download`),
   prefetchPdf: jest.fn()
 }));
 
@@ -81,6 +82,19 @@ describe('ReportItem Component', () => {
     expect(signals).not.toBeNull();
     expect(signals.textContent).toContain('005930');
     expect(signals.textContent).not.toContain('출처 확인 필요');
+  });
+
+  it('shows the archive download action only for an archived PDF with a storage key', () => {
+    const { container } = render(
+      <ReportItem
+        report={{ ...mockReport, pdf_archive: { archive_status: 'ARCHIVED', storage_key: '2026-08/테스트.pdf' } }}
+        onToggleSummary={jest.fn()}
+      />
+    );
+
+    const downloadLink = container.querySelector('.archive-download-button');
+    expect(downloadLink).not.toBeNull();
+    expect(downloadLink.getAttribute('href')).toContain('/reports/1/archive-download');
   });
 
   it('does not show BUY or MAINTAIN defaults for an industry report', () => {

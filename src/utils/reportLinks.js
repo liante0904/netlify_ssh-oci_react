@@ -2,6 +2,10 @@ export function getShareUrl(reportId, origin = window.location.origin) {
   return `${origin}/share?id=${reportId}`;
 }
 
+export function getArchiveDownloadUrl(reportId, apiBaseUrl = import.meta.env.VITE_API_URL || 'https://ssh-oci.duckdns.org') {
+  return `${apiBaseUrl.replace(/\/$/, '')}/external/api/reports/${encodeURIComponent(reportId)}/archive-download`;
+}
+
 export function isDsReport(report) {
   const { firm, firm_id, sec_firm_order, link, pdf_file_url } = report || {};
   const sourceUrl = pdf_file_url || link || '';
