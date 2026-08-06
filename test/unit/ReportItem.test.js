@@ -92,9 +92,9 @@ describe('ReportItem Component', () => {
       />
     );
 
-    const downloadLink = container.querySelector('.archive-download-button');
-    expect(downloadLink).not.toBeNull();
-    expect(downloadLink.getAttribute('href')).toContain('/reports/1/archive-download');
+    const downloadButton = container.querySelector('.archive-download-button');
+    expect(downloadButton).not.toBeNull();
+    expect(downloadButton.disabled).toBe(false);
   });
 
   it('does not show BUY or MAINTAIN defaults for an industry report', () => {

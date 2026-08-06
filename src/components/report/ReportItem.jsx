@@ -25,6 +25,7 @@ const ReportItem = ({
   } = report;
   const { setViewerReport, telegramUser, llmVisibility } = useReport();
   const [showConfirm, setShowConfirm] = useState(null);
+  const [isArchiveDownloading, setIsArchiveDownloading] = useState(false);
   /* 기존 주석 유지: 요약 요청 및 완료 여부 파악 */
   const isSummaryRequested = summaryRequestedIds?.has(id);
   const isSummaryCompleted = summaryCompletedIds?.has(id);
@@ -48,6 +49,28 @@ const ReportItem = ({
       setViewerReport({ ...report, link: pdf_file_url });
     } else {
       setViewerReport(report);
+    }
+  };
+
+  const handleArchiveDownload = async () => {
+    if (isArchiveDownloading) return;
+    setIsArchiveDownloading(true);
+    try {
+      const response = await fetch(getArchiveDownloadUrl(id));
+      if (!response.ok) throw new Error('archive download failed');
+      const blob = await response.blob();
+      const downloadUrl = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = downloadUrl;
+      anchor.download = report.pdf_archive?.file_name || `[${firm}] ${title}.pdf`;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(downloadUrl);
+    } catch {
+      showToast('아카이브 PDF를 내려받지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsArchiveDownloading(false);
     }
   };
 
@@ -283,16 +306,19 @@ const ReportItem = ({
             </p>
             <div className="report-actions">
               {canDownloadArchive && (
-                <a
+                <button
                   className="viewer-button archive-download-button"
-                  href={getArchiveDownloadUrl(id)}
-                  title="Google Drive 아카이브 PDF 다운로드"
+                  onClick={handleArchiveDownload}
+                  disabled={isArchiveDownloading}
+                  title={isArchiveDownloading ? 'Google Drive에서 PDF를 준비 중입니다' : 'Google Drive 아카이브 PDF 다운로드'}
                   aria-label="아카이브 PDF 다운로드"
                 >
-                  <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-                    <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
-                  </svg>
-                </a>
+                  {isArchiveDownloading ? <span aria-hidden="true">…</span> : (
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+                      <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+                    </svg>
+                  )}
+                </button>
               )}
               <button 
                 className="viewer-button" 
