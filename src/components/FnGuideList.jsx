@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { CONFIG } from '../constants/config';
 import { REPORT_SECTIONS } from '../constants/reportSections';
@@ -35,16 +35,12 @@ function FnGuideList() {
   const selectedSummaryId = searchParams.get('summary_id');
   const scrolledSummaryIdRef = useRef(null);
   const dateChipsRef = useRef(null);
-  const [summaries, setSummaries] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [providerFilter, setProviderFilter] = useState('');
   const [facetType, setFacetType] = useState('company');
   const [selectedFacet, setSelectedFacet] = useState(null);
   
-  const [isLoading, setIsLoading] = useState(false);
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
   const [expandedItems, setExpandedItems] = useState({});
   const [collapsedCompanyGroups, setCollapsedCompanyGroups] = useState({});
 
@@ -75,41 +71,34 @@ function FnGuideList() {
     });
   }, [dates]);
 
-  // 2. 요약본 목록 조회
-  const fetchSummaries = useCallback(async (isInitial = false) => {
-    if (selectedDate === null) return;
-    setIsLoading(true);
-    const currentOffset = isInitial ? 0 : offset;
-    try {
+  // 2. 요약본 목록 조회 및 페이지 캐시
+  const summariesQuery = useInfiniteQuery({
+    queryKey: ['fnguide', 'report-summaries', { searchQuery, providerFilter, selectedDate }],
+    queryFn: async ({ pageParam = 0 }) => {
       const params = new URLSearchParams();
       if (searchQuery) params.append('q', searchQuery);
       if (providerFilter) params.append('provider', providerFilter);
       if (selectedDate) params.append('report_date', selectedDate);
       params.append('limit', LIMIT.toString());
-      params.append('offset', currentOffset.toString());
+      params.append('offset', pageParam.toString());
 
       const url = `${CONFIG.API.BASE_URL}/api/fnguide/report-summaries?${params.toString()}`;
       const data = await request(url, { skipAuth: false });
-      
-      if (Array.isArray(data)) {
-        setSummaries(prev => isInitial ? data : [...prev, ...data]);
-        setOffset(currentOffset + data.length);
-        setHasMore(data.length === LIMIT);
-      } else {
-        setHasMore(false);
-      }
-    } catch (error) {
-      console.error('Failed to fetch FnGuide summaries:', error);
-      setHasMore(false);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [searchQuery, providerFilter, selectedDate, offset]);
-
-  // 검색어 입력 혹은 필터 변경 시 날짜 및 목록 초기화 후 재조회
-  useEffect(() => {
-    if (selectedDate !== null) fetchSummaries(true);
-  }, [selectedDate, providerFilter]);
+      return Array.isArray(data) ? data : [];
+    },
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => (
+      lastPage.length === LIMIT ? lastPageParam + lastPage.length : undefined
+    ),
+    enabled: selectedDate !== null,
+    staleTime: 60_000,
+  });
+  const summaries = summariesQuery.data?.pages.flat() || [];
+  const isLoading = summariesQuery.isPending || summariesQuery.isFetchingNextPage;
+  const hasMore = Boolean(summariesQuery.hasNextPage);
+  const fetchSummaries = useCallback((isInitial = false) => (
+    isInitial ? summariesQuery.refetch() : summariesQuery.fetchNextPage()
+  ), [summariesQuery.fetchNextPage, summariesQuery.refetch]);
 
   // 검색 수동 실행 (엔터키 또는 검색 버튼 클릭)
   const handleSearchSubmit = (e) => {
