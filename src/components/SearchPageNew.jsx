@@ -10,6 +10,7 @@ import { CONFIG } from '../constants/config';
 import { request } from '../utils/api';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import AsyncErrorState from './AsyncErrorState';
+import { useBoards } from '../hooks/useBoards';
 import './SearchPageNew.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -32,7 +33,6 @@ function SearchPageNew() {
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [category, setCategory] = useState('title');
   const [selectedCompany, setSelectedCompany] = useState('');
-  const [boards, setBoards] = useState([]);
   const [selectedBoard, setSelectedBoard] = useState('');
   const [selectedRoute, setSelectedRoute] = useState('recent');
   const [selectedSort, setSelectedSort] = useState('time');
@@ -45,31 +45,11 @@ function SearchPageNew() {
     return () => clearTimeout(handler);
   }, [searchTerm]);
 
-  // 증권사 선택 시 게시판 fetch
+  const { boards } = useBoards(selectedCompany);
+
+  // 증권사 변경 시 기존 게시판 선택 초기화
   useEffect(() => {
-    if (!selectedCompany) {
-      setBoards([]);
-      setSelectedBoard('');
-      return;
-    }
-
-    const controller = new AbortController();
-    const fetchBoards = async () => {
-      try {
-        const data = await request(`${CONFIG.API.BOARDS_URL}?company=${selectedCompany}`, {
-          signal: controller.signal
-        });
-        setBoards(Array.isArray(data) ? data.filter(b => b.report_count > 0) : []);
-      } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('Failed to fetch boards:', error);
-          setBoards([]);
-        }
-      }
-    };
-
-    fetchBoards();
-    return () => controller.abort();
+    if (!selectedCompany) setSelectedBoard('');
   }, [selectedCompany]);
 
   // 검색 쿼리 빌드

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useBoards } from '../hooks/useBoards';
 import { CONFIG } from '../constants/config';
 import { FIRM_NAMES } from '../constants/firms';
 import { request } from '../utils/api';
@@ -128,8 +129,8 @@ export function ReportProvider({ children }) {
   const [viewerReport, setViewerReport] = useState(null);
   // 회사 코드는 DB/필터 매핑과 1:1로 맞아야 하므로 고정 순서를 유지한다.
   const companyNames = FIRM_NAMES;
-  const [boards, setBoards] = useState([]);
-  const [isLoadingBoards, setIsLoadingBoards] = useState(false);
+  const companyIndex = getSelectedCompanyOrder(activeSearch, null);
+  const { boards, isLoadingBoards } = useBoards(companyIndex);
 
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
@@ -158,44 +159,6 @@ export function ReportProvider({ children }) {
       return nextSearch;
     });
   }, []);
-
-  useEffect(() => {
-    const companyIndex = getSelectedCompanyOrder(activeSearch, null);
-    const controller = new AbortController();
-
-    if (!companyIndex) {
-      setBoards([]);
-      setIsLoadingBoards(false);
-      return () => controller.abort();
-    }
-
-    let isActive = true;
-
-    const fetchBoards = async () => {
-      setIsLoadingBoards(true);
-      try {
-        const data = await request(`${CONFIG.API.BOARDS_URL}?company=${companyIndex}`, {
-          signal: controller.signal
-        });
-        if (!isActive) return;
-        setBoards(Array.isArray(data) ? data.filter(b => b.report_count > 0) : []);
-      } catch (error) {
-        if (error.name !== 'AbortError') {
-          console.error('Failed to fetch boards:', error);
-          if (isActive) setBoards([]);
-        }
-      } finally {
-        if (isActive) setIsLoadingBoards(false);
-      }
-    };
-
-    fetchBoards();
-
-    return () => {
-      isActive = false;
-      controller.abort();
-    };
-  }, [activeSearch.category, activeSearch.query, activeSearch.companyOrder]);
 
   const toggleSearch = useCallback(() => setIsSearchOverlayOpen(prev => !prev), []);
   const toggleMenu = useCallback(() => setIsMenuOpen(prev => !prev), []);
@@ -231,7 +194,6 @@ export function ReportProvider({ children }) {
     sortBy,
     setSortBy,
     boards,
-    setBoards,
     isLoadingBoards,
     viewerReport,
     setViewerReport,

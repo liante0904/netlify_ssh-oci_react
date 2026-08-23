@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueries, useQueryClient } from '@tanstack/react-query';
 import { CONFIG } from '../constants/config';
 import { HOME_SECTIONS } from '../constants/reportSections';
 import { request } from '../utils/api';
@@ -53,108 +54,38 @@ function HomeDashboard() {
     }
     return true;
   };
-  const [sections, setSections] = useState(() => ({
-    fnguide: { items: [], isLoading: true, error: '' },
-    recent: { items: [], isLoading: true, error: '' },
-    industry: { items: [], isLoading: true, error: '' },
-    global: { items: [], isLoading: true, error: '' },
-  }));
-
-  // 탭이 다시 보일 때 자동 갱신을 위한 refresh counter
-  const [refreshKey, setRefreshKey] = useState(0);
+  const queryClient = useQueryClient();
   const lastRefreshRef = useRef(0);
 
-  const loadAllSections = useCallback(() => {
-    const controller = new AbortController();
+  const homeQueries = useQueries({
+    queries: [
+      {
+        queryKey: ['home', 'fnguide'],
+        queryFn: async ({ signal }) => {
+          const data = await request(`${CONFIG.API.BASE_URL}/api/fnguide/report-summaries?limit=${PREVIEW_LIMIT}&offset=0`, { signal, logoutOn401: false });
+          return Array.isArray(data) ? data.map(normalizeFnGuideItem) : [];
+        },
+      },
+      ...['recent', 'industry', 'global'].map((key) => ({
+        queryKey: ['home', key],
+        queryFn: async ({ signal }) => {
+          const data = await request(`${CONFIG.API.REPORT_API_URL}/${key}?limit=${PREVIEW_LIMIT}&offset=0`, { signal });
+          return Array.isArray(data?.items) ? data.items.map(normalizeReportPreview).filter(Boolean) : [];
+        },
+      })),
+    ],
+  });
 
-    const setSectionState = (key, nextState) => {
-      setSections((prev) => ({
-        ...prev,
-        [key]: { ...prev[key], ...nextState },
-      }));
-    };
-
-    const loadFnGuide = async () => {
-      try {
-        const data = await request(
-          `${CONFIG.API.BASE_URL}/api/fnguide/report-summaries?limit=${PREVIEW_LIMIT}&offset=0`,
-          { signal: controller.signal, logoutOn401: false }
-        );
-        setSectionState('fnguide', {
-          items: Array.isArray(data) ? data.map(normalizeFnGuideItem) : [],
-          isLoading: false,
-          error: '',
-        });
-      } catch (error) {
-        if (error.name === 'AbortError') return;
-        setSectionState('fnguide', { items: [], isLoading: false, error: '종목요약을 불러오지 못했습니다.' });
-      }
-    };
-
-    const loadRecent = async () => {
-      try {
-        const data = await request(
-          `${CONFIG.API.REPORT_API_URL}/recent?limit=${PREVIEW_LIMIT}&offset=0`,
-          { signal: controller.signal }
-        );
-        setSectionState('recent', {
-          items: Array.isArray(data?.items) ? data.items.map(normalizeReportPreview).filter(Boolean) : [],
-          isLoading: false,
-          error: '',
-        });
-      } catch (error) {
-        if (error.name === 'AbortError') return;
-        setSectionState('recent', { items: [], isLoading: false, error: '최근 레포트를 불러오지 못했습니다.' });
-      }
-    };
-
-    const loadIndustry = async () => {
-      try {
-        const data = await request(
-          `${CONFIG.API.REPORT_API_URL}/industry?limit=${PREVIEW_LIMIT}&offset=0`,
-          { signal: controller.signal }
-        );
-        setSectionState('industry', {
-          items: Array.isArray(data?.items) ? data.items.map(normalizeReportPreview).filter(Boolean) : [],
-          isLoading: false,
-          error: '',
-        });
-      } catch (error) {
-        if (error.name === 'AbortError') return;
-        setSectionState('industry', { items: [], isLoading: false, error: '산업레포트를 불러오지 못했습니다.' });
-      }
-    };
-
-    const loadGlobal = async () => {
-      try {
-        const data = await request(
-          `${CONFIG.API.REPORT_API_URL}/global?limit=${PREVIEW_LIMIT}&offset=0`,
-          { signal: controller.signal }
-        );
-        setSectionState('global', {
-          items: Array.isArray(data?.items) ? data.items.map(normalizeReportPreview).filter(Boolean) : [],
-          isLoading: false,
-          error: '',
-        });
-      } catch (error) {
-        if (error.name === 'AbortError') return;
-        setSectionState('global', { items: [], isLoading: false, error: '글로벌 리포트를 불러오지 못했습니다.' });
-      }
-    };
-
-    loadFnGuide();
-    loadRecent();
-    loadIndustry();
-    loadGlobal();
-
-    return controller;
-  }, []);
-
-  // 최초 로딩 + refreshKey 변경 시 갱신
-  useEffect(() => {
-    const controller = loadAllSections();
-    return () => controller.abort();
-  }, [loadAllSections, refreshKey]);
+  const sections = useMemo(() => Object.fromEntries(
+    HOME_SECTIONS.map((section, index) => {
+      const query = homeQueries[index];
+      return [section.key, {
+        items: query.data || [],
+        isLoading: query.isPending,
+        error: query.isError ? `${section.title}을(를) 불러오지 못했습니다.` : '',
+      }];
+    }),
+  ), [homeQueries]);
 
   // 탭 visibility 변경 감지 → 홈으로 돌아올 때 자동 갱신 (30초 throttle)
   useEffect(() => {
@@ -163,13 +94,13 @@ function HomeDashboard() {
         const now = Date.now();
         if (now - lastRefreshRef.current > 30000) {
           lastRefreshRef.current = now;
-          setRefreshKey((k) => k + 1);
+          queryClient.invalidateQueries({ queryKey: ['home'] });
         }
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);
     return () => document.removeEventListener('visibilitychange', handleVisibility);
-  }, []);
+  }, [queryClient]);
 
   return (
     <div className="home-dashboard">
