@@ -12,6 +12,7 @@ import { isDsReport, prefetchPdf } from '../utils/reportLinks';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import MenuSummary from './MenuSummary';
+import AsyncErrorState from './AsyncErrorState';
 import './ReportList.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -36,7 +37,9 @@ function ReportList({ onWriterClick }) {
     isLoading, 
     hasMore, 
     offset, 
-    fetchReports 
+    fetchReports,
+    error,
+    retry,
   } = useReportFetch(searchQuery, location.pathname, outlookYear, sortBy);
 
   const [collapsedDates, setCollapsedDates] = useState({});
@@ -493,7 +496,9 @@ function ReportList({ onWriterClick }) {
             ))}
           </div>
         )}
-        {isFavoritesPage && !favoriteReports && offset === 0 && isLoading ? (
+        {error && offset === 0 ? (
+          <AsyncErrorState onRetry={retry} />
+        ) : isFavoritesPage && !favoriteReports && offset === 0 && isLoading ? (
           null
         ) : isFavoritesPage && favoriteReports && Object.keys(favoriteReports).length === 0 && !isLoading ? (
           <div className="empty-favorites">

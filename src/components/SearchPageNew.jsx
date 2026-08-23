@@ -9,6 +9,7 @@ import { useReportFetch } from '../hooks/useReportFetch';
 import { CONFIG } from '../constants/config';
 import { request } from '../utils/api';
 import { buildShareMenuData } from '../utils/shareMenuData';
+import AsyncErrorState from './AsyncErrorState';
 import './SearchPageNew.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -90,7 +91,9 @@ function SearchPageNew() {
     isLoading,
     hasMore,
     offset,
-    fetchReports
+    fetchReports,
+    error,
+    retry,
   } = useReportFetch(searchQuery, fetchPathname, null, selectedSort);
 
   // 리스트 컨트롤 상태 (즐겨찾기, 토글 등)
@@ -405,7 +408,9 @@ function SearchPageNew() {
         </div>
 
         <div className="results-list-container">
-          {offset === 0 && isLoading ? (
+          {error && offset === 0 ? (
+            <AsyncErrorState onRetry={retry} />
+          ) : offset === 0 && isLoading ? (
             <div className="search-state-msg">검색 조건에 맞춰 리포트를 분석 중입니다...</div>
           ) : filteredSortedDates.length === 0 && !isLoading ? (
             <div className="search-state-msg empty-msg">

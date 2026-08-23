@@ -76,5 +76,7 @@ export function useReportFetch(searchQuery, pathname, outlookYear, sortBy) {
     hasMore: Boolean(hasNextPage),
     offset,
     fetchReports,
+    error: reportsQuery.error,
+    retry: reportsQuery.refetch,
   };
 }

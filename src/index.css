@@ -166,6 +166,51 @@ body {
   font-weight: 700;
 }
 
+.app-error-fallback {
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-xl);
+  box-sizing: border-box;
+  background: var(--background-color);
+  color: var(--text-color);
+  text-align: center;
+}
+
+.app-error-card {
+  width: min(100%, 460px);
+  padding: var(--space-xl);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  box-shadow: var(--glass-shadow);
+}
+
+.app-error-card h1 { margin: 0 0 var(--space-md); }
+.app-error-card p { color: var(--text-muted); }
+.app-error-eyebrow { color: var(--danger-color) !important; font-weight: 700; }
+.app-error-card button,
+.async-error-state button {
+  border: 0;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.async-error-state {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-xl);
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.async-error-state p { margin: 0; }
+
 @media (min-width: 1024px) {
   .main-content {
     padding-top: calc(var(--header-height, 130px) + 30px + var(--safe-area-inset-top, 0px));
