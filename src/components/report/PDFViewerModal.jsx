@@ -95,6 +95,19 @@ const PDFViewerModal = ({ report, onClose }) => {
     };
   }, [report]);
 
+  // 키보드 사용자도 동일한 닫기 동작을 사용할 수 있게 한다.
+  useEffect(() => {
+    if (!report) return;
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onCloseRef.current();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [report]);
+
   // iOS PWA height
   useEffect(() => {
     if (!report) return;
@@ -208,11 +221,11 @@ const PDFViewerModal = ({ report, onClose }) => {
   if (!report) return null;
 
   return (
-    <div className="pdf-viewer-overlay" role="dialog" aria-modal="true">
+    <div className="pdf-viewer-overlay" role="dialog" aria-modal="true" aria-labelledby="pdf-viewer-title">
       <div className="pdf-viewer-header">
         <div className="pdf-viewer-header-left">
           {firm && <span className="pdf-viewer-firm-badge">{firm}</span>}
-          <div className="pdf-viewer-title">{title}</div>
+          <div id="pdf-viewer-title" className="pdf-viewer-title">{title || 'PDF 리포트 뷰어'}</div>
         </div>
         <div className="pdf-viewer-header-actions">
           <button className="pdf-viewer-share-btn" onClick={kakaoShare} title="카카오톡 공유">
