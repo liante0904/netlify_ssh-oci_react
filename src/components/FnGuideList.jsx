@@ -13,6 +13,7 @@ import {
   tokenizeFinancialHighlights,
 } from '../utils/fnguide';
 import MenuSummary from './MenuSummary';
+import AsyncErrorState from './AsyncErrorState';
 import './FnGuideList.css';
 
 function HighlightedSummary({ text }) {
@@ -436,7 +437,12 @@ function FnGuideList() {
             ‹
           </button>
           <div className="date-chips-scroll" ref={dateChipsRef}>
-            {isLoadingDates && dates.length === 0 ? (
+            {datesQuery.isError && dates.length === 0 ? (
+              <AsyncErrorState
+                message="FnGuide 날짜를 불러오지 못했습니다."
+                onRetry={() => datesQuery.refetch()}
+              />
+            ) : isLoadingDates && dates.length === 0 ? (
               <div className="chips-loading">날짜 로딩 중...</div>
             ) : (
               <>
@@ -529,7 +535,12 @@ function FnGuideList() {
 
       {/* 요약본 목록 */}
       <div className="fnguide-list">
-        {filteredSummaries.length === 0 && !isLoading ? (
+        {summariesQuery.isError && summaries.length === 0 ? (
+          <AsyncErrorState
+            message="FnGuide 요약 레포트를 불러오지 못했습니다."
+            onRetry={() => summariesQuery.refetch()}
+          />
+        ) : filteredSummaries.length === 0 && !isLoading ? (
           <div className="no-data-msg">
             검색 조건에 부합하는 요약 레포트가 없습니다.
           </div>
