@@ -494,14 +494,14 @@ function ReportList({ onWriterClick }) {
           </div>
         )}
         {isFavoritesPage && !favoriteReports && offset === 0 && isLoading ? (
-          <div className={`loading-overlay ${isSearchActive ? 'search-loading' : ''}`}>로딩 중...</div>
+          null
         ) : isFavoritesPage && favoriteReports && Object.keys(favoriteReports).length === 0 && !isLoading ? (
           <div className="empty-favorites">
             <div className="empty-icon">★</div>
             <p>즐겨찾기한 레포트가 없습니다.<br/>관심 있는 레포트에 별표를 눌러보세요!</p>
           </div>
         ) : !isFavoritesPage && offset === 0 && isLoading ? (
-          <div className={`loading-overlay ${isSearchActive ? 'search-loading' : ''}`}>로딩 중...</div>
+          null
         ) : isFavoritesPage && !favoriteReports && filteredSortedDates.length === 0 && !isLoading ? (
           <div className="empty-favorites">
             <div className="empty-icon">★</div>
@@ -555,7 +555,9 @@ function ReportList({ onWriterClick }) {
             ))}
           </InfiniteScroll>
         )}
-        {isLoading && hasMore && <div className="loading-overlay">로딩 중...</div>}
+        {isLoading && (
+          <div className={`loading-overlay ${isSearchActive ? 'search-loading' : ''}`}>로딩 중...</div>
+        )}
         {isFavoritesPage && !favoriteReports && !isLoading && <div className="loading-overlay">즐겨찾기 불러오는 중...</div>}
       </div>
 
