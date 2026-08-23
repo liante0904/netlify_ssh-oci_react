@@ -40,6 +40,7 @@ function HeaderPopoverShell({ labelledBy, children, onClose }) {
       <section
         className="header-popover"
         role="dialog"
+        id={`${labelledBy}-dialog`}
         aria-modal="false"
         aria-labelledby={labelledBy}
         onClick={(event) => event.stopPropagation()}

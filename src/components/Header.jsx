@@ -53,6 +53,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activePopover, setActivePopover] = useState(null);
+  const popoverTriggerRef = useRef(null);
 
   const {
     toggleSearch, 
@@ -94,9 +95,13 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
           type="button"
           className="tg-badge tg-badge-on"
           title={`텔레그램 로그인: ${telegramUser.first_name} (ID:${telegramUser.id})`}
-          onClick={() => setActivePopover((current) => current === 'account' ? null : 'account')}
+          onClick={(event) => {
+            popoverTriggerRef.current = event.currentTarget;
+            setActivePopover((current) => current === 'account' ? null : 'account');
+          }}
           aria-expanded={activePopover === 'account'}
           aria-haspopup="dialog"
+          aria-controls="account-popover-title-dialog"
         >
           <span className="tg-badge-icon">✈️</span>
           <span className="tg-badge-name">{telegramUser.first_name}</span>
@@ -117,7 +122,12 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
     );
   };
 
-  const closePopover = useCallback(() => setActivePopover(null), []);
+  const closePopover = useCallback(() => {
+    const trigger = popoverTriggerRef.current;
+    popoverTriggerRef.current = null;
+    setActivePopover(null);
+    window.setTimeout(() => trigger?.focus(), 0);
+  }, []);
 
   const handleOpenKeywordSettings = () => {
     setActivePopover(null);
@@ -128,7 +138,8 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
     keywordState.openKeywordOverlay();
   };
 
-  const handleNotificationClick = () => {
+  const handleNotificationClick = (event) => {
+    popoverTriggerRef.current = event.currentTarget;
     setActivePopover((current) => current === 'notifications' ? null : 'notifications');
   };
 
@@ -318,6 +329,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
                 aria-label="리포트 알림"
                 aria-expanded={activePopover === 'notifications'}
                 aria-haspopup="dialog"
+                aria-controls="notification-popover-title-dialog"
               >
                 <BellIcon />
                 {unreadCount > 0 && (
