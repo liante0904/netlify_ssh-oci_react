@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import KeywordOverlay from './menu/KeywordOverlay';
@@ -55,6 +55,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activePopover, setActivePopover] = useState(null);
   const popoverTriggerRef = useRef(null);
+  const queryClient = useQueryClient();
 
   const {
     toggleSearch, 
@@ -208,8 +209,10 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
     request(`${CONFIG.API.REPORT_API_URL}/reports/notifications/mark-all-read`, {
       method: 'POST', skipAuth: false, logoutOn401: false,
       body: JSON.stringify({ keys: allIds }),
-    }).catch(() => {});
-  }, [visibleNotifications]);
+    }).then(() => queryClient.invalidateQueries({
+      queryKey: ['notifications', telegramUser?.id ?? null],
+    })).catch(() => {});
+  }, [queryClient, telegramUser, visibleNotifications]);
 
   const handleNotificationItemClick = useCallback((item) => {
     const notificationKey = getNotificationKey(item);
@@ -219,7 +222,9 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
       request(`${CONFIG.API.REPORT_API_URL}/reports/notifications/mark-read`, {
         method: 'POST', skipAuth: false, logoutOn401: false,
         body: JSON.stringify({ notification_key: notificationKey }),
-      }).catch(() => {});
+      }).then(() => queryClient.invalidateQueries({
+        queryKey: ['notifications', telegramUser?.id ?? null],
+      })).catch(() => {});
     }
     setActivePopover(null);
 
@@ -240,7 +245,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
       handleSearch(item.article_title);
       navigate('/');
     }
-  }, [readNotifyIds, handleSearch, navigate]);
+  }, [queryClient, readNotifyIds, handleSearch, navigate, telegramUser]);
 
   useEffect(() => {
     const handleSummaryNotification = (event) => {
