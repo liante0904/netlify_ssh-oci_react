@@ -11,6 +11,7 @@ import { request } from '../utils/api';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import AsyncErrorState from './AsyncErrorState';
 import { useBoards } from '../hooks/useBoards';
+import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import './SearchPageNew.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -27,6 +28,7 @@ function emitSummaryNotification(detail) {
 function SearchPageNew() {
   const { telegramUser } = useReport();
   const isAdmin = telegramUser?.is_admin === true;
+  const { mutateFavorite } = useFavoriteMutation(telegramUser);
 
   // 로컬 필터 상태
   const [searchTerm, setSearchTerm] = useState('');
@@ -119,24 +121,12 @@ function SearchPageNew() {
   }, []);
 
   const toggleFavorite = useCallback((id) => {
-    const baseUrl = CONFIG.API.BASE_URL;
-    const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
-
-    setFavorites(prev => {
-      const isAdding = !prev[id];
-      const next = { ...prev, [id]: isAdding };
-      localStorage.setItem('report_favorites', JSON.stringify(next));
-
-      if (token && telegramUser) {
-        const method = isAdding ? 'POST' : 'DELETE';
-        request(`${baseUrl}/favorites/${id}`, {
-          method,
-          skipAuth: false,
-        }).catch(() => {});
-      }
-      return next;
-    });
-  }, [telegramUser]);
+    const isAdding = !favorites[id];
+    const next = { ...favorites, [id]: isAdding };
+    setFavorites(next);
+    localStorage.setItem('report_favorites', JSON.stringify(next));
+    mutateFavorite(id, isAdding);
+  }, [favorites, mutateFavorite]);
 
   const handleOpenShareMenu = useCallback((e, report) => {
     const rect = e.currentTarget.getBoundingClientRect();

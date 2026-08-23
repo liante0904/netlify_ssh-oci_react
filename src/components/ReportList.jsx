@@ -10,6 +10,7 @@ import { CONFIG } from '../constants/config';
 import { getReportSectionByPath } from '../constants/reportSections';
 import { isDsReport, prefetchPdf } from '../utils/reportLinks';
 import { normalizeReportItem } from '../utils/reportNormalizer';
+import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
@@ -29,6 +30,7 @@ function emitSummaryNotification(detail) {
 function ReportList({ onWriterClick }) {
   const { searchQuery, sortBy, setSortBy, telegramUser, handleSearch } = useReport();
   const isAdmin = telegramUser?.is_admin === true;
+  const { mutateFavorite } = useFavoriteMutation(telegramUser);
   const location = useLocation();
   const isOutlook = location.pathname.includes('outlook');
   const [outlookYear, setOutlookYear] = useState(null);
@@ -223,25 +225,11 @@ function ReportList({ onWriterClick }) {
 
 
   const toggleFavorite = (id) => {
-    const baseUrl = CONFIG.API.BASE_URL;
-    const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
-
-    setFavorites(prev => {
-      const isAdding = !prev[id];
-      const next = { ...prev, [id]: isAdding };
-      localStorage.setItem('report_favorites', JSON.stringify(next));
-
-      // 로그인 상태면 서버에도 반영
-      if (token && telegramUser) {
-        const method = isAdding ? 'POST' : 'DELETE';
-        request(`${baseUrl}/favorites/${id}`, {
-          method,
-          skipAuth: false,
-        }).catch(() => {});
-      }
-
-      return next;
-    });
+    const isAdding = !favorites[id];
+    const next = { ...favorites, [id]: isAdding };
+    setFavorites(next);
+    localStorage.setItem('report_favorites', JSON.stringify(next));
+    mutateFavorite(id, isAdding);
   };
 
   const handleOpenShareMenu = (e, report) => {
