@@ -10,7 +10,15 @@ import LoginPage from './LoginPage';
  *   <Route path="/" element={<RequireAuth><HomeDashboard /></RequireAuth>} />
  */
 export default function RequireAuth({ children }) {
-  const { telegramUser } = useReport();
+  const { telegramUser, isVerifying } = useReport();
+
+  if (isVerifying) {
+    return (
+      <div className="route-loading-fallback" role="status" aria-live="polite">
+        로그인 상태 확인 중...
+      </div>
+    );
+  }
 
   // 미로그인 or 승인 대기
   if (!telegramUser || !telegramUser.id) {
