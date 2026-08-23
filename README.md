@@ -55,6 +55,7 @@ This repository is public-only. See [NOTICE.md](./NOTICE.md) for the required bo
 - **Framework**: React 19
 - **Build Tool**: Vite
 - **Routing**: React Router
+- **Server State**: TanStack Query (리포트 목록 캐시 및 무한 스크롤 페이지 관리)
 - **UI**: React Infinite Scroll Component
 - **Linting**: ESLint
 
@@ -109,6 +110,8 @@ make local
 - `npm run netlify:legacy`: 기존 API 환경으로 앱을 실행합니다.
 - `npm run build`: 프로덕션용으로 앱을 빌드합니다.
 - `npm run lint`: ESLint를 사용하여 코드 스타일을 검사합니다.
+
+주요 보호 라우트(`/recent`, `/global`, `/industry`, `/favorites`, `/outlook`, `/ai-summary`, `/fnguide`, `/admin-console`, `/search-new`)는 lazy loading으로 분리되며, 리포트 목록 조회는 필터 조합별로 30초간 캐시됩니다.
 - `npm run preview`: 프로덕션 빌드를 로컬에서 미리 봅니다.
 
 ## 🧪 테스트 및 품질 관리

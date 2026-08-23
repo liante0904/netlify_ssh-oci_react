@@ -1,106 +1,80 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useCallback, useMemo } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { CONFIG } from '../constants/config';
 import { request } from '../utils/api';
 import { buildReportFetchUrl } from '../utils/reportFetch';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 
+function mergeReports(pages) {
+  const updated = {};
+
+  pages.flatMap((page) => Array.isArray(page?.items) ? page.items : []).forEach((item) => {
+    const report = normalizeReportItem(item);
+    if (!report) return;
+
+    if (!Array.isArray(updated[report.date])) updated[report.date] = [];
+    if (!updated[report.date].some((existing) => existing.id === report.id)) {
+      updated[report.date].push(report);
+    }
+  });
+
+  return updated;
+}
+
 export function useReportFetch(searchQuery, pathname, outlookYear, sortBy) {
-  const [reports, setReports] = useState({});
-  const [offset, setOffset] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  
-  const abortControllerRef = useRef(null);
-  const isLoadingRef = useRef(false);
-  const hasMoreRef = useRef(true);
+  const query = searchQuery?.query || '';
+  const category = searchQuery?.category || '';
+  const companyOrder = searchQuery?.companyOrder ?? null;
+  const board = searchQuery?.board ?? null;
 
-  // searchQuery 객체의 주소값이 변경되어도 내용이 같으면 재실행을 방지하기 위해 프리미티브 값으로 분해
-  const query = searchQuery?.query;
-  const category = searchQuery?.category;
-  const companyOrder = searchQuery?.companyOrder;
-  const board = searchQuery?.board;
+  const queryKey = useMemo(() => [
+    'reports',
+    { pathname, outlookYear: outlookYear ?? null, sortBy, query, category, companyOrder, board },
+  ], [pathname, outlookYear, sortBy, query, category, companyOrder, board]);
 
-  const buildApiUrl = useCallback(() => buildReportFetchUrl({
-    pathname,
-    offset,
-    sortBy,
-    searchQuery: { query, category, companyOrder, board },
-    outlookYear,
-    baseUrl: CONFIG.API.REPORT_API_URL,
-  }), [offset, pathname, outlookYear, sortBy, query, category, companyOrder, board]);
+  const fetchPage = useCallback(async ({ pageParam = 0, signal }) => {
+    const url = buildReportFetchUrl({
+      pathname,
+      offset: pageParam,
+      sortBy,
+      searchQuery: { query, category, companyOrder, board },
+      outlookYear,
+      baseUrl: CONFIG.API.REPORT_API_URL,
+    });
 
-  const mergeReports = useCallback((prev, newItems) => {
-    const updated = { ...prev };
+    return request(url, { signal });
+  }, [pathname, outlookYear, sortBy, query, category, companyOrder, board]);
 
-    for (const item of newItems) {
-      const report = normalizeReportItem(item);
-      const { date } = report;
+  const reportsQuery = useInfiniteQuery({
+    queryKey,
+    queryFn: fetchPage,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, pages) => {
+      if (!lastPage?.hasMore) return undefined;
+      return pages.reduce((total, page) => total + (Array.isArray(page?.items) ? page.items.length : 0), 0);
+    },
+  });
 
-      if (!updated[date] || !Array.isArray(updated[date])) {
-        updated[date] = Array.isArray(updated[date])
-          ? updated[date]
-          : Object.values(updated[date] || {}).flat();
-      }
-
-      const exists = updated[date].some((r) => r.id === report.id);
-      if (!exists) updated[date].push(report);
+  const pages = useMemo(() => reportsQuery.data?.pages || [], [reportsQuery.data?.pages]);
+  const reports = useMemo(() => mergeReports(pages), [pages]);
+  const offset = pages.reduce((total, page) => total + (Array.isArray(page?.items) ? page.items.length : 0), 0);
+  const {
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = reportsQuery;
+  const fetchReports = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      return fetchNextPage();
     }
-
-    return updated;
-  }, []);
-
-  const fetchReports = useCallback(async (isInitial = false) => {
-    if (!hasMoreRef.current && !isInitial) return;
-    if (isLoadingRef.current && !isInitial) return;
-
-    if (isInitial && abortControllerRef.current) {
-      abortControllerRef.current.abort();
-    }
-    const controller = new AbortController();
-    if (isInitial) abortControllerRef.current = controller;
-
-    setIsLoading(true);
-    isLoadingRef.current = true;
-
-    try {
-      const data = await request(buildApiUrl(), { signal: controller.signal });
-      if (data) {
-        const items = Array.isArray(data.items) ? data.items : [];
-        const apiHasMore = Boolean(data.hasMore);
-        setReports((prev) => mergeReports(isInitial ? {} : prev, items));
-        setOffset((prev) => (isInitial ? items.length : prev + items.length));
-        setHasMore(apiHasMore);
-        hasMoreRef.current = apiHasMore;
-      }
-    } catch (err) {
-      if (err.name === 'AbortError') return;
-      // 다른 에러는 request에서 이미 처리됨
-    } finally {
-      if (!isInitial || abortControllerRef.current === controller) {
-        setIsLoading(false);
-        isLoadingRef.current = false;
-      }
-    }
-  }, [buildApiUrl, mergeReports]);
-
-  useEffect(() => {
-    setReports({});
-    setOffset(0);
-    setHasMore(true);
-    hasMoreRef.current = true;
-  }, [query, category, companyOrder, board, pathname, outlookYear, sortBy]);
-
-  useEffect(() => {
-    if (offset === 0) {
-      fetchReports(true);
-    }
-  }, [offset, fetchReports]);
+    return undefined;
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return {
     reports,
-    isLoading,
-    hasMore,
+    isLoading: reportsQuery.isPending || reportsQuery.isFetching,
+    hasMore: Boolean(hasNextPage),
     offset,
-    fetchReports
+    fetchReports,
   };
 }

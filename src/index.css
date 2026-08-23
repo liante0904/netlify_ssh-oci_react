@@ -158,6 +158,14 @@ body {
   padding-top: calc(var(--header-height, 110px) + 20px + var(--safe-area-inset-top, 0px));
 }
 
+.route-loading-fallback {
+  min-height: 40vh;
+  display: grid;
+  place-items: center;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
 @media (min-width: 1024px) {
   .main-content {
     padding-top: calc(var(--header-height, 130px) + 30px + var(--safe-area-inset-top, 0px));

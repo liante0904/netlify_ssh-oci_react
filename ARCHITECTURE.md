@@ -49,6 +49,7 @@ SQLite (telegram.db)는 롤백/최근 동기화 소스로 유지
 | `scraper.py` | 29개 증권사 스크래핑 스케줄러 |
 | `src/components/` | React 기반 프론트엔드 UI 컴포넌트 |
 | `src/hooks/` | 비즈니스 로직 분리 (useKeywords, useReportFetch 등) |
+| `src/queryClient.js` | TanStack Query 전역 서버 상태 캐시 설정 |
 | `models/db_factory.py` | DB_BACKEND 기반 팩토리 (SQLite ↔ PostgreSQL) |
 | `models/ConfigManager.py` | 환경별 설정 중앙화 (싱글톤) |
 
@@ -201,6 +202,7 @@ SQLite (telegram.db)는 롤백/최근 동기화 소스로 유지
 
 ## 최근 변경 이력
 
+- 2026-08-24: 주요 보호 라우트 lazy loading과 `useReportFetch`의 페이지 캐시/중복 요청 제거를 TanStack Query로 통합.
 - 2026-08-24: `ReportList` 초기 조회와 무한 스크롤 추가 조회의 중복 로딩 표시를 중앙 `loading-overlay` 하나로 통합 (`26171b1`).
 - 2026-08-06: 아카이브 PDF 다운로드 액션 및 다운로드 진행 표시 추가 (`18cf511`, `ea9ace6`).
 - 2026-08-03: 카카오 인앱 브라우저 공유 진입 시 로딩 화면 표시 보강 (`33ac862`).

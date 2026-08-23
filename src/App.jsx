@@ -1,19 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import SearchOverlay from './components/SearchOverlay';
-import SearchPageNew from './components/SearchPageNew';
 import HomeDashboard from './components/HomeDashboard';
-import ReportList from './components/ReportList';
 import BottomNav from './components/BottomNav';
-import AdminConsole from './components/AdminConsole';
-import FnGuideList from './components/FnGuideList';
 import { ReportProvider } from './context/ReportContext';
 import { useReport } from './context/useReport';
 import { useAppLayout } from './hooks/useAppLayout';
 import PDFViewerModal from './components/report/PDFViewerModal';
 import RequireAuth from './components/RequireAuth';
 import './index.css';
+
+const ReportList = lazy(() => import('./components/ReportList'));
+const SearchPageNew = lazy(() => import('./components/SearchPageNew'));
+const AdminConsole = lazy(() => import('./components/AdminConsole'));
+const FnGuideList = lazy(() => import('./components/FnGuideList'));
+
+function RouteLoadingFallback() {
+  return (
+    <div className="route-loading-fallback" role="status" aria-live="polite">
+      화면 불러오는 중...
+    </div>
+  );
+}
 
 function AppContent() {
   const { 
@@ -85,7 +94,8 @@ function AppContent() {
           }
         }}
       >
-        <Routes>
+        <Suspense fallback={<RouteLoadingFallback />}>
+          <Routes>
           {/* 메인 페이지만 공개, 나머지는 인증 필요 */}
           <Route path="/" element={<HomeDashboard />} />
           <Route path="/recent" element={<RequireAuth><ReportList key="recent" onWriterClick={handleWriterSearch} /></RequireAuth>} />
@@ -97,7 +107,8 @@ function AppContent() {
           <Route path="/fnguide" element={<RequireAuth><FnGuideList /></RequireAuth>} />
           <Route path="/admin-console" element={<RequireAuth><AdminConsole /></RequireAuth>} />
           <Route path="/search-new" element={<RequireAuth><SearchPageNew /></RequireAuth>} />
-        </Routes>
+          </Routes>
+        </Suspense>
       </main>
       <SearchOverlay />
       <BottomNav 

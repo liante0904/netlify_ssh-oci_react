@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { QueryClientProvider } from '@tanstack/react-query';
 import App from './App';
+import { queryClient } from './queryClient';
 import './index.css';
 
 // 브라우저의 자동 스크롤 복원 기능 비활성화
@@ -16,6 +18,8 @@ if (window.Kakao && KAKAO_KEY && !window.Kakao.isInitialized()) {
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <App />
+    </QueryClientProvider>
   </React.StrictMode>
 );
