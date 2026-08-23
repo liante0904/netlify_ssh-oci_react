@@ -288,6 +288,21 @@ body {
   to { transform: rotate(360deg); }
 }
 
+.network-status-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 3000;
+  padding: 9px 16px;
+  color: #5f3b00;
+  background: #fff3cd;
+  border-bottom: 1px solid #f0d98c;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
 .container {
   padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
 }

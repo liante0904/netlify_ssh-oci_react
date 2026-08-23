@@ -9,6 +9,7 @@ import { useReport } from './context/useReport';
 import { useAppLayout } from './hooks/useAppLayout';
 import PDFViewerModal from './components/report/PDFViewerModal';
 import RequireAuth from './components/RequireAuth';
+import NetworkStatusBanner from './components/NetworkStatusBanner';
 import './index.css';
 
 const ReportList = lazy(() => import('./components/ReportList'));
@@ -79,6 +80,7 @@ function AppContent() {
 
   return (
     <>
+      <NetworkStatusBanner />
       <Header
         ref={headerRef}
         isNavVisible={isNavVisible}
