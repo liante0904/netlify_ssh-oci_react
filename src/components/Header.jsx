@@ -1,5 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import KeywordOverlay from './menu/KeywordOverlay';
@@ -143,10 +144,22 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
     setActivePopover((current) => current === 'notifications' ? null : 'notifications');
   };
 
-  const [notifications, setNotifications] = useState([]);
   const [localNotifications, setLocalNotifications] = useState([]);
   const [notificationToast, setNotificationToast] = useState(null);
   const [readNotifyIds, setReadNotifyIds] = useState([]);
+
+  const notificationsQuery = useQuery({
+    queryKey: ['notifications', telegramUser?.id ?? null],
+    queryFn: async () => {
+      const data = await request(`${CONFIG.API.REPORT_API_URL}/reports/notifications?limit=50`, { skipAuth: false });
+      const items = Array.isArray(data) ? data.map(normalizeNotificationItem) : [];
+      return items.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+    },
+    enabled: Boolean(telegramUser?.id),
+    staleTime: 15_000,
+    refetchInterval: 30_000,
+  });
+  const notifications = notificationsQuery.data || [];
 
   // DB에서 읽음 상태 로드
   useEffect(() => {
@@ -177,30 +190,6 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
       }
     } catch {}
   }, [readNotifyIds, telegramUser]);
-
-  const fetchNotifications = useCallback(async () => {
-    if (!telegramUser) return;
-    try {
-      const url = `${CONFIG.API.REPORT_API_URL}/reports/notifications?limit=50`;
-      const data = await request(url, { skipAuth: false });
-      const items = Array.isArray(data) ? data.map(normalizeNotificationItem) : [];
-      setNotifications(items.sort((a, b) => (
-        new Date(b.created_at || 0) - new Date(a.created_at || 0)
-      )));
-    } catch (err) {
-      console.error('Failed to fetch notifications:', err);
-    }
-  }, [telegramUser]);
-
-  useEffect(() => {
-    if (!telegramUser) {
-      setNotifications([]);
-      return;
-    }
-    fetchNotifications();
-    const interval = setInterval(fetchNotifications, 30000);
-    return () => clearInterval(interval);
-  }, [fetchNotifications, telegramUser]);
 
   const visibleNotifications = [...localNotifications, ...notifications]
     .filter((item, index, items) => (
