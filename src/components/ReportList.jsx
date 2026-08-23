@@ -11,6 +11,7 @@ import { getReportSectionByPath } from '../constants/reportSections';
 import { isDsReport, prefetchPdf } from '../utils/reportLinks';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
+import { useFavorites } from '../hooks/useFavorites';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
@@ -31,6 +32,7 @@ function ReportList({ onWriterClick }) {
   const { searchQuery, sortBy, setSortBy, telegramUser, handleSearch } = useReport();
   const isAdmin = telegramUser?.is_admin === true;
   const { mutateFavorite } = useFavoriteMutation(telegramUser);
+  const { favoriteItems } = useFavorites(telegramUser);
   const location = useLocation();
   const isOutlook = location.pathname.includes('outlook');
   const [outlookYear, setOutlookYear] = useState(null);
@@ -146,16 +148,15 @@ function ReportList({ onWriterClick }) {
     const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
     if (!token) return;
 
-    const baseUrl = CONFIG.API.BASE_URL;
     const LOCAL_KEY = 'report_favorites';
-
-    request(`${baseUrl}/favorites`, { skipAuth: false })
-      .then(data => {
-        if (!data?.items) return;
+    if (favoriteItems.length === 0) {
+      setFavoriteReports({});
+      return;
+    }
 
         // (A) favorites 상태 업데이트 (report_id 기준)
         const serverFavs = {};
-        data.items.forEach(item => { serverFavs[item.report_id] = true; });
+        favoriteItems.forEach(item => { serverFavs[item.report_id] = true; });
         setFavorites(prev => {
           const merged = { ...prev, ...serverFavs };
           localStorage.setItem(LOCAL_KEY, JSON.stringify(merged));
@@ -163,7 +164,7 @@ function ReportList({ onWriterClick }) {
         });
 
         // (B) 서버가 tbl_sec_reports와 JOIN한 풀 리포트 데이터 정규화
-        const normalizedItems = data.items
+        const normalizedItems = favoriteItems
           .map(item => normalizeReportItem(item))
           .filter(Boolean);
 
@@ -181,9 +182,7 @@ function ReportList({ onWriterClick }) {
           if (!exists) grouped[date].push(report);
         });
         setFavoriteReports(grouped);
-      })
-      .catch(() => {});
-  }, [location.pathname, telegramUser?.id]);
+  }, [favoriteItems, location.pathname, telegramUser?.id]);
 
   const [summaryRequestedIds, setSummaryRequestedIds] = useState(new Set());
   const [summaryCompletedIds, setSummaryCompletedIds] = useState(new Set());
