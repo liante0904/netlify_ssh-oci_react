@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { CONFIG } from '../constants/config';
 import { REPORT_SECTIONS } from '../constants/reportSections';
@@ -35,7 +36,6 @@ function FnGuideList() {
   const scrolledSummaryIdRef = useRef(null);
   const dateChipsRef = useRef(null);
   const [summaries, setSummaries] = useState([]);
-  const [dates, setDates] = useState([]);
   const [selectedDate, setSelectedDate] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [providerFilter, setProviderFilter] = useState('');
@@ -43,7 +43,6 @@ function FnGuideList() {
   const [selectedFacet, setSelectedFacet] = useState(null);
   
   const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingDates, setIsLoadingDates] = useState(false);
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [expandedItems, setExpandedItems] = useState({});
@@ -51,33 +50,30 @@ function FnGuideList() {
 
   const LIMIT = 100;
 
-  // 1. 날짜별 집계 목록 조회
-  const fetchDates = useCallback(async () => {
-    setIsLoadingDates(true);
-    try {
-      // 쿼리 매개변수 구성
+  // 1. 날짜별 집계 목록 조회 및 캐시
+  const datesQuery = useQuery({
+    queryKey: ['fnguide', 'report-dates', { searchQuery, providerFilter }],
+    queryFn: async () => {
       const params = new URLSearchParams();
       if (searchQuery) params.append('q', searchQuery);
       if (providerFilter) params.append('provider', providerFilter);
-      
       const url = `${CONFIG.API.BASE_URL}/api/fnguide/report-dates?${params.toString()}`;
       const data = await request(url, { skipAuth: false });
-      const nextDates = Array.isArray(data) ? data : [];
-      setDates(nextDates);
-      setSelectedDate((currentDate) => {
-        if (currentDate === '') return currentDate;
-        if (currentDate && nextDates.some((item) => item.report_date === currentDate)) {
-          return currentDate;
-        }
-        return nextDates[0]?.report_date || '';
-      });
-    } catch (error) {
-      console.error('Failed to fetch FnGuide report dates:', error);
-      setDates([]);
-    } finally {
-      setIsLoadingDates(false);
-    }
-  }, [searchQuery, providerFilter]);
+      return Array.isArray(data) ? data : [];
+    },
+    staleTime: 60_000,
+  });
+  const dates = datesQuery.data || [];
+  const isLoadingDates = datesQuery.isPending;
+  const fetchDates = datesQuery.refetch;
+
+  useEffect(() => {
+    setSelectedDate((currentDate) => {
+      if (currentDate === '') return currentDate;
+      if (currentDate && dates.some((item) => item.report_date === currentDate)) return currentDate;
+      return dates[0]?.report_date || '';
+    });
+  }, [dates]);
 
   // 2. 요약본 목록 조회
   const fetchSummaries = useCallback(async (isInitial = false) => {
@@ -112,7 +108,6 @@ function FnGuideList() {
 
   // 검색어 입력 혹은 필터 변경 시 날짜 및 목록 초기화 후 재조회
   useEffect(() => {
-    fetchDates();
     if (selectedDate !== null) fetchSummaries(true);
   }, [selectedDate, providerFilter]);
 
