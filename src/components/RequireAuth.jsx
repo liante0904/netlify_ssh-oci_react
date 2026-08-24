@@ -10,9 +10,9 @@ import LoginPage from './LoginPage';
  *   <Route path="/" element={<RequireAuth><HomeDashboard /></RequireAuth>} />
  */
 export default function RequireAuth({ children }) {
-  const { telegramUser, isVerifying } = useReport();
+  const { telegramUser, authStatus } = useReport();
 
-  if (isVerifying) {
+  if (authStatus === 'checking') {
     return (
       <div className="route-loading-fallback" role="status" aria-live="polite">
         로그인 상태 확인 중...
@@ -21,11 +21,15 @@ export default function RequireAuth({ children }) {
   }
 
   // 미로그인 or 승인 대기
-  if (!telegramUser || !telegramUser.id) {
+  if (authStatus === 'expired') {
+    return <LoginPage reason="session_expired" />;
+  }
+
+  if (authStatus === 'unauthenticated') {
     return <LoginPage reason="not_logged_in" />;
   }
 
-  if (telegramUser.status !== 'active') {
+  if (authStatus === 'pending') {
     return <LoginPage reason="pending_approval" user={telegramUser} />;
   }
 

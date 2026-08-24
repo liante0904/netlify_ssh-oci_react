@@ -31,7 +31,24 @@ export function ReportProvider({ children }) {
     }
   });
   // 토큰 검증 중 여부 (true일 때는 401 → 로그아웃 건너뜀)
-  const [isVerifying, setIsVerifying] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(() => Boolean(
+    localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN) &&
+    localStorage.getItem(CONFIG.STORAGE_KEYS.TELEGRAM_USER)
+  ));
+  const [authExpired, setAuthExpired] = useState(false);
+  const authStatus = isVerifying
+    ? 'checking'
+    : authExpired
+      ? 'expired'
+      : !telegramUser?.id
+        ? 'unauthenticated'
+        : telegramUser.status === 'active'
+          ? 'authenticated'
+          : 'pending';
+
+  useEffect(() => {
+    if (telegramUser?.id) setAuthExpired(false);
+  }, [telegramUser?.id]);
 
   // LLM 요약 노출 범위 설정 ('admin' 또는 'telegram')
   const [llmVisibility, setLlmVisibility] = useState('admin');
@@ -68,6 +85,7 @@ export function ReportProvider({ children }) {
           localStorage.removeItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
           localStorage.removeItem(CONFIG.STORAGE_KEYS.TELEGRAM_USER);
           localStorage.removeItem(CONFIG.STORAGE_KEYS.REMEMBER_ME);
+          setAuthExpired(true);
           setTelegramUser(null);
         }
         // 그 외(200, 네트워크 에러 등) → 기존 상태 유지
@@ -87,6 +105,7 @@ export function ReportProvider({ children }) {
     const handleStorage = (e) => {
       if (e.key === CONFIG.STORAGE_KEYS.AUTH_TOKEN && !e.newValue) {
         // 다른 탭에서 토큰 삭제 → 동기화
+        setAuthExpired(false);
         setTelegramUser(null);
       }
       if (e.key === CONFIG.STORAGE_KEYS.TELEGRAM_USER) {
@@ -96,6 +115,7 @@ export function ReportProvider({ children }) {
             if (user?.id) setTelegramUser(user);
           } catch { /* 무시 */ }
         } else {
+          setAuthExpired(false);
           setTelegramUser(null);
         }
       }
@@ -168,6 +188,7 @@ export function ReportProvider({ children }) {
     localStorage.removeItem(CONFIG.STORAGE_KEYS.REMEMBER_ME);
     sessionStorage.removeItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
     sessionStorage.removeItem(CONFIG.STORAGE_KEYS.TELEGRAM_USER);
+    setAuthExpired(false);
     setTelegramUser(null);
   }, []);
 
@@ -203,6 +224,7 @@ export function ReportProvider({ children }) {
     telegramUser,
     setTelegramUser,
     isVerifying,
+    authStatus,
     llmVisibility,
     updateLlmSetting,
     logout

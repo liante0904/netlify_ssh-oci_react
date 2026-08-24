@@ -36,12 +36,16 @@ export default function LoginPage({ reason, user }) {
     );
   }
 
+  const isSessionExpired = reason === 'session_expired';
+
   return (
     <div style={s.container}>
       <div style={s.card}>
         <div style={s.icon}>📊</div>
         <h2 style={s.title}>리포트 허브</h2>
-        <p style={s.sub}>증권사 리서치 리포트 통합 뷰어</p>
+        <p style={s.sub}>
+          {isSessionExpired ? '세션이 만료되었습니다. 다시 로그인해 주세요.' : '증권사 리서치 리포트 통합 뷰어'}
+        </p>
 
         <button
           style={{ ...s.btn, background: '#0088cc', opacity: isAuthenticating ? 0.6 : 1 }}
