@@ -12,6 +12,7 @@ import { isDsReport, prefetchPdf } from '../utils/reportLinks';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { useFavorites } from '../hooks/useFavorites';
+import { useFavoriteSync } from '../hooks/useFavoriteSync';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
@@ -33,6 +34,7 @@ function ReportList({ onWriterClick }) {
   const isAdmin = telegramUser?.is_admin === true;
   const { mutateFavorite } = useFavoriteMutation(telegramUser);
   const { favoriteItems } = useFavorites(telegramUser);
+  const { syncFavoriteIds } = useFavoriteSync();
   const location = useLocation();
   const isOutlook = location.pathname.includes('outlook');
   const [outlookYear, setOutlookYear] = useState(null);
@@ -67,27 +69,11 @@ function ReportList({ onWriterClick }) {
     const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
     if (!token) return;
 
-    const baseUrl = CONFIG.API.BASE_URL;
     const LOCAL_KEY = 'report_favorites';
     const SYNC_FLAG_KEY = 'report_favorites_synced';
 
-    // 이미 동기화한 적 있으면 서버 데이터만 가져옴 (로컬과 병합)
-    if (localStorage.getItem(SYNC_FLAG_KEY)) {
-      request(`${baseUrl}/favorites`, { skipAuth: false })
-        .then(data => {
-          if (data?.items) {
-            const serverFavs = {};
-            data.items.forEach(f => { serverFavs[f.report_id] = true; });
-            setFavorites(prev => {
-              const merged = { ...prev, ...serverFavs };
-              localStorage.setItem(LOCAL_KEY, JSON.stringify(merged));
-              return merged;
-            });
-          }
-        })
-        .catch(() => {});
-      return;
-    }
+    // 이미 동기화한 적 있으면 useFavorites query 결과를 사용한다.
+    if (localStorage.getItem(SYNC_FLAG_KEY)) return;
 
     // 로컬에 저장된 즐겨찾기를 서버로 업로드
     const localSaved = localStorage.getItem(LOCAL_KEY);
@@ -100,46 +86,23 @@ function ReportList({ onWriterClick }) {
 
     const reportIds = Object.keys(localFavs).filter(id => localFavs[id]).map(Number);
     if (reportIds.length > 0) {
-      Promise.allSettled(
-        reportIds.map(id =>
-          request(`${baseUrl}/favorites/${id}`, { method: 'POST', skipAuth: false })
-        )
-      ).then(() => {
-        // 업로드 완료 후 서버 데이터로 갱신 (로컬과 병합)
-        request(`${baseUrl}/favorites`, { skipAuth: false })
-          .then(data => {
-            if (data?.items) {
-              const serverFavs = {};
-              data.items.forEach(f => { serverFavs[f.report_id] = true; });
-              setFavorites(prev => {
-                const merged = { ...prev, ...serverFavs };
-                localStorage.setItem(LOCAL_KEY, JSON.stringify(merged));
-                return merged;
-              });
-            }
-          })
-          .catch(() => {});
-      });
-    } else {
-      // 업로드할 게 없어도 서버 데이터로 갱신 (로컬과 병합)
-      request(`${baseUrl}/favorites`, { skipAuth: false })
-        .then(data => {
-          if (data?.items) {
-            const serverFavs = {};
-            data.items.forEach(f => { serverFavs[f.report_id] = true; });
-            setFavorites(prev => {
-              const merged = { ...prev, ...serverFavs };
-              localStorage.setItem(LOCAL_KEY, JSON.stringify(merged));
-              return merged;
-            });
-          }
-        })
-        .catch(() => {});
+      syncFavoriteIds(reportIds);
     }
 
     // 동기화 완료 플래그 (재실행 방지)
     localStorage.setItem(SYNC_FLAG_KEY, '1');
-  }, [telegramUser?.id]);
+  }, [syncFavoriteIds, telegramUser?.id]);
+
+  useEffect(() => {
+    if (!favoriteItems.length) return;
+    const serverFavs = {};
+    favoriteItems.forEach(item => { serverFavs[item.report_id] = true; });
+    setFavorites(prev => {
+      const merged = { ...prev, ...serverFavs };
+      localStorage.setItem('report_favorites', JSON.stringify(merged));
+      return merged;
+    });
+  }, [favoriteItems]);
 
   // 즐겨찾기 페이지 진입 시 서버에서 tbl_sec_reports와 JOIN된 풀 리포트 데이터 조회
   useEffect(() => {
@@ -148,22 +111,12 @@ function ReportList({ onWriterClick }) {
     const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
     if (!token) return;
 
-    const LOCAL_KEY = 'report_favorites';
     if (favoriteItems.length === 0) {
       setFavoriteReports({});
       return;
     }
 
-        // (A) favorites 상태 업데이트 (report_id 기준)
-        const serverFavs = {};
-        favoriteItems.forEach(item => { serverFavs[item.report_id] = true; });
-        setFavorites(prev => {
-          const merged = { ...prev, ...serverFavs };
-          localStorage.setItem(LOCAL_KEY, JSON.stringify(merged));
-          return merged;
-        });
-
-        // (B) 서버가 tbl_sec_reports와 JOIN한 풀 리포트 데이터 정규화
+        // 서버가 tbl_sec_reports와 JOIN한 풀 리포트 데이터 정규화
         const normalizedItems = favoriteItems
           .map(item => normalizeReportItem(item))
           .filter(Boolean);
