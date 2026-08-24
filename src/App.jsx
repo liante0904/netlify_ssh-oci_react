@@ -46,6 +46,10 @@ function AppContent() {
   // 글로벌 워밍업: 앱 시작 시 서버(Lambda) 미리 깨우기
   useEffect(() => {
     const warmUp = async () => {
+      const warmupKey = 'ssh-reports:server-warmup:v1';
+      if (!navigator.onLine || sessionStorage.getItem(warmupKey)) return;
+      sessionStorage.setItem(warmupKey, '1');
+
       const origin = window.location.origin;
       const targets = [
         `${origin}/.netlify/functions/proxy?warmup=true`,
@@ -61,7 +65,7 @@ function AppContent() {
     
     // 브라우저 로딩이 완전히 끝난 뒤 여유 있을 때 실행
     if (window.requestIdleCallback) {
-      window.requestIdleCallback(warmUp);
+      window.requestIdleCallback(warmUp, { timeout: 3000 });
     } else {
       setTimeout(warmUp, 2000);
     }
