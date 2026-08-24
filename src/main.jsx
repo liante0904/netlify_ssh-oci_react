@@ -11,6 +11,15 @@ if ('scrollRestoration' in window.history) {
   window.history.scrollRestoration = 'manual';
 }
 
+// 정적 셸만 네트워크 우선으로 캐시해 오프라인에서도 앱 진입을 허용한다.
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((error) => {
+      console.warn('Service worker registration failed:', error);
+    });
+  });
+}
+
 // 카카오 SDK 초기화
 const KAKAO_KEY = import.meta.env.VITE_KAKAO_JS_KEY;
 if (window.Kakao && KAKAO_KEY && !window.Kakao.isInitialized()) {
