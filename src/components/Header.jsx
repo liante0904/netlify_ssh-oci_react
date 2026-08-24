@@ -1,12 +1,10 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import KeywordOverlay from './menu/KeywordOverlay';
 import { AccountPopover, BellIcon, NotificationPopover } from './HeaderPopovers';
 import { useReport } from '../context/useReport';
-import { request } from '../utils/api';
 import { getDirectUrl } from '../utils/reportLinks';
 import { CONFIG } from '../constants/config';
 import { HEADER_PATHS } from '../utils/headerNavigation';
@@ -14,27 +12,11 @@ import { useHeaderSearchState } from '../hooks/useHeaderSearchState';
 import { useKeywords } from '../hooks/useKeywords';
 import { useTelegramAuth } from '../hooks/useTelegramAuth';
 import { useNotificationReadStatus } from '../hooks/useNotificationReadStatus';
+import { getNotificationKey, useNotifications } from '../hooks/useNotifications';
 import './Header.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
 const NOTIFICATION_TOAST_TIMEOUT_MS = 4500;
-
-function getNotificationKey(item) {
-  return item?.notification_key || `${item?.source || 'summary'}:${item?.id}`;
-}
-
-function normalizeNotificationItem(item) {
-  return {
-    ...item,
-    source: item.summary_model ? 'summary' : 'telegram',
-    notification_key: item.notification_key || `${item.summary_model ? 'summary' : 'telegram'}:${item.id}`,
-    created_at: item.created_at,
-    pdf_url: item.pdf_file_url || null,
-    telegram_url: item.telegram_url || null,
-    source_url: item.source_url || null,
-    sec_firm_order: item.sec_firm_order ?? null,
-  };
-}
 
 function normalizeLocalSummaryEvent(detail) {
   const id = `local-${detail.status || 'summary'}-${detail.report_id}-${Date.now()}`;
@@ -149,18 +131,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
   const [notificationToast, setNotificationToast] = useState(null);
   const { readNotifyIds, markAllAsRead, markAsRead } = useNotificationReadStatus(telegramUser);
 
-  const notificationsQuery = useQuery({
-    queryKey: ['notifications', telegramUser?.id ?? null],
-    queryFn: async () => {
-      const data = await request(`${CONFIG.API.REPORT_API_URL}/reports/notifications?limit=50`, { skipAuth: false });
-      const items = Array.isArray(data) ? data.map(normalizeNotificationItem) : [];
-      return items.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
-    },
-    enabled: Boolean(telegramUser?.id),
-    staleTime: 15_000,
-    refetchInterval: 30_000,
-  });
-  const notifications = notificationsQuery.data || [];
+  const { notifications } = useNotifications(telegramUser);
 
   // localStorage → DB 마이그레이션 (1회)
   useEffect(() => {
