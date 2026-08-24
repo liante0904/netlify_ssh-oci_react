@@ -7,7 +7,7 @@ import { request } from '../utils/api';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 import { getDirectUrl } from '../utils/reportLinks';
 import { useReport } from '../context/useReport';
-import LoadingSkeleton from './LoadingSkeleton';
+import AsyncState from './AsyncState';
 import './HomeDashboard.css';
 
 const PREVIEW_LIMIT = 5;
@@ -127,14 +127,14 @@ function HomeDashboard() {
             </div>
 
             <div className="home-preview-list">
-              {sections[section.key].isLoading ? (
-                <LoadingSkeleton rows={3} label={`${section.title} 불러오는 중`} />
-              ) : sections[section.key].error ? (
-                <div className="home-preview-state">{sections[section.key].error}</div>
-              ) : sections[section.key].items.length === 0 ? (
-                <div className="home-preview-state">표시할 항목이 없습니다.</div>
-              ) : (
-                sections[section.key].items.map((item) => {
+              <AsyncState
+                isLoading={sections[section.key].isLoading}
+                error={sections[section.key].error}
+                isEmpty={sections[section.key].items.length === 0}
+                empty={<div className="home-preview-state">표시할 항목이 없습니다.</div>}
+                loadingLabel={`${section.title} 불러오는 중`}
+              >
+                {sections[section.key].items.map((item) => {
                   const isFnGuide = section.key === 'fnguide';
                   if (isFnGuide) {
                     return (
@@ -170,8 +170,8 @@ function HomeDashboard() {
                       {item.date && <span className="home-preview-date">{item.date}</span>}
                     </button>
                   );
-                })
-              )}
+                })}
+              </AsyncState>
             </div>
           </article>
         ))}
