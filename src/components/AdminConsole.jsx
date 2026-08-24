@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReport } from '../context/useReport';
-import { FIRM_NAMES } from '../constants/firms';
 import { CONFIG } from '../constants/config';
 import AdminLogContent from './admin/AdminLogContent';
 import AdminReprocessPanel from './admin/AdminReprocessPanel';
+import { useAdminMetrics } from '../hooks/useAdminMetrics';
 import './AdminConsole.css';
 
 /* ===== Main Component ===== */
@@ -20,21 +20,9 @@ function AdminConsole() {
     }
   }, [telegramUser, navigate]);
 
-  const [firmRecords, setFirmRecords] = useState([]);
-  const [archiveHistory, setArchiveHistory] = useState([]);
-  const [summary, setSummary] = useState({
-    totalArchived: 0, todayCount: 0,
-    activeFirms: 0, totalFirms: FIRM_NAMES.length,
-    pendingReprocess: 0,
-  });
-  const [systemStatus, setSystemStatus] = useState(null);
-  const [statusLoading, setStatusLoading] = useState(true);
-  const [statusError, setStatusError] = useState(null);
   const [processing, setProcessing] = useState({});
   const [logLines, setLogLines] = useState([]);
   const [refreshIntervalMs, setRefreshIntervalMs] = useState(60000);
-  const [manualRefreshKey, setManualRefreshKey] = useState(0);
-  const [firmHealth, setFirmHealth] = useState(null);
 
   const [updatingLlm, setUpdatingLlm] = useState(false);
   const [llmFeedback, setLlmFeedback] = useState('');
@@ -60,108 +48,16 @@ function AdminConsole() {
     { label: '5분', value: 300000 },
   ];
 
-  // FastAPI `/admin/metrics` 조회
-  useEffect(() => {
-    let cancelled = false;
-    const fetchMetrics = async () => {
-      setStatusLoading(true);
-      setStatusError(null);
-      try {
-        const authToken = localStorage.getItem('auth_token');
-        const baseUrl = 'https://ssh-oci.duckdns.org';
-        const res = await fetch(`${baseUrl}/admin/metrics`, {
-          headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
-        });
-        if (res.status === 401) throw new Error('인증 필요 - 관리자 로그인 확인');
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        if (cancelled) return;
-
-        let lastCrawlDisplay = '-', lastPdfGenDisplay = '-';
-        if (data.last_activity?.last_save_time) {
-          const savedAt = new Date(data.last_activity.last_save_time);
-          const now = new Date();
-          const diffMin = Math.floor((now - savedAt) / 60000);
-          if (diffMin < 1) lastCrawlDisplay = '방금 전';
-          else if (diffMin < 60) lastCrawlDisplay = `${diffMin}분 전`;
-          else lastCrawlDisplay = `${Math.floor(diffMin / 60)}시간 전`;
-          lastPdfGenDisplay = lastCrawlDisplay;
-        }
-
-        setSystemStatus({
-          overall: data.overall || 'unknown',
-          db: data.database?.status || 'unknown',
-          api: data.overall === 'online' ? 'online' : 'degraded',
-          cpu: data.cpu?.percent ?? '-',
-          cpuCores: data.cpu?.cores ?? 0,
-          cpuFreq: data.cpu?.frequency_mhz,
-          memoryPercent: data.memory?.percent ?? 0,
-          memoryUsed: data.memory?.used_gb ?? 0,
-          memoryTotal: data.memory?.total_gb ?? 0,
-          diskPercent: data.disk?.percent ?? 0,
-          diskUsed: data.disk?.used_gb ?? 0,
-          diskTotal: data.disk?.total_gb ?? 0,
-          lastCrawl: lastCrawlDisplay,
-          lastPdfGen: lastPdfGenDisplay,
-          totalReports: data.reports?.total?.toLocaleString() ?? '-',
-          todayReports: data.reports?.today_inserts ?? 0,
-          uptimeDays: data.system?.uptime_days ?? 0,
-        });
-
-        // 증권사별 실적
-        const byFirm = (data.reports?.by_firm_today || []).map(f => ({
-          name: f.firm,
-          todayCount: f.count,
-        }));
-        setFirmRecords(byFirm);
-
-        // 아카이브 히스토리
-        const hist = (data.reports?.archive_history || []).map(h => ({
-          label: h.label,
-          count: h.count,
-        }));
-        setArchiveHistory(hist);
-
-        // Firm Health
-        try {
-          const healthRes = await fetch(`${baseUrl}/admin/firm-health`, {
-            headers: authToken ? { Authorization: `Bearer ${authToken}` } : {},
-          });
-          if (healthRes.ok) setFirmHealth(await healthRes.json());
-        } catch {
-          // ignore
-        }
-
-        // 요약
-        const totalArchived = hist.reduce((sum, d) => sum + d.count, 0);
-        const todayCount = hist.length > 0 ? hist[hist.length - 1].count : 0;
-        setSummary({
-          totalArchived,
-          todayCount,
-          activeFirms: data.reports?.active_firms_today ?? 0,
-          totalFirms: FIRM_NAMES.length,
-          pendingReprocess: 0,
-        });
-      } catch (err) {
-        if (!cancelled) {
-          setStatusError(err.message);
-          setSystemStatus({
-            overall: 'degraded', db: 'unknown', api: 'unknown',
-            cpu: 0, cpuCores: 0, cpuFreq: null,
-            memoryPercent: 0, memoryUsed: 0, memoryTotal: 0,
-            diskPercent: 0, diskUsed: 0, diskTotal: 0,
-            lastCrawl: err.message === '인증 필요 - 관리자 로그인 확인' ? '(관리자 로그인 필요)' : '(연결 실패)',
-            lastPdfGen: '-', totalReports: '-', todayReports: 0, uptimeDays: 0,
-          });
-        }
-      } finally {
-        if (!cancelled) setStatusLoading(false);
-      }
-    };
-    fetchMetrics();
-    const interval = setInterval(fetchMetrics, refreshIntervalMs);
-    return () => { cancelled = true; clearInterval(interval); };
-  }, [refreshIntervalMs, manualRefreshKey]);
+  const {
+    firmRecords,
+    archiveHistory,
+    summary,
+    systemStatus,
+    statusLoading,
+    statusError,
+    firmHealth,
+    retryMetrics,
+  } = useAdminMetrics(Boolean(telegramUser?.is_admin), refreshIntervalMs);
 
   const maxCount = Math.max(...firmRecords.map((f) => f.todayCount), 1);
 
@@ -315,7 +211,7 @@ function AdminConsole() {
       <div className="refresh-bar">
         <button
           className="refresh-btn"
-          onClick={() => setManualRefreshKey(k => k + 1)}
+          onClick={() => retryMetrics()}
           disabled={statusLoading}
           title="수동 갱신"
         >
