@@ -30,6 +30,7 @@ function SearchOverlay() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const previousFocusRef = useRef(null);
   const overlayRef = useFocusTrap(isSearchOpen);
   const selectedCompanyOrder = category === 'company'
     ? getSelectedCompanyOrder(activeSearch, query)
@@ -58,6 +59,12 @@ function SearchOverlay() {
       setPendingSearch({ query: '', category: '' });
     }
   }, [isSearchOpen, searchParams, pendingSearch, setPendingSearch, onSearch, setSearchParams]);
+
+  useEffect(() => {
+    if (!isSearchOpen) return undefined;
+    previousFocusRef.current = document.activeElement;
+    return () => previousFocusRef.current?.focus?.();
+  }, [isSearchOpen]);
 
   const showToast = useCallback((message) => {
     setToast({ visible: true, message });
