@@ -511,7 +511,7 @@ function AdminConsole() {
             </button>
             <button
               className="close-btn"
-              onClick={() => setLogViewer({ file: null, content: '', loading: false, error: null })}
+              onClick={goLogRoot}
               title="닫기"
             >
               ✕

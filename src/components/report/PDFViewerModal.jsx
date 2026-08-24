@@ -207,7 +207,7 @@ const PDFViewerModal = ({ report, onClose }) => {
     return () => { window.removeEventListener('resize', onR); window.visualViewport?.removeEventListener('resize', onR); };
   }, []);
 
-  const copyUrl = useCallback(async () => { try { await navigator.clipboard.writeText(shareUrl || window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch {} }, [shareUrl]);
+  const copyUrl = useCallback(async () => { try { await navigator.clipboard.writeText(shareUrl || window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* clipboard unavailable */ } }, [shareUrl]);
 
   const kakaoShare = useCallback(() => {
     const st = `[${firm}] ${title}`;

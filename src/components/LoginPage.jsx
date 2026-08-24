@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
 import { useTelegramAuth } from '../hooks/useTelegramAuth';
-import { useReport } from '../context/useReport';
 import { CONFIG } from '../constants/config';
 
 /**
@@ -16,7 +15,7 @@ export default function LoginPage({ reason, user }) {
     const interval = setInterval(() => {
       const stored = localStorage.getItem(CONFIG.STORAGE_KEYS.TELEGRAM_USER);
       if (stored) {
-        try { if (JSON.parse(stored).status === 'active') window.location.reload(); } catch {}
+        try { if (JSON.parse(stored).status === 'active') window.location.reload(); } catch { /* ignore malformed storage */ }
       }
     }, 120000);
     return () => clearInterval(interval);

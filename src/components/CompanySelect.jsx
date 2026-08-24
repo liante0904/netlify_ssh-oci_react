@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { createPortal } from 'react-dom';
 import { useGridOverlay } from '../hooks/useGridOverlay';
 import { hasGridSelection } from '../utils/gridSelect';
