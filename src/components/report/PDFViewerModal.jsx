@@ -63,6 +63,9 @@ const PageCanvasMemo = React.memo(PageCanvas);
 const PDFViewerModal = ({ report, onClose }) => {
   const histRef = useRef(false);
   const bodyRef = useRef(null);
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousActiveElementRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [pages, setPages] = useState([]);       // {pageNum, page}[]
@@ -98,10 +101,32 @@ const PDFViewerModal = ({ report, onClose }) => {
   // 키보드 사용자도 동일한 닫기 동작을 사용할 수 있게 한다.
   useEffect(() => {
     if (!report) return;
+    previousActiveElementRef.current = document.activeElement;
+    requestAnimationFrame(() => closeButtonRef.current?.focus());
+    return () => previousActiveElementRef.current?.focus?.();
+  }, [report]);
+
+  useEffect(() => {
+    if (!report) return;
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') {
         event.preventDefault();
         onCloseRef.current();
+        return;
+      }
+      if (event.key !== 'Tab' || !modalRef.current) return;
+      const focusable = [...modalRef.current.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )];
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
       }
     };
     document.addEventListener('keydown', handleKeyDown);
@@ -221,7 +246,7 @@ const PDFViewerModal = ({ report, onClose }) => {
   if (!report) return null;
 
   return (
-    <div className="pdf-viewer-overlay" role="dialog" aria-modal="true" aria-labelledby="pdf-viewer-title">
+    <div ref={modalRef} className="pdf-viewer-overlay" role="dialog" aria-modal="true" aria-labelledby="pdf-viewer-title">
       <div className="pdf-viewer-header">
         <div className="pdf-viewer-header-left">
           {firm && <span className="pdf-viewer-firm-badge">{firm}</span>}
@@ -235,7 +260,7 @@ const PDFViewerModal = ({ report, onClose }) => {
             {copied ? <svg viewBox="0 0 24 24" width="18" height="18" fill="#34c759"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
               : <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>}
           </button>
-          <button className="pdf-viewer-close" onClick={onClose} aria-label="뷰어 닫기">
+          <button ref={closeButtonRef} className="pdf-viewer-close" onClick={onClose} aria-label="뷰어 닫기">
             <svg viewBox="0 0 24 24" width="24" height="24"><path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.41L10.59 13.41 4.29 19.7 2.88 18.29 9.17 12 2.88 5.71 4.29 4.3l6.3 6.29 6.3-6.29z"/></svg>
           </button>
         </div>
