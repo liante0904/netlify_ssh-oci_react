@@ -94,6 +94,7 @@ function FnGuideList() {
     enabled: selectedDate !== null,
     staleTime: 60_000,
   });
+  const { fetchNextPage, refetch: refetchSummaries } = summariesQuery;
   const summaries = useMemo(
     () => summariesQuery.data?.pages.flat() || [],
     [summariesQuery.data?.pages]
@@ -101,8 +102,8 @@ function FnGuideList() {
   const isLoading = summariesQuery.isPending || summariesQuery.isFetchingNextPage;
   const hasMore = Boolean(summariesQuery.hasNextPage);
   const fetchSummaries = useCallback((isInitial = false) => (
-    isInitial ? summariesQuery.refetch() : summariesQuery.fetchNextPage()
-  ), [summariesQuery.fetchNextPage, summariesQuery.refetch]);
+    isInitial ? refetchSummaries() : fetchNextPage()
+  ), [fetchNextPage, refetchSummaries]);
 
   // 검색 수동 실행 (엔터키 또는 검색 버튼 클릭)
   const handleSearchSubmit = (e) => {
