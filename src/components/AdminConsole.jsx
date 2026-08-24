@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReport } from '../context/useReport';
-import { CONFIG } from '../constants/config';
 import AdminLogContent from './admin/AdminLogContent';
 import AdminReprocessPanel from './admin/AdminReprocessPanel';
 import { useAdminMetrics } from '../hooks/useAdminMetrics';
+import { useAdminLogs } from '../hooks/useAdminLogs';
 import './AdminConsole.css';
 
 /* ===== Main Component ===== */
@@ -58,6 +58,14 @@ function AdminConsole() {
     firmHealth,
     retryMetrics,
   } = useAdminMetrics(Boolean(telegramUser?.is_admin), refreshIntervalMs);
+  const {
+    logBrowser,
+    logViewer,
+    fetchLogDir,
+    fetchLogFile,
+    openLogDir,
+    goLogRoot,
+  } = useAdminLogs(Boolean(telegramUser?.is_admin));
 
   const maxCount = Math.max(...firmRecords.map((f) => f.todayCount), 1);
 
@@ -96,98 +104,12 @@ function AdminConsole() {
     setLogLines([]);
   }, []);
 
-  /* ===== Log Browser (서버 로그 파일 탐색/보기) ===== */
-  const API_BASE = CONFIG.API.BASE_URL;
-  const authToken = localStorage.getItem('auth_token');
-  const authHeaders = React.useMemo(
-    () => (authToken ? { Authorization: `Bearer ${authToken}` } : {}),
-    [authToken]
-  );
-
-  const [logBrowser, setLogBrowser] = useState({
-    entries: [],
-    currentPath: null,
-    loading: false,
-    error: null,
-  });
-  const [logViewer, setLogViewer] = useState({
-    file: null,
-    content: '',
-    loading: false,
-    error: null,
-  });
   const logViewerRef = useRef(null);
 
-  const fetchLogDir = useCallback(async (path) => {
-    setLogBrowser((prev) => ({ ...prev, loading: true, error: null }));
-    try {
-      const params = path ? `?path=${encodeURIComponent(path)}` : '';
-      const res = await fetch(`${API_BASE}/admin/logs${params}`, {
-        headers: authHeaders,
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setLogBrowser({
-        entries: data.entries || [],
-        currentPath: data.current_path || null,
-        loading: false,
-        error: null,
-      });
-    } catch (err) {
-      setLogBrowser((prev) => ({ ...prev, loading: false, error: err.message }));
-    }
-  }, [API_BASE, authHeaders]);
-
-  const fetchLogFile = useCallback(async (filePath, opts = {}) => {
-    const { tail = false, lines = 500 } = opts;
-    setLogViewer({ file: filePath, content: '', loading: true, error: null });
-    try {
-      const params = new URLSearchParams({
-        file: filePath,
-        lines: String(lines),
-        tail: String(tail),
-      });
-      const res = await fetch(`${API_BASE}/admin/logs/view?${params}`, {
-        headers: authHeaders,
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.detail || `HTTP ${res.status}`);
-      }
-      const data = await res.json();
-      setLogViewer({
-        file: filePath,
-        content: data.content || '',
-        loading: false,
-        error: null,
-      });
-      // 자동 스크롤 (tail 모드에서 bottom)
-      setTimeout(() => {
-        if (logViewerRef.current) {
-          logViewerRef.current.scrollTop = logViewerRef.current.scrollHeight;
-        }
-      }, 50);
-    } catch (err) {
-      setLogViewer((prev) => ({ ...prev, loading: false, error: err.message }));
-    }
-  }, [API_BASE, authHeaders]);
-
-  const openLogDir = useCallback((path) => {
-    setLogViewer({ file: null, content: '', loading: false, error: null });
-    fetchLogDir(path);
-  }, [fetchLogDir]);
-
-  const goLogRoot = useCallback(() => {
-    setLogViewer({ file: null, content: '', loading: false, error: null });
-    fetchLogDir(null);
-  }, [fetchLogDir]);
-
-  // 최초 마운트 시 로그 디렉토리 로드
   useEffect(() => {
-    if (telegramUser?.is_admin) {
-      fetchLogDir(null);
-    }
-  }, [telegramUser?.is_admin, fetchLogDir]);
+    if (!logViewer.content || !logViewerRef.current) return;
+    logViewerRef.current.scrollTop = logViewerRef.current.scrollHeight;
+  }, [logViewer.content]);
 
   if (!telegramUser?.is_admin) {
     return null;
