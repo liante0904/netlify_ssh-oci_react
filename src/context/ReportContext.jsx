@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useBoards } from '../hooks/useBoards';
 import { useLlmVisibilityMutation } from '../hooks/useLlmVisibilityMutation';
@@ -155,9 +155,9 @@ export function ReportProvider({ children }) {
     localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, theme);
   }, [theme]);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
-  };
+  }, []);
 
   const handleSearch = useCallback(({ query, category, board = null, companyOrder = null }) => {
     const nextSearch = normalizeSearchSelection({ query, category, board, companyOrder });
@@ -186,7 +186,7 @@ export function ReportProvider({ children }) {
     setTelegramUser(null);
   }, []);
 
-  const value = {
+  const value = useMemo(() => ({
     searchQuery: activeSearch,
     setSearchQuery: setActiveSearch,
     pendingSearch: stagedSearch,
@@ -222,7 +222,30 @@ export function ReportProvider({ children }) {
     llmVisibility,
     updateLlmSetting,
     logout
-  };
+  }), [
+    activeSearch,
+    stagedSearch,
+    isSearchOverlayOpen,
+    isMenuOpen,
+    isTopMenuOpen,
+    sortBy,
+    boards,
+    isLoadingBoards,
+    viewerReport,
+    companyNames,
+    theme,
+    telegramUser,
+    isVerifying,
+    authStatus,
+    llmVisibility,
+    handleSearch,
+    toggleSearch,
+    toggleMenu,
+    toggleMenuTop,
+    toggleTheme,
+    updateLlmSetting,
+    logout,
+  ]);
 
   return (
     <ReportContext.Provider value={value}>
