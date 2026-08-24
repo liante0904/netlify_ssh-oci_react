@@ -1,6 +1,6 @@
 import React, { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import HamburgerMenu from './HamburgerMenu';
 import KeywordOverlay from './menu/KeywordOverlay';
@@ -13,6 +13,7 @@ import { HEADER_PATHS } from '../utils/headerNavigation';
 import { useHeaderSearchState } from '../hooks/useHeaderSearchState';
 import { useKeywords } from '../hooks/useKeywords';
 import { useTelegramAuth } from '../hooks/useTelegramAuth';
+import { useNotificationReadStatus } from '../hooks/useNotificationReadStatus';
 import './Header.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -55,7 +56,6 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activePopover, setActivePopover] = useState(null);
   const popoverTriggerRef = useRef(null);
-  const queryClient = useQueryClient();
 
   const {
     toggleSearch, 
@@ -147,7 +147,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
 
   const [localNotifications, setLocalNotifications] = useState([]);
   const [notificationToast, setNotificationToast] = useState(null);
-  const [readNotifyIds, setReadNotifyIds] = useState([]);
+  const { readNotifyIds, markAllAsRead, markAsRead } = useNotificationReadStatus(telegramUser);
 
   const notificationsQuery = useQuery({
     queryKey: ['notifications', telegramUser?.id ?? null],
@@ -162,17 +162,6 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
   });
   const notifications = notificationsQuery.data || [];
 
-  // DB에서 읽음 상태 로드
-  useEffect(() => {
-    if (!telegramUser) return;
-    (async () => {
-      try {
-        const data = await request(`${CONFIG.API.REPORT_API_URL}/reports/notifications/read-status`, { skipAuth: false, logoutOn401: false });
-        if (Array.isArray(data)) setReadNotifyIds(data);
-      } catch {}
-    })();
-  }, [telegramUser]);
-
   // localStorage → DB 마이그레이션 (1회)
   useEffect(() => {
     if (!telegramUser) return;
@@ -181,11 +170,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
       if (saved) {
         const ids = JSON.parse(saved);
         if (Array.isArray(ids) && ids.length > 0 && readNotifyIds.length === 0) {
-          setReadNotifyIds(ids);
-          request(`${CONFIG.API.REPORT_API_URL}/reports/notifications/mark-all-read`, {
-            method: 'POST', skipAuth: false, logoutOn401: false,
-            body: JSON.stringify({ keys: ids }),
-          }).catch(() => {});
+          markAllAsRead(ids);
         }
         localStorage.removeItem('ssh_read_notifications');
       }
@@ -205,26 +190,13 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
 
   const handleMarkAllAsRead = useCallback(() => {
     const allIds = visibleNotifications.flatMap((item) => [getNotificationKey(item), item.id]);
-    setReadNotifyIds(allIds);
-    request(`${CONFIG.API.REPORT_API_URL}/reports/notifications/mark-all-read`, {
-      method: 'POST', skipAuth: false, logoutOn401: false,
-      body: JSON.stringify({ keys: allIds }),
-    }).then(() => queryClient.invalidateQueries({
-      queryKey: ['notifications', telegramUser?.id ?? null],
-    })).catch(() => {});
-  }, [queryClient, telegramUser, visibleNotifications]);
+    markAllAsRead(allIds);
+  }, [markAllAsRead, visibleNotifications]);
 
   const handleNotificationItemClick = useCallback((item) => {
     const notificationKey = getNotificationKey(item);
     if (!readNotifyIds.includes(notificationKey) && !readNotifyIds.includes(item.id)) {
-      const nextReadIds = [...readNotifyIds, notificationKey, item.id];
-      setReadNotifyIds(nextReadIds);
-      request(`${CONFIG.API.REPORT_API_URL}/reports/notifications/mark-read`, {
-        method: 'POST', skipAuth: false, logoutOn401: false,
-        body: JSON.stringify({ notification_key: notificationKey }),
-      }).then(() => queryClient.invalidateQueries({
-        queryKey: ['notifications', telegramUser?.id ?? null],
-      })).catch(() => {});
+      markAsRead(notificationKey);
     }
     setActivePopover(null);
 
@@ -245,7 +217,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
       handleSearch(item.article_title);
       navigate('/');
     }
-  }, [queryClient, readNotifyIds, handleSearch, navigate, telegramUser]);
+  }, [markAsRead, readNotifyIds, handleSearch, navigate]);
 
   useEffect(() => {
     const handleSummaryNotification = (event) => {
