@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useReport } from '../context/useReport';
 import { CONFIG } from '../constants/config';
 import { request } from '../utils/api';
@@ -6,9 +7,9 @@ import { DEV_AUTH_ENABLED } from '../utils/devAuth';
 
 export const useKeywords = (telegramUser) => {
   const { logout } = useReport();
-  const [keywords, setKeywords] = useState([]);
+  const queryClient = useQueryClient();
+  const [devKeywords, setDevKeywords] = useState([]);
   const [newKeyword, setNewKeyword] = useState('');
-  const [isLoadingKeywords, setIsLoadingKeywords] = useState(false);
   const [isKeywordOverlayOpen, setIsKeywordOverlayOpen] = useState(false);
   const [lastDeleted, setLastDeleted] = useState(null);
 
@@ -22,41 +23,37 @@ export const useKeywords = (telegramUser) => {
     return [];
   };
 
-  const fetchKeywords = useCallback(async () => {
-    if (!telegramUser) return;
-    if (isDevBypassSession) {
-      setKeywords([]);
-      return;
-    }
-
-    setIsLoadingKeywords(true);
-    try {
+  const queryKey = ['keywords', telegramUser?.id ?? null];
+  const keywordsQuery = useQuery({
+    queryKey,
+    queryFn: async () => {
       const data = await request(`${CONFIG.API.BASE_URL}/keywords`, {}, logout);
-      const keywordList = normalizeKeywordList(data);
-      setKeywords(keywordList.filter(k => k.is_active));
-    } catch {
-      // 에러는 request 내부에서 이미 로깅됨
-    } finally {
-      setIsLoadingKeywords(false);
-    }
-  }, [logout, telegramUser, isDevBypassSession]);
+      return normalizeKeywordList(data).filter(k => k.is_active);
+    },
+    enabled: Boolean(telegramUser) && !isDevBypassSession,
+    staleTime: 60_000,
+  });
+  const keywords = isDevBypassSession ? devKeywords : (keywordsQuery.data || []);
 
-  const syncKeywords = async (updatedKeywords) => {
-    if (isDevBypassSession) {
-      setKeywords(updatedKeywords.map((keyword) => ({ keyword, is_active: true })));
-      return;
-    }
-
-    try {
+  const keywordsMutation = useMutation({
+    mutationFn: async (updatedKeywords) => {
       const data = await request(`${CONFIG.API.BASE_URL}/keywords/sync`, {
         method: 'POST',
-        body: JSON.stringify({ keywords: updatedKeywords })
+        body: JSON.stringify({ keywords: updatedKeywords }),
       }, logout);
-      const keywordList = normalizeKeywordList(data);
-      setKeywords(keywordList.filter(k => k.is_active));
-    } catch {
-      // 에러 로깅됨
+      return normalizeKeywordList(data).filter(k => k.is_active);
+    },
+    onSuccess: (keywordList) => {
+      queryClient.setQueryData(queryKey, keywordList);
+    },
+  });
+
+  const syncKeywords = (updatedKeywords) => {
+    if (isDevBypassSession) {
+      setDevKeywords(updatedKeywords.map((keyword) => ({ keyword, is_active: true })));
+      return;
     }
+    keywordsMutation.mutate(updatedKeywords);
   };
 
   const handleAddKeyword = () => {
@@ -116,15 +113,7 @@ export const useKeywords = (telegramUser) => {
     setLastDeleted(null);
   };
 
-  useEffect(() => {
-    if (telegramUser) {
-      fetchKeywords();
-    } else {
-      setKeywords([]);
-      setIsKeywordOverlayOpen(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [telegramUser]);
+  const isLoadingKeywords = keywordsQuery.isPending || keywordsMutation.isPending;
 
   return {
     keywords,
@@ -141,6 +130,5 @@ export const useKeywords = (telegramUser) => {
     toggleKeywordOverlay,
     openKeywordOverlay,
     closeKeywordOverlay,
-    setKeywords,
   };
 };
