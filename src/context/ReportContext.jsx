@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useBoards } from '../hooks/useBoards';
+import { useLlmVisibilityMutation } from '../hooks/useLlmVisibilityMutation';
 import { CONFIG } from '../constants/config';
 import { FIRM_NAMES } from '../constants/firms';
 import { request } from '../utils/api';
@@ -12,7 +13,6 @@ import {
 import ReportContext from './reportContext';
 
 export function ReportProvider({ children }) {
-  const queryClient = useQueryClient();
   const [activeSearch, setActiveSearch] = useState(createEmptySearchSelection());
   const [stagedSearch, setStagedSearch] = useState(createEmptySearchSelection());
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
@@ -58,6 +58,7 @@ export function ReportProvider({ children }) {
     queryFn: () => request(CONFIG.API.LLM_SETTING_URL),
     staleTime: 60_000,
   });
+  const llmVisibilityMutation = useLlmVisibilityMutation();
 
   useEffect(() => {
     if (llmSettingQuery.data?.visibility) setLlmVisibility(llmSettingQuery.data.visibility);
@@ -127,21 +128,14 @@ export function ReportProvider({ children }) {
   // LLM 노출 설정 변경 (관리자 전용)
   const updateLlmSetting = useCallback(async (newVisibility) => {
     try {
-      const data = await request(CONFIG.API.ADMIN_LLM_SETTING_URL, {
-        method: 'POST',
-        body: JSON.stringify({ visibility: newVisibility })
-      });
-      if (data && data.status === 'success') {
-        setLlmVisibility(newVisibility);
-        queryClient.setQueryData(['llm-visibility'], { visibility: newVisibility });
-        return { success: true, visibility: newVisibility };
-      }
-      return { success: false, message: 'Invalid response' };
+      const data = await llmVisibilityMutation.mutateAsync(newVisibility);
+      setLlmVisibility(data.visibility);
+      return { success: true, visibility: data.visibility };
     } catch (error) {
       console.error('Failed to update LLM visibility setting:', error);
       return { success: false, message: error.message };
     }
-  }, [queryClient]);
+  }, [llmVisibilityMutation]);
 
   const [sortBy, setSortBy] = useState('time');
   const [viewerReport, setViewerReport] = useState(null);
