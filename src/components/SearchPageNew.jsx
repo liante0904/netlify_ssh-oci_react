@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import { useSearchParams } from 'react-router-dom';
 import CompanySelect from './CompanySelect';
 import BoardSelect from './BoardSelect';
 import ShareMenu from './ShareMenu';
@@ -30,15 +31,16 @@ function SearchPageNew() {
   const isAdmin = telegramUser?.is_admin === true;
   const { mutateFavorite } = useFavoriteMutation(telegramUser);
   const { triggerSummary } = useSummaryMutation();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // 로컬 필터 상태
-  const [searchTerm, setSearchTerm] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [category, setCategory] = useState('title');
-  const [selectedCompany, setSelectedCompany] = useState('');
-  const [selectedBoard, setSelectedBoard] = useState('');
-  const [selectedRoute, setSelectedRoute] = useState('recent');
-  const [selectedSort, setSelectedSort] = useState('time');
+  const [searchTerm, setSearchTerm] = useState(() => searchParams.get('q') || '');
+  const [debouncedQuery, setDebouncedQuery] = useState(() => searchParams.get('q') || '');
+  const [category, setCategory] = useState(() => searchParams.get('category') || 'title');
+  const [selectedCompany, setSelectedCompany] = useState(() => searchParams.get('company') || '');
+  const [selectedBoard, setSelectedBoard] = useState(() => searchParams.get('board') || '');
+  const [selectedRoute, setSelectedRoute] = useState(() => searchParams.get('route') || 'recent');
+  const [selectedSort, setSelectedSort] = useState(() => searchParams.get('sort') || 'time');
 
   // 텍스트 디바운스
   useEffect(() => {
@@ -47,6 +49,19 @@ function SearchPageNew() {
     }, 300);
     return () => clearTimeout(handler);
   }, [searchTerm]);
+
+  // 검색 화면의 필터를 URL에 반영해 새로고침/공유/뒤로가기를 보존한다.
+  useEffect(() => {
+    const params = new URLSearchParams();
+    const trimmedQuery = debouncedQuery.trim();
+    if (trimmedQuery) params.set('q', trimmedQuery);
+    if (category !== 'title') params.set('category', category);
+    if (selectedCompany) params.set('company', selectedCompany);
+    if (selectedBoard) params.set('board', selectedBoard);
+    if (selectedRoute !== 'recent') params.set('route', selectedRoute);
+    if (selectedSort !== 'time') params.set('sort', selectedSort);
+    setSearchParams(params, { replace: true });
+  }, [category, debouncedQuery, selectedBoard, selectedCompany, selectedRoute, selectedSort, setSearchParams]);
 
   const { boards } = useBoards(selectedCompany);
 
