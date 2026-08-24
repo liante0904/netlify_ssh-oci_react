@@ -179,10 +179,14 @@ function ReportList({ onWriterClick }) {
 
   const toggleFavorite = (id) => {
     const isAdding = !favorites[id];
+    const previous = favorites;
     const next = { ...favorites, [id]: isAdding };
     setFavorites(next);
     localStorage.setItem('report_favorites', JSON.stringify(next));
-    mutateFavorite(id, isAdding);
+    mutateFavorite(id, isAdding)?.catch(() => {
+      setFavorites(previous);
+      localStorage.setItem('report_favorites', JSON.stringify(previous));
+    });
   };
 
   const handleOpenShareMenu = (e, report) => {

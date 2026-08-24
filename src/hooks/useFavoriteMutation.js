@@ -17,8 +17,8 @@ export function useFavoriteMutation(telegramUser) {
   });
 
   const mutateFavorite = (id, isAdding) => {
-    if (!telegramUser || !localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN)) return;
-    mutation.mutate({ id, isAdding });
+    if (!telegramUser || !localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN)) return null;
+    return mutation.mutateAsync({ id, isAdding });
   };
 
   return {
