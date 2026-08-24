@@ -12,6 +12,7 @@ import {
 import './SearchOverlay.css';
 import CompanySelect from './CompanySelect';
 import BoardSelect from './BoardSelect';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 function SearchOverlay() {
   const { 
@@ -29,6 +30,7 @@ function SearchOverlay() {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const inputRef = useRef(null);
+  const overlayRef = useFocusTrap(isSearchOpen);
   const selectedCompanyOrder = category === 'company'
     ? getSelectedCompanyOrder(activeSearch, query)
     : '';
@@ -151,7 +153,8 @@ function SearchOverlay() {
   return (
     <>
       <div className={`search-overlay ${isSearchOpen ? 'visible' : ''}`} id="searchOverlay" onClick={toggleSearch}>
-        <div className="search-container" onClick={(e) => e.stopPropagation()}>
+        <div ref={overlayRef} className="search-container" role="dialog" aria-modal="true" aria-labelledby="search-overlay-title" onClick={(e) => e.stopPropagation()}>
+          <h2 id="search-overlay-title" className="sr-only">리포트 검색</h2>
           <select
             id="searchCategory"
             className="search-category"

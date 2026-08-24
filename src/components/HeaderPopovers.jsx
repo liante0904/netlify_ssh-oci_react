@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useFocusTrap } from '../hooks/useFocusTrap';
 
 function BellIcon() {
   return (
@@ -26,6 +27,7 @@ function CloseIcon() {
 }
 
 function HeaderPopoverShell({ labelledBy, children, onClose }) {
+  const popoverRef = useFocusTrap(true);
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Escape') onClose();
@@ -38,6 +40,7 @@ function HeaderPopoverShell({ labelledBy, children, onClose }) {
   return (
     <div className="header-popover-layer" onClick={onClose}>
       <section
+        ref={popoverRef}
         className="header-popover"
         role="dialog"
         id={`${labelledBy}-dialog`}
