@@ -7,11 +7,11 @@ import ReportGroup from './report/ReportGroup';
 import { useReport } from '../context/useReport';
 import { useReportFetch } from '../hooks/useReportFetch';
 import { CONFIG } from '../constants/config';
-import { request } from '../utils/api';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import AsyncErrorState from './AsyncErrorState';
 import { useBoards } from '../hooks/useBoards';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
+import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import './SearchPageNew.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -29,6 +29,7 @@ function SearchPageNew() {
   const { telegramUser } = useReport();
   const isAdmin = telegramUser?.is_admin === true;
   const { mutateFavorite } = useFavoriteMutation(telegramUser);
+  const { triggerSummary } = useSummaryMutation();
 
   // 로컬 필터 상태
   const [searchTerm, setSearchTerm] = useState('');
@@ -139,7 +140,6 @@ function SearchPageNew() {
   }, []);
 
   const handleTriggerSummary = useCallback(async (reportId, engine = 'deepseek', force = false, report = null) => {
-    const baseUrl = CONFIG.API.BASE_URL;
     const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
     if (!token) return;
     const title = report?.title || report?.article_title || `리포트 #${reportId}`;
@@ -173,12 +173,7 @@ function SearchPageNew() {
     });
 
     try {
-      const url = `${baseUrl}/admin/reports/${reportId}/summarize?engine=${engine}${force ? '&force=true' : ''}`;
-      const result = await request(url, {
-        method: 'POST',
-        skipAuth: false,
-        timeout: 180000,
-      });
+      const result = await triggerSummary({ reportId, engine, force });
       if (result?.status === 'success' || result?.status === 'skipped') {
         setSummaryCompletedIds(prev => new Set(prev).add(reportId));
         emitSummaryNotification({
@@ -206,7 +201,7 @@ function SearchPageNew() {
         message: `${modelLabel} 요약 요청에 실패했습니다: ${title}`,
       });
     }
-  }, [summaryRequestedIds]);
+  }, [summaryRequestedIds, triggerSummary]);
 
   const handleReset = () => {
     setSearchTerm('');

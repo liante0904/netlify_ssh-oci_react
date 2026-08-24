@@ -5,7 +5,6 @@ import ShareMenu from './ShareMenu';
 import ReportGroup from './report/ReportGroup';
 import { useReportFetch } from '../hooks/useReportFetch';
 import { useReport } from '../context/useReport';
-import { request } from '../utils/api';
 import { CONFIG } from '../constants/config';
 import { getReportSectionByPath } from '../constants/reportSections';
 import { isDsReport, prefetchPdf } from '../utils/reportLinks';
@@ -13,6 +12,7 @@ import { normalizeReportItem } from '../utils/reportNormalizer';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { useFavorites } from '../hooks/useFavorites';
 import { useFavoriteSync } from '../hooks/useFavoriteSync';
+import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
@@ -35,6 +35,7 @@ function ReportList({ onWriterClick }) {
   const { mutateFavorite } = useFavoriteMutation(telegramUser);
   const { favoriteItems } = useFavorites(telegramUser);
   const { syncFavoriteIds } = useFavoriteSync();
+  const { triggerSummary } = useSummaryMutation();
   const location = useLocation();
   const isOutlook = location.pathname.includes('outlook');
   const [outlookYear, setOutlookYear] = useState(null);
@@ -196,7 +197,6 @@ function ReportList({ onWriterClick }) {
   };
 
   const handleTriggerSummary = async (reportId, engine = 'deepseek', force = false, report = null) => {
-    const baseUrl = CONFIG.API.BASE_URL;
     const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
     if (!token) return;
     const title = report?.title || report?.article_title || `리포트 #${reportId}`;
@@ -230,12 +230,7 @@ function ReportList({ onWriterClick }) {
     });
 
     try {
-      const url = `${baseUrl}/admin/reports/${reportId}/summarize?engine=${engine}${force ? '&force=true' : ''}`;
-      const result = await request(url, {
-        method: 'POST',
-        skipAuth: false,
-        timeout: 180000,
-      });
+      const result = await triggerSummary({ reportId, engine, force });
       if (result?.status === 'success') {
         setSummaryCompletedIds(prev => new Set(prev).add(reportId));
         emitSummaryNotification({
