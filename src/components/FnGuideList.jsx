@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useSearchParams } from 'react-router-dom';
 import { CONFIG } from '../constants/config';
@@ -60,7 +60,7 @@ function FnGuideList() {
     },
     staleTime: 60_000,
   });
-  const dates = datesQuery.data || [];
+  const dates = useMemo(() => datesQuery.data || [], [datesQuery.data]);
   const isLoadingDates = datesQuery.isPending;
   const fetchDates = datesQuery.refetch;
 
@@ -94,7 +94,10 @@ function FnGuideList() {
     enabled: selectedDate !== null,
     staleTime: 60_000,
   });
-  const summaries = summariesQuery.data?.pages.flat() || [];
+  const summaries = useMemo(
+    () => summariesQuery.data?.pages.flat() || [],
+    [summariesQuery.data?.pages]
+  );
   const isLoading = summariesQuery.isPending || summariesQuery.isFetchingNextPage;
   const hasMore = Boolean(summariesQuery.hasNextPage);
   const fetchSummaries = useCallback((isInitial = false) => (
