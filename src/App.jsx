@@ -10,6 +10,7 @@ import { useAppLayout } from './hooks/useAppLayout';
 import PDFViewerModal from './components/report/PDFViewerModal';
 import RequireAuth from './components/RequireAuth';
 import NetworkStatusBanner from './components/NetworkStatusBanner';
+import NotFoundPage from './components/NotFoundPage';
 import './index.css';
 
 const ReportList = lazy(() => import('./components/ReportList'));
@@ -113,6 +114,7 @@ function AppContent() {
           <Route path="/fnguide" element={<RequireAuth><FnGuideList /></RequireAuth>} />
           <Route path="/admin-console" element={<RequireAuth><AdminConsole /></RequireAuth>} />
           <Route path="/search-new" element={<RequireAuth><SearchPageNew /></RequireAuth>} />
+          <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Suspense>
       </main>
