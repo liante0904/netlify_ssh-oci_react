@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import LoadingSkeleton from './LoadingSkeleton';
 
 function BellIcon() {
   return (
@@ -85,6 +86,7 @@ export function NotificationPopover({
   onLogin,
   isAuthenticating,
   notifications = [],
+  isLoadingNotifications = false,
   readNotifyIds = [],
   onMarkAllAsRead,
   onNotificationClick,
@@ -122,7 +124,9 @@ export function NotificationPopover({
         </div>
       </div>
 
-      {notifications.length > 0 ? (
+      {isLoadingNotifications && notifications.length === 0 ? (
+        <LoadingSkeleton rows={3} label="알림 불러오는 중" />
+      ) : notifications.length > 0 ? (
         <>
           <div className="notification-list-container">
             {notifications.map((item) => {

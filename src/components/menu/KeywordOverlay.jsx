@@ -1,4 +1,5 @@
 import React from 'react';
+import LoadingSkeleton from '../LoadingSkeleton';
 
 function KeywordOverlay({ 
   newKeyword, 
@@ -50,10 +51,7 @@ function KeywordOverlay({
           
           <div className="keyword-large-list">
             {isLoadingKeywords ? (
-              <div className="loading-spinner-container">
-                <div className="spinner"></div>
-                <p>로딩 중...</p>
-              </div>
+              <LoadingSkeleton rows={3} label="키워드 불러오는 중" />
             ) : keywords.length > 0 ? (
               <div className="keyword-grid">
                 {keywords.map((k, index) => (

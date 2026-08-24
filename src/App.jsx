@@ -11,6 +11,7 @@ import PDFViewerModal from './components/report/PDFViewerModal';
 import RequireAuth from './components/RequireAuth';
 import NetworkStatusBanner from './components/NetworkStatusBanner';
 import NotFoundPage from './components/NotFoundPage';
+import LoadingSkeleton from './components/LoadingSkeleton';
 import './index.css';
 
 const ReportList = lazy(() => import('./components/ReportList'));
@@ -19,11 +20,7 @@ const AdminConsole = lazy(() => import('./components/AdminConsole'));
 const FnGuideList = lazy(() => import('./components/FnGuideList'));
 
 function RouteLoadingFallback() {
-  return (
-    <div className="route-loading-fallback" role="status" aria-live="polite">
-      화면 불러오는 중...
-    </div>
-  );
+  return <LoadingSkeleton variant="list" rows={7} label="화면 불러오는 중" />;
 }
 
 function AppContent() {

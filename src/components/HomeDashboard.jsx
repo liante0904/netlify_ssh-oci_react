@@ -7,6 +7,7 @@ import { request } from '../utils/api';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 import { getDirectUrl } from '../utils/reportLinks';
 import { useReport } from '../context/useReport';
+import LoadingSkeleton from './LoadingSkeleton';
 import './HomeDashboard.css';
 
 const PREVIEW_LIMIT = 5;
@@ -127,7 +128,7 @@ function HomeDashboard() {
 
             <div className="home-preview-list">
               {sections[section.key].isLoading ? (
-                <div className="home-preview-state">불러오는 중...</div>
+                <LoadingSkeleton rows={3} label={`${section.title} 불러오는 중`} />
               ) : sections[section.key].error ? (
                 <div className="home-preview-state">{sections[section.key].error}</div>
               ) : sections[section.key].items.length === 0 ? (

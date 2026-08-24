@@ -10,6 +10,7 @@ import { useReportFetch } from '../hooks/useReportFetch';
 import { CONFIG } from '../constants/config';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import AsyncErrorState from './AsyncErrorState';
+import LoadingSkeleton from './LoadingSkeleton';
 import { useBoards } from '../hooks/useBoards';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { useSummaryMutation } from '../hooks/useSummaryMutation';
@@ -395,7 +396,7 @@ function SearchPageNew() {
           {error && offset === 0 ? (
             <AsyncErrorState onRetry={retry} />
           ) : offset === 0 && isLoading ? (
-            <div className="search-state-msg">검색 조건에 맞춰 리포트를 분석 중입니다...</div>
+            <LoadingSkeleton rows={6} label="검색 결과 불러오는 중" />
           ) : filteredSortedDates.length === 0 && !isLoading ? (
             <div className="search-state-msg empty-msg">
               <span className="empty-icon">📂</span>
@@ -407,7 +408,7 @@ function SearchPageNew() {
               next={fetchReports}
               hasMore={hasMore}
               scrollThreshold={0.7}
-              loader={<div className="search-state-msg">더 불러오는 중...</div>}
+              loader={<LoadingSkeleton variant="spinner" label="검색 결과 더 불러오는 중" />}
             >
               {filteredSortedDates.map((date) => (
                 <ReportGroup 

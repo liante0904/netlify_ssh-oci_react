@@ -6,6 +6,7 @@ import AdminReprocessPanel from './admin/AdminReprocessPanel';
 import { useAdminMetrics } from '../hooks/useAdminMetrics';
 import { useAdminLogs } from '../hooks/useAdminLogs';
 import './AdminConsole.css';
+import LoadingSkeleton from './LoadingSkeleton';
 
 /* ===== Main Component ===== */
 
@@ -224,12 +225,7 @@ function AdminConsole() {
             </div>
           </div>
         ) : (
-          <div className="status-grid">
-            <div className="status-item">
-              <span className="status-label">상태 로딩 중...</span>
-              <span className="status-value">⏳</span>
-            </div>
-          </div>
+          <LoadingSkeleton rows={2} label="서버 상태 불러오는 중" />
         )}
       </div>
 
@@ -420,7 +416,7 @@ function AdminConsole() {
             </table>
           </div>
         ) : (
-          <div style={{ padding: 16, color: '#888', textAlign: 'center' }}>로딩 중...</div>
+          <LoadingSkeleton rows={4} label="증권사 상태 불러오는 중" />
         )}
       </div>
 
@@ -459,7 +455,7 @@ function AdminConsole() {
 
         {/* 파일 목록 */}
         {logBrowser.loading ? (
-          <div className="log-browser-loading">⏳ 로그 목록 로딩 중...</div>
+          <LoadingSkeleton rows={4} label="로그 목록 불러오는 중" />
         ) : logBrowser.entries.length === 0 && !logBrowser.error ? (
           <div className="log-browser-empty">로그 디렉토리가 없습니다.</div>
         ) : (
@@ -525,7 +521,7 @@ function AdminConsole() {
           )}
 
           {logViewer.loading ? (
-            <div className="log-browser-loading">⏳ 로그 내용 로딩 중...</div>
+            <LoadingSkeleton rows={5} label="로그 내용 불러오는 중" />
           ) : (
             <div className="log-viewer-content" ref={logViewerRef}>
               {logViewer.content

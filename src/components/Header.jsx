@@ -131,7 +131,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
   const [notificationToast, setNotificationToast] = useState(null);
   const { readNotifyIds, markAllAsRead, markAsRead } = useNotificationReadStatus(telegramUser);
 
-  const { notifications } = useNotifications(telegramUser);
+  const { notifications, isLoadingNotifications } = useNotifications(telegramUser);
 
   // localStorage → DB 마이그레이션 (1회)
   useEffect(() => {
@@ -293,6 +293,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
           onLogin={loginWithTelegram}
           isAuthenticating={isAuthenticating}
           notifications={visibleNotifications}
+          isLoadingNotifications={isLoadingNotifications}
           readNotifyIds={readNotifyIds}
           onMarkAllAsRead={handleMarkAllAsRead}
           onNotificationClick={handleNotificationItemClick}

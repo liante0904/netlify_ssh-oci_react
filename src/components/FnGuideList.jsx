@@ -14,6 +14,7 @@ import {
 } from '../utils/fnguide';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
+import LoadingSkeleton from './LoadingSkeleton';
 import './FnGuideList.css';
 
 function HighlightedSummary({ text }) {
@@ -474,7 +475,7 @@ function FnGuideList() {
                 onRetry={() => datesQuery.refetch()}
               />
             ) : isLoadingDates && dates.length === 0 ? (
-              <div className="chips-loading">날짜 로딩 중...</div>
+              <LoadingSkeleton variant="chips" label="FnGuide 날짜 불러오는 중" />
             ) : (
               <>
                 <button
@@ -632,9 +633,7 @@ function FnGuideList() {
 
       {/* 로딩 표시 */}
       {isLoading && (
-        <div className="list-loading-spinner">
-          <div className="spinner"></div> 요약 정보 가져오는 중...
-        </div>
+        <LoadingSkeleton rows={6} label="FnGuide 요약 불러오는 중" />
       )}
 
       {/* 더보기 버튼 */}

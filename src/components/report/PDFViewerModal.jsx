@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getProxyPdfUrl } from '../../utils/reportLinks';
+import LoadingSkeleton from '../LoadingSkeleton';
 import './PDFViewerModal.css';
 
 // ---------------------------------------------------------------------------
@@ -268,10 +269,7 @@ const PDFViewerModal = ({ report, onClose }) => {
 
       <div className="pdf-viewer-body" ref={bodyRef}>
         {loading && (
-          <div className="pdf-viewer-spinner">
-            <svg viewBox="0 0 24 24" width="48" height="48" className="spinner-icon"><circle cx="12" cy="12" r="10" fill="none" stroke="var(--primary-color, #007aff)" strokeWidth="2.5" strokeDasharray="31.4 31.4" strokeLinecap="round"/></svg>
-            <span>PDF 불러오는 중...</span>
-          </div>
+          <LoadingSkeleton variant="spinner" label="PDF 불러오는 중" />
         )}
         <div className="pdf-viewer-pages" style={{ visibility: loading ? 'hidden' : 'visible' }}>
           {pages.map(({ pageNum, page }) => (

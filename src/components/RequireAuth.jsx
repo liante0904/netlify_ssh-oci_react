@@ -1,6 +1,7 @@
 import React from 'react';
 import { useReport } from '../context/useReport';
 import LoginPage from './LoginPage';
+import LoadingSkeleton from './LoadingSkeleton';
 
 /**
  * Protected route wrapper — 로그인 + 승인된 회원만 접근.
@@ -13,11 +14,7 @@ export default function RequireAuth({ children }) {
   const { telegramUser, authStatus } = useReport();
 
   if (authStatus === 'checking') {
-    return (
-      <div className="route-loading-fallback" role="status" aria-live="polite">
-        로그인 상태 확인 중...
-      </div>
-    );
+    return <LoadingSkeleton rows={5} label="로그인 상태 확인 중" />;
   }
 
   // 미로그인 or 승인 대기

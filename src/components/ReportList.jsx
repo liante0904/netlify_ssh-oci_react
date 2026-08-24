@@ -16,6 +16,7 @@ import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
+import LoadingSkeleton from './LoadingSkeleton';
 import './ReportList.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -445,7 +446,7 @@ function ReportList({ onWriterClick }) {
             <p>즐겨찾기한 레포트가 없습니다.<br/>관심 있는 레포트에 별표를 눌러보세요!</p>
           </div>
         ) : !isFavoritesPage && offset === 0 && isLoading ? (
-          null
+          <LoadingSkeleton rows={6} label="리포트 불러오는 중" />
         ) : isFavoritesPage && !favoriteReports && filteredSortedDates.length === 0 && !isLoading ? (
           <div className="empty-favorites">
             <div className="empty-icon">★</div>
@@ -499,10 +500,8 @@ function ReportList({ onWriterClick }) {
             ))}
           </InfiniteScroll>
         )}
-        {isLoading && (
-          <div className={`loading-overlay ${isSearchActive ? 'search-loading' : ''}`}>로딩 중...</div>
-        )}
-        {isFavoritesPage && !favoriteReports && !isLoading && <div className="loading-overlay">즐겨찾기 불러오는 중...</div>}
+        {isLoading && offset > 0 && <LoadingSkeleton variant="spinner" label="리포트 더 불러오는 중" />}
+        {isFavoritesPage && !favoriteReports && !isLoading && <LoadingSkeleton rows={6} label="즐겨찾기 불러오는 중" />}
       </div>
 
       <ShareMenu 
