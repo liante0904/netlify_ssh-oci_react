@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useGridOverlay } from '../hooks/useGridOverlay';
 import { hasGridSelection } from '../utils/gridSelect';
 import { getFirmNameByOrder, getFirmOrderByName } from '../constants/firms';
-import { request } from '../utils/api';
-import { CONFIG } from '../constants/config';
+import { useCompanies } from '../hooks/useCompanies';
 import './CompanySelect.css';
 
 const firm_colors = {
@@ -15,31 +14,17 @@ const firm_colors = {
 
 /** /external/api/companies API에서 증권사 목록을 가져온다 (하드코딩 대체) */
 function useFirmOptions() {
-  const [firms, setFirms] = useState([]);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const data = await request(CONFIG.API.COMPANIES_URL, { skipAuth: true });
-        if (cancelled || !Array.isArray(data)) return;
-        const mapped = data.map((item, idx) => {
-          const fallbackOrder = getFirmOrderByName(item.name);
-          return {
-            order: fallbackOrder !== null ? fallbackOrder : idx,
-            name: item.name,
-            report_count: item.report_count,
-          };
-        });
-        // sec_firm_order 오름차순 정렬
-        mapped.sort((a, b) => a.order - b.order);
-        if (!cancelled) setFirms(mapped);
-      } catch { /* API 실패 시 하드코딩 fallback 없음 - 빈 목록 */ }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  return firms;
+  const { companies } = useCompanies();
+  return companies
+    .map((item, idx) => {
+      const fallbackOrder = getFirmOrderByName(item.name);
+      return {
+        order: fallbackOrder !== null ? fallbackOrder : idx,
+        name: item.name,
+        report_count: item.report_count,
+      };
+    })
+    .sort((a, b) => a.order - b.order);
 }
 
 function CompanySelect({ value, onChange, className = '' }) {
