@@ -36,11 +36,15 @@ function FnGuideList() {
   const selectedSummaryId = searchParams.get('summary_id');
   const scrolledSummaryIdRef = useRef(null);
   const dateChipsRef = useRef(null);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [providerFilter, setProviderFilter] = useState('');
-  const [facetType, setFacetType] = useState('company');
-  const [selectedFacet, setSelectedFacet] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(() => searchParams.get('date') || null);
+  const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '');
+  const [providerFilter, setProviderFilter] = useState(() => searchParams.get('provider') || '');
+  const [facetType, setFacetType] = useState(() => searchParams.get('facet') || 'company');
+  const [selectedFacet, setSelectedFacet] = useState(() => {
+    const type = searchParams.get('facet');
+    const value = searchParams.get('facet_value');
+    return type && value ? { type, value } : null;
+  });
   
   const [expandedItems, setExpandedItems] = useState({});
   const [collapsedCompanyGroups, setCollapsedCompanyGroups] = useState({});
@@ -71,6 +75,29 @@ function FnGuideList() {
       return dates[0]?.report_date || '';
     });
   }, [dates]);
+
+  useEffect(() => {
+    const nextParams = new URLSearchParams();
+    if (selectedSummaryId) nextParams.set('summary_id', selectedSummaryId);
+    const values = [
+      ['q', searchQuery],
+      ['provider', providerFilter],
+      ['date', selectedDate],
+    ];
+    values.forEach(([key, value]) => {
+      if (value) nextParams.set(key, value);
+      else nextParams.delete(key);
+    });
+
+    if (selectedFacet) {
+      nextParams.set('facet', selectedFacet.type);
+      nextParams.set('facet_value', selectedFacet.value);
+    } else {
+      nextParams.delete('facet');
+      nextParams.delete('facet_value');
+    }
+    setSearchParams(nextParams, { replace: true });
+  }, [selectedSummaryId, searchQuery, providerFilter, selectedDate, selectedFacet, setSearchParams]);
 
   // 2. 요약본 목록 조회 및 페이지 캐시
   const summariesQuery = useInfiniteQuery({
