@@ -93,7 +93,7 @@ function ReportList({ onWriterClick }) {
 
     // 동기화 완료 플래그 (재실행 방지)
     localStorage.setItem(SYNC_FLAG_KEY, '1');
-  }, [syncFavoriteIds, telegramUser?.id]);
+  }, [syncFavoriteIds, telegramUser]);
 
   useEffect(() => {
     if (!favoriteItems.length) return;
@@ -137,7 +137,7 @@ function ReportList({ onWriterClick }) {
           if (!exists) grouped[date].push(report);
         });
         setFavoriteReports(grouped);
-  }, [favoriteItems, location.pathname, telegramUser?.id]);
+  }, [favoriteItems, location.pathname, telegramUser]);
 
   const [summaryRequestedIds, setSummaryRequestedIds] = useState(new Set());
   const [summaryCompletedIds, setSummaryCompletedIds] = useState(new Set());
@@ -387,7 +387,7 @@ function ReportList({ onWriterClick }) {
 
     const timeoutId = window.setTimeout(runPrefetch, 1200);
     return () => window.clearTimeout(timeoutId);
-  }, [collapsedDates, favorites, filteredSortedDates, isFavoritesPage, isLoading, reports]);
+  }, [collapsedDates, displayReports, favoriteReports, favorites, filteredSortedDates, isAiSummary, isFavoritesPage, isLoading, reports]);
 
   return (
     <div className="report-list-wrapper">

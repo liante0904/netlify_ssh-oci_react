@@ -90,7 +90,7 @@ export function useAppLayout() {
         rafId.current = null;
       }
     };
-  }, []); // 빈 의존성: ref로 상태를 읽으므로 재생성 불필요
+  }, [setIsMenuOpen, setIsTopMenuOpen]);
 
   // 헤더 높이 계산 (CSS 변수 --header-height 업데이트)
   useEffect(() => {

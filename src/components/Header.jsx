@@ -146,7 +146,7 @@ const Header = forwardRef(({ isNavVisible }, ref) => {
         localStorage.removeItem('ssh_read_notifications');
       }
     } catch { /* ignore malformed legacy storage */ }
-  }, [readNotifyIds, telegramUser]);
+  }, [markAllAsRead, readNotifyIds, telegramUser]);
 
   const visibleNotifications = [...localNotifications, ...notifications]
     .filter((item, index, items) => (

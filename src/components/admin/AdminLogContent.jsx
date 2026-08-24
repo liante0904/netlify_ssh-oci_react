@@ -17,7 +17,6 @@ function linkify(text, lineIdx, offset) {
   let match;
 
   URL_RE.lastIndex = 0;
-  // eslint-disable-next-line no-cond-assign
   while ((match = URL_RE.exec(text)) !== null) {
     if (match.index > last) pieces.push(text.slice(last, match.index));
     pieces.push(
