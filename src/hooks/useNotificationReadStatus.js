@@ -7,10 +7,11 @@ export function useNotificationReadStatus(telegramUser) {
   const queryKey = ['notification-read-status', telegramUser?.id ?? null];
   const query = useQuery({
     queryKey,
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const data = await request(`${CONFIG.API.REPORT_API_URL}/reports/notifications/read-status`, {
         skipAuth: false,
         logoutOn401: false,
+        signal,
       });
       return Array.isArray(data) ? data : [];
     },

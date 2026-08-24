@@ -5,8 +5,8 @@ import { request } from '../utils/api';
 export function useFavorites(telegramUser) {
   const query = useQuery({
     queryKey: ['favorites', telegramUser?.id ?? null],
-    queryFn: async () => {
-      const data = await request(`${CONFIG.API.BASE_URL}/favorites`, { skipAuth: false });
+    queryFn: async ({ signal }) => {
+      const data = await request(`${CONFIG.API.BASE_URL}/favorites`, { skipAuth: false, signal });
       return Array.isArray(data?.items) ? data.items : [];
     },
     enabled: Boolean(telegramUser?.id && localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN)),

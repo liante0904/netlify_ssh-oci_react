@@ -14,10 +14,13 @@ function formatActivityTime(value) {
 export function useAdminMetrics(enabled, refreshInterval) {
   const query = useQuery({
     queryKey: ['admin', 'metrics'],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const [data, firmHealth] = await Promise.all([
-        request(`${CONFIG.API.BASE_URL}/admin/metrics`, { skipAuth: false }),
-        request(`${CONFIG.API.BASE_URL}/admin/firm-health`, { skipAuth: false }).catch(() => null),
+        request(`${CONFIG.API.BASE_URL}/admin/metrics`, { skipAuth: false, signal }),
+        request(`${CONFIG.API.BASE_URL}/admin/firm-health`, { skipAuth: false, signal }).catch((error) => {
+          if (error.name === 'AbortError') throw error;
+          return null;
+        }),
       ]);
       const activityTime = formatActivityTime(data.last_activity?.last_save_time);
       const archiveHistory = (data.reports?.archive_history || []).map((item) => ({

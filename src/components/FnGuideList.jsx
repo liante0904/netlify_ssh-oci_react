@@ -54,12 +54,12 @@ function FnGuideList() {
   // 1. 날짜별 집계 목록 조회 및 캐시
   const datesQuery = useQuery({
     queryKey: ['fnguide', 'report-dates', { searchQuery, providerFilter }],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const params = new URLSearchParams();
       if (searchQuery) params.append('q', searchQuery);
       if (providerFilter) params.append('provider', providerFilter);
       const url = `${CONFIG.API.BASE_URL}/api/fnguide/report-dates?${params.toString()}`;
-      const data = await request(url, { skipAuth: false });
+      const data = await request(url, { skipAuth: false, signal });
       return Array.isArray(data) ? data : [];
     },
     staleTime: 60_000,
@@ -102,7 +102,7 @@ function FnGuideList() {
   // 2. 요약본 목록 조회 및 페이지 캐시
   const summariesQuery = useInfiniteQuery({
     queryKey: ['fnguide', 'report-summaries', { searchQuery, providerFilter, selectedDate }],
-    queryFn: async ({ pageParam = 0 }) => {
+    queryFn: async ({ pageParam = 0, signal }) => {
       const params = new URLSearchParams();
       if (searchQuery) params.append('q', searchQuery);
       if (providerFilter) params.append('provider', providerFilter);
@@ -111,7 +111,7 @@ function FnGuideList() {
       params.append('offset', pageParam.toString());
 
       const url = `${CONFIG.API.BASE_URL}/api/fnguide/report-summaries?${params.toString()}`;
-      const data = await request(url, { skipAuth: false });
+      const data = await request(url, { skipAuth: false, signal });
       return Array.isArray(data) ? data : [];
     },
     initialPageParam: 0,

@@ -26,8 +26,8 @@ export const useKeywords = (telegramUser) => {
   const queryKey = ['keywords', telegramUser?.id ?? null];
   const keywordsQuery = useQuery({
     queryKey,
-    queryFn: async () => {
-      const data = await request(`${CONFIG.API.BASE_URL}/keywords`, {}, logout);
+    queryFn: async ({ signal }) => {
+      const data = await request(`${CONFIG.API.BASE_URL}/keywords`, { signal }, logout);
       return normalizeKeywordList(data).filter(k => k.is_active);
     },
     enabled: Boolean(telegramUser) && !isDevBypassSession,

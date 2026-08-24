@@ -5,7 +5,7 @@ import { request } from '../utils/api';
 export function useCompanies() {
   const query = useQuery({
     queryKey: ['companies'],
-    queryFn: () => request(CONFIG.API.COMPANIES_URL, { skipAuth: true }),
+    queryFn: ({ signal }) => request(CONFIG.API.COMPANIES_URL, { skipAuth: true, signal }),
     staleTime: 5 * 60_000,
   });
 

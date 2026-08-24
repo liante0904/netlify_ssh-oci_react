@@ -9,9 +9,9 @@ export function useAdminLogs(enabled) {
 
   const directoryQuery = useQuery({
     queryKey: ['admin', 'logs', directoryPath],
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       const params = directoryPath ? `?path=${encodeURIComponent(directoryPath)}` : '';
-      return request(`${CONFIG.API.BASE_URL}/admin/logs${params}`, { skipAuth: false });
+      return request(`${CONFIG.API.BASE_URL}/admin/logs${params}`, { skipAuth: false, signal });
     },
     enabled,
     staleTime: 15_000,
@@ -19,13 +19,13 @@ export function useAdminLogs(enabled) {
 
   const viewerQuery = useQuery({
     queryKey: ['admin', 'log-view', viewerRequest],
-    queryFn: () => {
+    queryFn: ({ signal }) => {
       const params = new URLSearchParams({
         file: viewerRequest.filePath,
         lines: String(viewerRequest.lines),
         tail: String(viewerRequest.tail),
       });
-      return request(`${CONFIG.API.BASE_URL}/admin/logs/view?${params}`, { skipAuth: false });
+      return request(`${CONFIG.API.BASE_URL}/admin/logs/view?${params}`, { skipAuth: false, signal });
     },
     enabled: Boolean(enabled && viewerRequest?.filePath),
     staleTime: 5_000,

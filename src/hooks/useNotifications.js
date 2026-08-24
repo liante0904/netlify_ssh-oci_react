@@ -22,8 +22,8 @@ function normalizeNotificationItem(item) {
 export function useNotifications(telegramUser) {
   const query = useQuery({
     queryKey: ['notifications', telegramUser?.id ?? null],
-    queryFn: async () => {
-      const data = await request(`${CONFIG.API.REPORT_API_URL}/reports/notifications?limit=50`, { skipAuth: false });
+    queryFn: async ({ signal }) => {
+      const data = await request(`${CONFIG.API.REPORT_API_URL}/reports/notifications?limit=50`, { skipAuth: false, signal });
       const items = Array.isArray(data) ? data.map(normalizeNotificationItem) : [];
       return items.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
     },
