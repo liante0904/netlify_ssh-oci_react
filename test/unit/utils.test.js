@@ -29,6 +29,9 @@ import {
 import {
   buildReportFetchUrl,
 } from '../../src/utils/reportFetch.js';
+import {
+  formatNotificationMessage,
+} from '../../src/utils/notificationMessage.js';
 
 // ─── 테스트 헬퍼 ───
 let passed = 0;
@@ -581,6 +584,26 @@ assertEqual(titleSearch.category, 'title', 'title: category = "title"');
 // createTagSearch 기본값 (isSector 생략 → 'title')
 const defaultSearch = createTagSearch('메자닌');
 assertEqual(defaultSearch.category, 'title', '기본: category = "title"');
+
+// 알림 메시지 출처 머리말
+assertEqual(
+  formatNotificationMessage({
+    message: '[텔레그램 · 최진영] [최진영] 베센트 덕에 반등한 금, 그럼에도 제한적일 상단',
+    firm_nm: '신한투자증권',
+  }),
+  '[신한투자증권] [최진영] 베센트 덕에 반등한 금, 그럼에도 제한적일 상단',
+  '알림 첫 대괄호를 증권사명으로 교체',
+);
+assertEqual(
+  formatNotificationMessage({ message: '대괄호 없는 알림', firm_nm: '신한투자증권' }),
+  '대괄호 없는 알림',
+  '알림 머리말이 없으면 원문 유지',
+);
+assertEqual(
+  formatNotificationMessage({ message: '[AI 요약] 원문', firm_nm: '신한투자증권', summary_model: 'gemini' }),
+  '[AI 요약] 원문',
+  'AI 요약 알림은 원문 유지',
+);
 
 // ─── 결과 요약 ───
 console.log('\n════════════════════════════════════════════');
