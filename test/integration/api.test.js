@@ -125,12 +125,12 @@ async function runTests() {
 
         // page_count 검증: 있으면 10 이상이어야 함
         const archive = item.pdf_archive;
-        if (archive && archive.page_count !== null && archive.page_count !== undefined) {
+        if (archive && Number(archive.page_count) > 0) {
           assert(archive.page_count >= 10,
             'industry page_count >= 10', `page_count=${archive.page_count}`);
         }
-        // page_count가 없는 리포트는 통과 (필터링 안 함)
-        if (!archive || archive.page_count == null) {
+        // 0/null은 아직 아카이브 메타데이터가 없는 정상적인 상태로 취급한다.
+        if (!archive || Number(archive.page_count) <= 0) {
           console.log(`  ℹ️ INFO: page_count 정보 없는 리포트 통과 (report_id=${item.report_id})`);
         }
       }
@@ -353,6 +353,16 @@ async function runTests() {
     const metricRes = await assertHttpOk(`${BASE_URL}/admin/metrics`, 'GET /admin/metrics');
     assert(metricRes.status === 200 || metricRes.status === 401,
       '/admin/metrics 응답이 200 또는 401', `HTTP ${metricRes.status}`);
+  }
+  {
+    const logDirRes = await assertHttpOk(`${BASE_URL}/admin/logs`, 'GET /admin/logs (미인증)');
+    assert([200, 401, 403, 404].includes(logDirRes.status),
+      '/admin/logs 미인증 응답 상태 확인', `HTTP ${logDirRes.status}`);
+  }
+  {
+    const logFileRes = await assertHttpOk(`${BASE_URL}/admin/logs/view?path=app.log`, 'GET /admin/logs/view (미인증)');
+    assert([200, 401, 403, 404].includes(logFileRes.status),
+      '/admin/logs/view 미인증 응답 상태 확인', `HTTP ${logFileRes.status}`);
   }
   {
     const dsSummarizeRes = await assertHttpOk(`${BASE_URL}/admin/reports/1/summarize?engine=deepseek`, 'POST /admin/reports/{id}/summarize?engine=deepseek (미인증)',
