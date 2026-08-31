@@ -52,7 +52,7 @@ export default function ReportList({ onWriterClick }) {
     const willCollapse = !collapsedDates[date];
     setCollapsedDates((current) => ({ ...current, [date]: willCollapse }));
     if (isRecent && willCollapse) requestReveal(date);
-  }, [collapsedDates, isRecent]);
+  }, [collapsedDates, isRecent, requestReveal]);
   const toggleFirm = useCallback((date, firm) => setCollapsedFirms((current) => ({ ...current, [date]: { ...current[date], [firm]: !current[date]?.[firm] } })), []);
   const toggleSummary = useCallback((id) => setExpandedSummaries((current) => ({ ...current, [id]: !current[id] })), []);
   const toggleFavorite = useCallback((id) => { const next = { ...favorites, [id]: !favorites[id] }; setFavorites(next); localStorage.setItem('report_favorites', JSON.stringify(next)); mutateFavorite(id, next[id])?.catch(() => setFavorites(favorites)); }, [favorites, mutateFavorite]);

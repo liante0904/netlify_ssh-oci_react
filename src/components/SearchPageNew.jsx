@@ -123,7 +123,7 @@ function SearchPageNew() {
     const willCollapse = !dateToggles[date];
     setDateToggles(prev => ({ ...prev, [date]: willCollapse }));
     if (willCollapse) requestReveal(date);
-  }, [dateToggles]);
+  }, [dateToggles, requestReveal]);
 
   const toggleFirm = useCallback((date, firm) => {
     setFirmToggles(prev => ({
