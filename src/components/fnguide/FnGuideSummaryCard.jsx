@@ -1,6 +1,7 @@
 import React from 'react';
 import { calculateUpsidePercent, formatUpsidePercent } from '../../utils/financial';
 import { tokenizeFinancialHighlights } from '../../utils/fnguide';
+import './FnGuideSummaryCard.css';
 
 function HighlightedSummary({ text }) {
   return tokenizeFinancialHighlights(text).map((token, index) => (
