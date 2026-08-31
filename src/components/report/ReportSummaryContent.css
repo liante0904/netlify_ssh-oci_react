@@ -1,0 +1,6 @@
+.summary-content { background: var(--card-background-color); border: 1px solid var(--loading-border-color); border-top: none; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; overflow: hidden; transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out, padding 0.3s ease; z-index: 1; box-sizing: border-box !important; width: 100% !important; max-width: 100% !important; }
+.summary-content.collapsed { max-height: 0; opacity: 0; border-bottom-width: 0; }
+.summary-content.expanded { max-height: 5000px; opacity: 1; padding-bottom: 8px; }
+.summary-inner { box-sizing: border-box !important; padding: 12px 16px; background-color: rgba(110, 142, 251, 0.05); border-top: 1px dashed var(--loading-border-color); margin: 0 0 8px 0 !important; border-radius: 8px; width: 100% !important; max-width: 100% !important; }
+.summary-inner-wrapper { display: flex; flex-direction: column; gap: 14px; padding: 12px; box-sizing: border-box; width: 100%; max-width: 100%; }
+.summary-inner svg { margin-right: 6px; }

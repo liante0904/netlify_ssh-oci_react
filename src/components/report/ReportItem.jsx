@@ -6,6 +6,7 @@ import ReportItemActions from './ReportItemActions';
 import { getReportPresentation } from '../../utils/reportItemModel';
 import { useReportItemActions } from '../../hooks/useReportItemActions';
 import './ReportSummaryControls.css';
+import './ReportSummaryContent.css';
 
 const ReportItem = ({ 
   report, 
