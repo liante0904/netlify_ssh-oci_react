@@ -1,0 +1,108 @@
+/* Header panel & Search Form */
+.fnguide-header-panel {
+  background: var(--glass-bg);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.fnguide-page-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 0 16px 0;
+  color: var(--text-color);
+  letter-spacing: -0.5px;
+}
+
+.fnguide-search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  font-size: 1rem;
+  opacity: 0.6;
+}
+
+.fnguide-search-input {
+  width: 100%;
+  padding: 12px 40px 12px 38px;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--text-color) 16%, transparent);
+  background: var(--background-color);
+  color: var(--text-color);
+  outline: none;
+  box-sizing: border-box;
+  transition: var(--transition-smooth);
+}
+
+.fnguide-search-input:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.15);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: var(--text-color);
+  opacity: 0.5;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.clear-search-btn:hover {
+  opacity: 0.8;
+}
+
+.fnguide-provider-input {
+  padding: 12px;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+  border: 1px solid color-mix(in srgb, var(--text-color) 16%, transparent);
+  background: var(--background-color);
+  color: var(--text-color);
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+  transition: var(--transition-smooth);
+}
+
+.fnguide-provider-input:focus {
+  border-color: var(--primary-color);
+}
+
+.fnguide-search-submit {
+  padding: 12px;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 25%, transparent);
+}
+
+.fnguide-search-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 122, 255, 0.4);
+}

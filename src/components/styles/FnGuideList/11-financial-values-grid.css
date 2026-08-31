@@ -1,0 +1,155 @@
+/* Financial values Grid */
+.card-financial-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  background: var(--background-color);
+  padding: 12px;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.02);
+}
+
+html[data-theme='dark'] .card-financial-grid {
+  border-color: rgba(255, 255, 255, 0.02);
+}
+
+.grid-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cell-label {
+  font-size: 0.72rem;
+  opacity: 0.6;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.cell-value {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.cell-value.opinion {
+  color: #34c759; /* Green */
+}
+.cell-value.target-price {
+  color: #ff9500; /* Orange */
+}
+.cell-value.prev-close {
+  opacity: 0.85;
+}
+
+.cell-value.upside.positive {
+  color: #d94a4a;
+}
+
+.cell-value.upside.negative {
+  color: #2777c7;
+}
+
+.upside-data-note {
+  margin: -8px 0 14px;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  line-height: 1.4;
+  text-align: right;
+}
+
+@media (max-width: 560px) {
+  .fnguide-container {
+    padding: 12px;
+  }
+
+  .fnguide-date-section {
+    gap: 12px;
+  }
+
+  .fnguide-header-panel {
+    padding: 16px;
+  }
+
+  .date-chips-control {
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr) 34px;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .date-scroll-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 38px;
+    border: 1px solid color-mix(in srgb, var(--text-color) 14%, transparent);
+    border-radius: 6px;
+    background: var(--background-color);
+    color: var(--text-color);
+    font-size: 1.35rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .date-chips-scroll {
+    min-width: 0;
+    padding-bottom: 4px;
+    scroll-snap-type: x proximity;
+  }
+
+  .date-chip {
+    scroll-snap-align: start;
+  }
+
+  .fnguide-facet-header {
+    align-items: flex-start;
+  }
+
+  .fnguide-facet-tab {
+    min-width: 52px;
+  }
+
+  .fnguide-facet-cloud {
+    max-height: 132px;
+  }
+
+  .fnguide-company-group-toggle {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .company-group-meta {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .company-group-meta small {
+    max-width: calc(100% - 74px);
+  }
+
+  .fnguide-company-reports {
+    padding-left: 8px;
+  }
+
+  .card-financial-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fnguide-card {
+    padding: 16px;
+  }
+
+  .card-report-title {
+    font-size: 1.16rem;
+  }
+
+  .card-summary-text {
+    font-size: 1rem;
+    line-height: 1.86;
+  }
+}

@@ -1,0 +1,26 @@
+/* Card Top Meta Badges */
+.card-top-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.card-date-badge,
+.card-provider-badge,
+.card-author-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: var(--background-color);
+  color: var(--text-color);
+  opacity: 0.9;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+html[data-theme='dark'] .card-date-badge,
+html[data-theme='dark'] .card-provider-badge,
+html[data-theme='dark'] .card-author-badge {
+  border-color: rgba(255, 255, 255, 0.05);
+}

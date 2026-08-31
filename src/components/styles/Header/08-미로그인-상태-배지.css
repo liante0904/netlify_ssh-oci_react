@@ -1,0 +1,45 @@
+/* 미로그인 상태 배지 */
+.tg-badge-off {
+  background: var(--bg-muted);
+  border: 1px dashed var(--glass-border);
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0.85;
+  transition: var(--transition-smooth);
+}
+
+.tg-badge-off:disabled {
+  cursor: wait;
+  opacity: 0.55;
+}
+
+.tg-badge-off:hover {
+  opacity: 1;
+  background: var(--secondary-background-color);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.company-select-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  flex: 0 0 auto;
+  white-space: nowrap;
+  width: auto;
+}
+
+.header-nav-filters {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-width: 0;
+  white-space: nowrap;
+  width: auto;
+}
+
+.header-nav-filters .grid-trigger-btn span {
+  white-space: nowrap;
+}

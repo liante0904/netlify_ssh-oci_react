@@ -1,0 +1,6 @@
+/* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
+@media (min-width: 1024px) {
+  .menu-panel {
+    width: 350px;
+  }
+}

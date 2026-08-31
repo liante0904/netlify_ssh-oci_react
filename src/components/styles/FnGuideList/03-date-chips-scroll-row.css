@@ -1,0 +1,17 @@
+/* Date Chips Scroll Row */
+.date-chips-control {
+  position: relative;
+}
+
+.date-chips-scroll {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+.date-scroll-btn {
+  display: none;
+}

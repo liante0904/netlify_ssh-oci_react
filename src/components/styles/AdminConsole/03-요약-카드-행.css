@@ -1,0 +1,41 @@
+/* 요약 카드 행 */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summary-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--glass-shadow);
+  text-align: center;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: var(--transition-smooth);
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--glass-shadow), 0 6px 20px color-mix(in srgb, var(--primary-color) 8%, transparent);
+}
+
+.summary-card .card-icon {
+  font-size: 1.6em;
+  margin-bottom: 6px;
+}
+
+.summary-card .card-value {
+  font-size: 1.8em;
+  font-weight: bold;
+  color: var(--primary-color);
+}
+
+.summary-card .card-label {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-top: 4px;
+}

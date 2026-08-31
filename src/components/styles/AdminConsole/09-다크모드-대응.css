@@ -1,0 +1,4 @@
+/* 다크모드 대응 */
+html[data-theme='dark'] .status-item {
+  background: var(--secondary-background-color);
+}

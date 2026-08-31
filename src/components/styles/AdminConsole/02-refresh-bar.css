@@ -1,0 +1,62 @@
+/* ===== Refresh Bar ===== */
+.refresh-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.refresh-bar .refresh-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: 0.8em;
+  cursor: pointer;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+}
+
+.refresh-bar .refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.refresh-bar .refresh-btn:hover:not(:disabled) {
+  opacity: 0.85;
+}
+
+.refresh-label {
+  font-size: 0.8em;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.refresh-interval-group {
+  display: flex;
+  gap: 4px;
+}
+
+.refresh-interval-btn {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  font-size: 0.78em;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.refresh-interval-btn:hover {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.refresh-interval-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}

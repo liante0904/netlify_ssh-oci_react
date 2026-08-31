@@ -1,0 +1,32 @@
+/* 연도별 전망 필터 칩 */
+.outlook-year-filter {
+  display: flex;
+  gap: 8px;
+  padding: 10px 0 14px 0;
+  flex-wrap: wrap;
+}
+
+.year-chip {
+  padding: 5px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--loading-border-color);
+  background: var(--card-background-color);
+  color: var(--text-color);
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.year-chip:hover {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.year-chip.active {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+  font-weight: 600;
+}

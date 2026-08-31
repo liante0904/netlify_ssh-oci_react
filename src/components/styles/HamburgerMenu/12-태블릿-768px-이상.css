@@ -1,0 +1,6 @@
+/* 태블릿 (768px 이상) */
+@media (min-width: 768px) {
+  .keyword-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

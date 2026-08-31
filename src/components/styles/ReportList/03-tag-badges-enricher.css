@@ -1,0 +1,340 @@
+/* ── Tag badges (enricher) ── */
+.report-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 4px 0 0 0;
+}
+
+.report-signals {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 6px 0 0;
+}
+
+.signal {
+  font-size: 0.68em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.signal-rating, .signal-revision {
+  color: #0d47a1;
+  background: #e3f2fd;
+}
+
+.signal-target {
+  color: #1b5e20;
+  background: #e8f5e9;
+}
+
+.signal-type, .signal-ticker {
+  color: #4a148c;
+  background: #f3e5f5;
+}
+
+.tag {
+  font-size: 0.65em;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  white-space: nowrap;
+  line-height: 1.5;
+}
+
+.tag-sector {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.tag-stock {
+  background: #e3f2fd;
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+.tag-keyword {
+  background: #f3e5f5;
+  color: #7b1fa2;
+  border: 1px solid #ce93d8;
+}
+
+.fnguide-badge-title {
+  background-color: #2e7d32;
+  margin-left: 6px;
+}
+
+.admin-summary-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-summary-label {
+  font-size: 12px;
+  color: var(--text-color-secondary, #888);
+  font-weight: bold;
+}
+
+.summary-btn-icon {
+  line-height: 1;
+  margin-right: 2px;
+}
+
+.summary-btn-icon-deepseek { font-size: 14px; font-weight: 900; }
+.summary-btn-icon-gemini { font-size: 11px; }
+
+.admin-summary-confirm-btns-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.re-summarize-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-6px);
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 10;
+  font-weight: normal;
+}
+
+.admin-summary-confirm-btns {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.report-summary-buttons {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.summary-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.82em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.summary-toggle-btn.ai-summary-btn {
+  background: rgba(110, 142, 251, 0.1);
+  color: #6e8efb;
+  border: 1px solid rgba(110, 142, 251, 0.3);
+}
+
+.summary-toggle-btn.ai-summary-btn.active {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: #fff;
+}
+
+.summary-toggle-btn.fnguide-summary-btn {
+  background: rgba(46, 125, 50, 0.1);
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.summary-toggle-btn.fnguide-summary-btn.active {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.report-writer.clickable { cursor: pointer; }
+
+.fnguide-summary-section.has-gemini-summary {
+  border-top: 1px dashed var(--border-color, #e0e0e0);
+  padding-top: 14px;
+}
+
+.fnguide-summary-title-row {
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fnguide-summary-title,
+.fnguide-meta-badges {
+  display: flex;
+  align-items: center;
+}
+
+.fnguide-meta-badges { gap: 6px; }
+
+.fnguide-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: bold;
+}
+
+.opinion-badge {
+  background-color: rgba(46, 125, 50, 0.1);
+  color: #2e7d32;
+  border: 1px solid rgba(46, 125, 50, 0.3);
+}
+
+.target-price-badge {
+  background-color: rgba(123, 31, 162, 0.1);
+  color: #7b1fa2;
+  border: 1px solid rgba(123, 31, 162, 0.3);
+}
+
+.fnguide-summary-text {
+  margin-top: 8px;
+  color: var(--text-color-secondary, #666);
+  font-size: 13.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.summary-title-row {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 0.9em;
+  color: var(--primary-color);
+  margin-bottom: 8px;
+}
+
+.summary-text {
+  font-size: 0.95em;
+  line-height: 1.6;
+  color: var(--text-color);
+  word-break: break-all !important;
+  overflow-wrap: break-word !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.summary-text,
+.summary-text p,
+.summary-text ul,
+.summary-text ol,
+.summary-text li,
+.summary-text blockquote,
+.summary-text pre,
+.summary-text code {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  word-break: break-all !important;
+  overflow-wrap: break-word !important;
+}
+
+.report-content {
+  flex: 1;
+}
+
+.favorite-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+.favorite-button:hover {
+  background-color: rgba(255, 215, 0, 0.1);
+  transform: scale(1.1);
+}
+
+.favorite-button.active {
+  color: #FFD700;
+}
+
+.viewer-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+.viewer-button:hover {
+  background-color: rgba(110, 142, 251, 0.1);
+  transform: scale(1.1);
+}
+
+.viewer-button svg {
+  display: block;
+}
+
+.favorite-button svg {
+  display: block;
+}
+
+.share-button {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, transform 0.2s;
+  flex-shrink: 0;
+}
+
+.share-button:hover {
+  background-color: rgba(0, 122, 255, 0.1);
+  transform: scale(1.1);
+}
+
+.share-button svg {
+  display: block;
+}
+
+.empty-favorites {
+  text-align: center;
+  padding: 100px 20px;
+  color: var(--text-color);
+}
+
+.empty-favorites .empty-icon {
+  font-size: 4em;
+  margin-bottom: 20px;
+  color: #FFD700;
+  opacity: 0.5;
+}
+
+.empty-favorites p {
+  font-size: 1.1em;
+  line-height: 1.6;
+  opacity: 0.8;
+}

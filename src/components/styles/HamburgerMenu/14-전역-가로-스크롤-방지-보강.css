@@ -1,0 +1,183 @@
+/* 전역 가로 스크롤 방지 보강 */
+:global(body) {
+  overflow-x: hidden;
+  position: relative;
+  width: 100%;
+}
+
+.menu-overlay, .grid-overlay-portal {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.keyword-delete-btn {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border-radius: 50%;
+  transition: var(--transition-smooth);
+}
+
+.keyword-delete-btn:hover {
+  background-color: color-mix(in srgb, var(--danger-color) 12%, transparent);
+}
+
+.keyword-empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #8e8e93;
+}
+
+.empty-icon {
+  font-size: 3em;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.polling-waiting-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 10px 0;
+  width: 100%;
+}
+
+.polling-desc {
+  font-size: 0.85em;
+  color: #0369a1;
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.polling-desc b {
+  color: #0088cc;
+}
+
+.cancel-polling-btn {
+  background: none;
+  border: 1px solid #d1d1d6;
+  color: #8e8e93;
+  padding: 6px 15px;
+  border-radius: 8px;
+  font-size: 0.8em;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cancel-polling-btn:hover {
+  background-color: #f2f2f7;
+  color: #ff3b30;
+  border-color: #ff3b30;
+}
+
+.telegram-app-login-btn:disabled, .telegram-custom-login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #e0e0e0;
+  border-top: 3px solid #0088cc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+  .keyword-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.telegram-icon {
+  font-size: 1.2em;
+}
+
+.user-info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.bot-connect-banner {
+  background-color: #fff9db;
+  border: 1px solid #ffe066;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bot-connect-desc {
+  font-size: 0.85em;
+  color: #856404;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.bot-connect-btn {
+  background-color: #0088cc;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 0.9em;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 136, 204, 0.2);
+}
+
+.bot-connect-btn:hover {
+  background-color: #0077b5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 136, 204, 0.3);
+}
+
+.bot-connect-btn:active {
+  transform: translateY(0);
+}
+
+.logout-small-btn {
+  background: none;
+  border: 1px solid #d1d1d6;
+  color: #8e8e93;
+  font-size: 0.75em;
+  padding: 4px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.loading-text, .empty-text {
+  font-size: 0.85em;
+  color: #8e8e93;
+  text-align: center;
+  margin: 10px 0;
+}

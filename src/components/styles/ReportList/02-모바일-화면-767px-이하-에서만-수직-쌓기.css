@@ -1,0 +1,89 @@
+/* 모바일 화면 (767px 이하)에서만 수직 쌓기 */
+@media (max-width: 767px) {
+  .report-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+.report-title-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  width: 100%;
+}
+
+.report-title {
+  flex: 1;
+  line-height: 1.4;
+  text-decoration: none; 
+  color: var(--primary-color); 
+  font-weight: bold;
+}
+
+.report-title:hover {
+  text-decoration: underline;
+}
+
+.report-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 10px;
+}
+
+.report-writer {
+  margin: 0 !important;
+  font-size: 0.9em;
+  color: var(--text-color);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.writer-search-icon {
+  font-size: 0.8em;
+  opacity: 0.6;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.report-writer:hover .writer-search-icon {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.report-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.firm-tag {
+  background-color: var(--primary-color);
+  color: white;
+  font-size: 0.75em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+  display: inline-block;
+  opacity: 0.9;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.ai-badge {
+  background: linear-gradient(135deg, #6e8efb, #a777e3);
+  color: white;
+  font-size: 0.7em;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  flex-shrink: 0;
+}

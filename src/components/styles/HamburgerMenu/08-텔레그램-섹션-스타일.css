@@ -1,0 +1,146 @@
+/* 텔레그램 섹션 스타일 */
+.telegram-section {
+  margin: 0;
+  padding: 12px;
+  background-color: var(--secondary-background-color);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+}
+
+.telegram-auth-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.remember-me-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85em;
+  color: var(--text-muted);
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+  justify-content: center;
+}
+
+.remember-me-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-color);
+  cursor: pointer;
+}
+
+.telegram-btn-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.telegram-desc {
+  font-size: 0.85em;
+  color: var(--primary-color);
+  margin: 0;
+  text-align: center;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.telegram-login-container {
+  min-height: 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.telegram-user-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.telegram-custom-login-btn, .telegram-app-login-btn {
+  border: none;
+  padding: 9px 12px;
+  border-radius: var(--radius-md);
+  font-weight: bold;
+  font-size: 0.86em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-smooth);
+  box-shadow: none;
+  width: auto;
+  min-height: 36px;
+  align-self: center;
+  box-sizing: border-box;
+}
+
+.telegram-custom-login-btn {
+  background-color: #0088cc;
+  color: white;
+}
+
+.telegram-custom-login-btn:hover {
+  background-color: #0077b5;
+  transform: translateY(-1px);
+}
+
+.telegram-dev-login-btn {
+  background-color: #10b981;
+  color: white;
+}
+
+.telegram-dev-login-btn:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.telegram-dev-desc {
+  margin: 0;
+  font-size: 0.8em;
+  line-height: 1.4;
+  color: #047857;
+  text-align: center;
+}
+
+.telegram-app-login-btn {
+  background-color: var(--glass-bg);
+  color: #0088cc;
+  border: 1px solid #0088cc;
+}
+
+.telegram-app-login-btn:hover {
+  background-color: var(--secondary-background-color);
+  transform: translateY(-1px);
+}
+
+.open-keyword-overlay-btn {
+  background-color: var(--secondary-background-color);
+  color: var(--primary-color);
+  border: 1px solid var(--glass-border);
+  padding: 12px;
+  border-radius: var(--radius-md);
+  font-weight: bold;
+  font-size: 0.95em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: var(--transition-smooth);
+  width: 100%;
+}
+
+.open-keyword-overlay-btn:hover {
+  background-color: color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color));
+  border-color: var(--primary-color);
+}
+
+.open-keyword-overlay-btn .icon {
+  font-size: 1.1em;
+}

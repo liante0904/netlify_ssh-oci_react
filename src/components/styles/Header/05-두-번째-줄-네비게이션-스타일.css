@@ -1,0 +1,21 @@
+/* 두 번째 줄 네비게이션 스타일 */
+.header-nav {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 5px 15px;
+  box-sizing: border-box;
+  align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  white-space: nowrap;
+}
+
+.header-nav::-webkit-scrollbar {
+  display: none;
+}

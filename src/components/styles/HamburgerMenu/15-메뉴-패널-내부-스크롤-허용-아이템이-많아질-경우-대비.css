@@ -1,0 +1,5 @@
+/* 메뉴 패널 내부 스크롤 허용 (아이템이 많아질 경우 대비) */
+.menu-panel {
+  overflow-y: auto;
+  padding-bottom: 40px;
+}

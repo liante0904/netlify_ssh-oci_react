@@ -1,0 +1,66 @@
+/* 데스크탑 화면 */
+@media (min-width: 1280px) {
+  header {
+    max-width: 100%;
+    margin: auto;
+  }
+
+  .header-top {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    box-sizing: border-box;
+  }
+
+  .title {
+    padding: 6px 0;
+  }
+
+  .hamburger-menu {
+    width: 40px;
+    height: 28px;
+    padding: 2px 0;
+  }
+
+  .hamburger-menu div {
+    width: 34px;
+    height: 4px;
+  }
+
+  .header-actions {
+    gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .header-nav-filters {
+    margin-left: 0;
+  }
+
+  .header-nav {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    flex-direction: row !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none;
+    white-space: nowrap !important;
+  }
+
+  .header-nav > * {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    min-width: max-content !important;
+  }
+
+  .header-nav-filters .grid-trigger-btn {
+    padding: 8px 12px;
+    font-size: 0.9em;
+  }
+
+  .header-nav-filters .grid-trigger-btn span {
+    max-width: 220px;
+  }
+}

@@ -1,0 +1,18 @@
+/* 메뉴 오버레이 스타일 */
+.menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 101;
+  opacity: 0;
+  transition: var(--transition-smooth);
+  display: none;
+}
+
+.menu-overlay.open {
+  opacity: 1;
+  display: block;
+}

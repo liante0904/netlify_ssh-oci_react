@@ -1,0 +1,45 @@
+/* PDF 아카이브 테이블 */
+.archive-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85em;
+}
+
+.archive-table th {
+  text-align: left;
+  padding: 8px 6px;
+  border-bottom: 2px solid var(--secondary-background-color);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.8em;
+  text-transform: uppercase;
+}
+
+.archive-table td {
+  padding: 8px 6px;
+  border-bottom: 1px solid var(--secondary-background-color);
+}
+
+.archive-table tr:last-child td {
+  border-bottom: none;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.status-dot.online {
+  background-color: var(--success-color);
+}
+
+.status-dot.offline {
+  background-color: var(--danger-color);
+}
+
+.status-dot.partial {
+  background-color: var(--warning-color);
+}

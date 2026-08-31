@@ -1,0 +1,23 @@
+/* Card Company Header */
+.card-company-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.card-company-name {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--primary-color);
+}
+
+.card-company-code {
+  font-size: 0.8rem;
+  color: var(--text-color);
+  opacity: 0.5;
+  background: var(--background-color);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+}

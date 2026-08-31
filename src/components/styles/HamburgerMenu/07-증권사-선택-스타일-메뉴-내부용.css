@@ -1,0 +1,14 @@
+/* 증권사 선택 스타일 (메뉴 내부용) */
+.menu-item-select {
+  width: 100%;
+  margin: 0;
+}
+
+.menu-item-select .company-select {
+  width: 100%;
+}
+
+.menu-item-select .company-select .grid-trigger-btn {
+  width: 100%;
+  justify-content: flex-start;
+}

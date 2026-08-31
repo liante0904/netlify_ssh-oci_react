@@ -1,0 +1,19 @@
+/* 관리자 콘솔 스타일 */
+.admin-console {
+  padding: 16px;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
+}
+
+.admin-console h1 {
+  font-size: 1.5em;
+  color: var(--primary-color);
+  margin: 0 0 6px 0;
+}
+
+.admin-console .subtitle {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  margin: 0 0 12px 0;
+}

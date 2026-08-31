@@ -1,0 +1,46 @@
+/* ===== Log Viewer ===== */
+.log-viewer-section {
+  margin-top: 0;
+}
+
+.log-viewer-title {
+  font-size: 0.9em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 200px;
+}
+
+.log-viewer-content {
+  background: var(--bg-muted);
+  color: var(--text-color);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 0;
+  max-height: 500px;
+  overflow: auto;
+  margin: 0;
+}
+
+.log-viewer-pre {
+  font-family: 'Courier New', monospace;
+  font-size: 0.75em;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  margin: 0;
+  padding: 12px;
+}
+
+.log-viewer-pre .log-line {
+  padding: 1px 0;
+}
+
+.log-url {
+  color: var(--primary-color);
+  text-decoration: underline;
+}
+
+.log-url:hover {
+  opacity: 0.7;
+}

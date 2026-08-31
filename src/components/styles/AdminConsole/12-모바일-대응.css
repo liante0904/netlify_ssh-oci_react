@@ -1,0 +1,41 @@
+/* 모바일 대응 */
+@media (max-width: 480px) {
+  .summary-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .firm-name {
+    width: 80px;
+    font-size: 0.78em;
+  }
+
+  .status-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .reprocess-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .archive-history {
+    height: 60px;
+  }
+
+  .log-entry-meta {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+  }
+
+  .log-entry-desc {
+    max-width: 120px;
+  }
+
+  .log-viewer-title {
+    max-width: 140px;
+  }
+}
+
+.log-root-link {
+  cursor: pointer;
+}

@@ -1,0 +1,78 @@
+/* Summary Text Block */
+.card-summary-text {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+  font-size: 1.02rem;
+  font-weight: 450;
+  line-height: 1.9;
+  letter-spacing: 0;
+  color: var(--text-color);
+  margin-bottom: 20px;
+  word-break: break-all !important;
+  overflow-wrap: break-word !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.card-summary-text p {
+  margin: 0 0 12px 0;
+  word-break: break-all !important;
+  overflow-wrap: break-word !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.financial-highlight {
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  color: var(--text-color);
+  font-weight: 900;
+  padding: 0 2px;
+}
+
+.investment-keyword-highlight {
+  display: inline;
+  border-radius: 3px;
+  font-size: 1.1em;
+  font-weight: 900;
+  padding: 0 2px;
+}
+
+.investment-keyword-highlight.positive {
+  background: color-mix(in srgb, #d94a4a 12%, transparent);
+  color: color-mix(in srgb, #d94a4a 82%, var(--text-color));
+}
+
+.investment-keyword-highlight.negative {
+  background: color-mix(in srgb, #2777c7 12%, transparent);
+  color: color-mix(in srgb, #2777c7 84%, var(--text-color));
+}
+
+.investment-keyword-highlight.catalyst {
+  background: color-mix(in srgb, #9a6a00 12%, transparent);
+  color: color-mix(in srgb, #8a5b00 86%, var(--text-color));
+}
+
+.toggle-expand-btn {
+  background: none;
+  border: none;
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 4px 0;
+  display: inline-block;
+  transition: opacity 0.2s;
+}
+
+.toggle-expand-btn:hover {
+  opacity: 0.8;
+}
+
+.card-summary-empty {
+  font-style: italic;
+  font-size: 0.85rem;
+  opacity: 0.5;
+  margin-bottom: 16px;
+}

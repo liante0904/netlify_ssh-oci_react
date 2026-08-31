@@ -1,0 +1,38 @@
+/* 운영 상태 */
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.status-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--secondary-background-color);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+}
+
+.status-label {
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.status-value {
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+.status-value.online {
+  color: var(--success-color);
+}
+
+.status-value.offline {
+  color: var(--danger-color);
+}
+
+.status-value.partial {
+  color: var(--warning-color);
+}

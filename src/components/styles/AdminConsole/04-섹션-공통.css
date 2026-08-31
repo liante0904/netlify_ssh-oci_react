@@ -1,0 +1,136 @@
+/* 섹션 공통 */
+.section-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: var(--transition-smooth);
+}
+
+.section-title {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--text-color);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section-title .badge {
+  font-size: 0.6em;
+  background: var(--primary-color);
+  color: white;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-weight: normal;
+}
+
+.status-error-badge {
+  background: #ff3b30 !important;
+}
+
+.llm-visibility-description {
+  color: var(--text-muted);
+  font-size: 0.9em;
+  margin: 0 0 16px;
+}
+
+.llm-visibility-options {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.llm-visibility-option {
+  flex: 1;
+  min-width: 240px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: var(--bg-muted);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.llm-visibility-option.selected {
+  background: var(--secondary-background-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 1px var(--primary-color);
+}
+
+.llm-visibility-option input {
+  accent-color: var(--primary-color);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.llm-visibility-option-title,
+.llm-visibility-option-description {
+  display: block;
+}
+
+.llm-visibility-option-title {
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.llm-visibility-option-description {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.llm-visibility-feedback {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  animation: fadeIn 0.3s ease;
+}
+
+.llm-visibility-feedback.success { color: #34c759; }
+.llm-visibility-feedback.error { color: #ff3b30; }
+
+.firm-health-badge { margin-left: 8px; }
+
+.firm-health-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.firm-health-table th {
+  border-bottom: 1px solid #333;
+  color: #888;
+  text-align: left;
+  padding: 4px 8px;
+}
+
+.firm-health-table th:nth-child(n+3):nth-child(-n+5),
+.firm-health-table td.align-right { text-align: right; }
+.firm-health-table th:last-child,
+.firm-health-table td.align-center { text-align: center; }
+.firm-health-table th:first-child { width: 30px; }
+
+.firm-health-table td {
+  border-bottom: 1px solid #1a1a2e;
+  padding: 3px 8px;
+}
+
+.firm-health-table tbody tr.is-warning { background: var(--firm-status-bg); }
+.firm-health-order { color: #666; font-size: 11px; }
+.firm-health-table td.is-stale { font-weight: 600; }
+.firm-health-table .monospace { font-family: monospace; }
+.firm-health-days,
+.firm-health-status { color: var(--firm-status-color); font-weight: 600; }
+.firm-health-status { font-size: 11px; }

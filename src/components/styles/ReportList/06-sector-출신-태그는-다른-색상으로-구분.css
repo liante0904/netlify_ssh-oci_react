@@ -1,0 +1,8 @@
+/* sector 출신 태그는 다른 색상으로 구분 */
+.tag-cloud-sector {
+  color: #2e7d32;
+}
+
+.tag-cloud-sector:hover {
+  color: #1b5e20;
+}

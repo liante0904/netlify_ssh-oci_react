@@ -1,0 +1,144 @@
+/* ===== Log Browser ===== */
+.log-browser-section {
+  margin-top: 4px;
+}
+
+.log-browser-section .section-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.refresh-btn {
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  color: var(--primary-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1em;
+  padding: 2px 8px;
+  line-height: 1.4;
+  transition: var(--transition-smooth);
+}
+
+.refresh-btn:hover {
+  background: var(--primary-color);
+  color: white;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.close-btn {
+  background: transparent;
+  border: 1px solid var(--danger-color);
+  color: var(--danger-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 0.85em;
+  padding: 2px 8px;
+  line-height: 1.4;
+  margin-left: auto;
+  transition: var(--transition-smooth);
+}
+
+.close-btn:hover {
+  background: var(--danger-color);
+  color: white;
+}
+
+.log-browser-error {
+  padding: 10px;
+  background: color-mix(in srgb, var(--danger-color) 12%, transparent);
+  color: var(--danger-color);
+  border: 1px solid var(--danger-color);
+  border-radius: var(--radius-md);
+  font-size: 0.85em;
+  margin-bottom: 8px;
+}
+
+.log-browser-loading {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+.log-browser-empty {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.85em;
+}
+
+.log-browser-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  font-size: 0.85em;
+}
+
+.log-entry:hover {
+  background: var(--secondary-background-color);
+}
+
+.log-entry-dir {
+  font-weight: 600;
+}
+
+.log-entry-archived {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.log-entry-icon {
+  font-size: 1em;
+  flex-shrink: 0;
+}
+
+.log-entry-name {
+  flex: 1;
+  word-break: break-all;
+  color: var(--text-color);
+}
+
+.log-entry-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-shrink: 0;
+  font-size: 0.85em;
+  color: var(--text-muted);
+}
+
+.log-entry-desc {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-entry-size {
+  min-width: 60px;
+  text-align: right;
+}
+
+.log-entry-modified {
+  min-width: 70px;
+  text-align: right;
+}
