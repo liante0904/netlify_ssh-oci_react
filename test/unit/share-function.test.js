@@ -5,7 +5,7 @@
  *   node test/unit/share-function.test.js
  */
 
-import { buildReportSearchUrl, isKakaoTalkBrowser, isSocialPreviewBot, selectOriginalDocumentUrl } from '../../netlify/functions/share.js';
+import { buildReportSearchUrl, isAttachmentDisposition, isKakaoTalkBrowser, isSocialPreviewBot, selectOriginalDocumentUrl } from '../../netlify/functions/share.js';
 
 let passed = 0;
 let failed = 0;
@@ -78,6 +78,8 @@ assertEqual(isSocialPreviewBot('Mozilla/5.0 (Linux; Android 14; KAKAOTALK 25.7.3
 assertEqual(isSocialPreviewBot('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), false, 'mobile browser receives loading page');
 assertEqual(isKakaoTalkBrowser('Mozilla/5.0 (Linux; Android 14; KAKAOTALK 25.7.3)'), true, 'Android Kakao browser is detected');
 assertEqual(isKakaoTalkBrowser('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), false, 'regular iOS browser is not Kakao');
+assertEqual(isAttachmentDisposition('attachment; filename="report.pdf"'), true, 'attachment disposition is detected');
+assertEqual(isAttachmentDisposition('inline; filename="report.pdf"'), false, 'inline disposition is not treated as attachment');
 
 console.log('\n--- share.js DB Securities document selection ---');
 

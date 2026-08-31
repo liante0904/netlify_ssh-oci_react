@@ -156,6 +156,7 @@ export const handler = async (event) => {
         headers: {
           'Content-Type': contentType,
           'Content-Length': res.headers.get('content-length') || '0',
+          'Content-Disposition': res.headers.get('content-disposition') || 'inline',
           'Access-Control-Allow-Origin': '*',
           'Cache-Control': 'no-store'
         },

@@ -27,6 +27,10 @@ function isKakaoTalkBrowser(userAgent = '') {
   return /KAKAOTALK/i.test(userAgent);
 }
 
+function isAttachmentDisposition(value = '') {
+  return /(?:^|;|\s)attachment(?:\s|;|$)/i.test(value);
+}
+
 function trimSlashes(value = '') {
   return String(value).replace(/^\/+/, '').replace(/\/+$/, '');
 }
@@ -180,23 +184,27 @@ export const handler = async (event) => {
         try {
           const proxyCheck = await fetchWithTimeout(proxyUrl, { method: 'HEAD' }, 3000);
           const proxyContentType = proxyCheck.headers.get('content-type') || '';
+          const proxyDisposition = proxyCheck.headers.get('content-disposition') || '';
           proxyLooksGood = proxyCheck.ok && !proxyContentType.includes('text/html');
+          if (proxyLooksGood && isAttachmentDisposition(proxyDisposition)) {
+            proxyLooksGood = 'attachment';
+          }
         } catch {
           proxyLooksGood = false;
         }
       }
 
-      if (!proxyLooksGood && !isKakaoTalk) {
+      if (!proxyLooksGood && proxyLooksGood !== 'attachment' && !isKakaoTalk) {
         finalUrl = pdfUrl;
       } else {
         const viewerBase = `${requestOrigin}/lib/pdfjs/web/viewer.html`;
         const viewerParams = `file=${encodeURIComponent(proxyUrl)}`;
         const viewerHash = 'pagemode=none&zoom=page-width';
-        finalUrl = isKakaoTalk
+        finalUrl = isKakaoTalk || proxyLooksGood === 'attachment'
           ? `${viewerBase}?${viewerParams}#${viewerHash}`
           : isIos || isDs
           ? proxyUrl
-          : `${viewerBase}?${viewerParams}#${viewerHash}`;
+          : pdfUrl;
       }
     }
 

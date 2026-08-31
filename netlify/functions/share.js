@@ -66,6 +66,10 @@ export function isKakaoTalkBrowser(userAgent = '') {
   return /KAKAOTALK/i.test(userAgent);
 }
 
+export function isAttachmentDisposition(value = '') {
+  return /(?:^|;|\s)attachment(?:\s|;|$)/i.test(value);
+}
+
 export function selectOriginalDocumentUrl(report = {}) {
   const pdfUrl = report.pdf_file_url;
   const telegramUrl = report.telegram_url;
@@ -199,24 +203,28 @@ export const handler = async (event) => {
         try {
           const proxyCheck = await fetchWithTimeout(proxyUrl, { method: 'HEAD' }, 3000);
           const proxyContentType = proxyCheck.headers.get('content-type') || '';
+          const proxyDisposition = proxyCheck.headers.get('content-disposition') || '';
           proxyLooksGood = proxyCheck.ok && !proxyContentType.includes('text/html');
+          if (proxyLooksGood && isAttachmentDisposition(proxyDisposition)) {
+            proxyLooksGood = 'attachment';
+          }
         } catch {
           proxyLooksGood = false;
         }
       }
 
-      if (!proxyLooksGood && !isKakaoTalk) {
+      if (!proxyLooksGood && proxyLooksGood !== 'attachment' && !isKakaoTalk) {
         finalUrl = pdfUrl;
       } else {
         const viewerBase = `${requestOrigin}/lib/pdfjs/web/viewer.html`;
         const viewerParams = `file=${encodeURIComponent(proxyUrl)}`;
         const viewerHash = 'pagemode=none&zoom=page-width';
         // iOS와 DS는 브라우저 기본 PDF 뷰어를 사용하고, 그 외는 셀프 호스팅된 pdf.js를 사용한다.
-        finalUrl = isKakaoTalk
+        finalUrl = isKakaoTalk || proxyLooksGood === 'attachment'
           ? `${viewerBase}?${viewerParams}#${viewerHash}`
           : isIos || isDs
           ? proxyUrl
-          : `${viewerBase}?${viewerParams}#${viewerHash}`;
+          : pdfUrl;
       }
     }
 
