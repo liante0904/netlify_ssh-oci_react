@@ -93,6 +93,7 @@ function SearchPageNew() {
 
   // 리스트 컨트롤 상태 (즐겨찾기, 토글 등)
   const [dateToggles, setDateToggles] = useState({});
+  const [revealOlderDate, setRevealOlderDate] = useState(null);
   const [firmToggles, setFirmToggles] = useState({});
   const [summaryToggles, setSummaryToggles] = useState({});
   const [favorites, setFavorites] = useState(() => {
@@ -113,14 +114,17 @@ function SearchPageNew() {
   // 검색 조건 변경 시 날짜 토글 및 요약 초기화
   useEffect(() => {
     setDateToggles({});
+    setRevealOlderDate(null);
     setFirmToggles({});
     setSummaryToggles({});
     setSummaryRequestedIds(new Set());
   }, [searchQuery, selectedRoute, selectedSort]);
 
   const toggleDate = useCallback((date) => {
-    setDateToggles(prev => ({ ...prev, [date]: !prev[date] }));
-  }, []);
+    const willCollapse = !dateToggles[date];
+    setDateToggles(prev => ({ ...prev, [date]: willCollapse }));
+    if (willCollapse) setRevealOlderDate(date);
+  }, [dateToggles]);
 
   const toggleFirm = useCallback((date, firm) => {
     setFirmToggles(prev => ({
@@ -244,6 +248,29 @@ function SearchPageNew() {
 
   const sortedDates = datesWithReports(reports);
   const filteredSortedDates = isAiSummary ? datesWithReports(reports, hasSummaryContent) : sortedDates;
+
+  useEffect(() => {
+    if (!revealOlderDate || isLoading) return undefined;
+
+    const currentIndex = filteredSortedDates.indexOf(revealOlderDate);
+    const olderDate = currentIndex >= 0 ? filteredSortedDates[currentIndex + 1] : null;
+    if (!olderDate) {
+      if (hasMore) {
+        fetchReports();
+        return undefined;
+      }
+      setRevealOlderDate(null);
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => {
+      const dateGroups = Array.from(document.querySelectorAll('[data-report-date]'));
+      const olderGroup = dateGroups.find((element) => element.dataset.reportDate === olderDate);
+      olderGroup?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setRevealOlderDate(null);
+    }, 450);
+    return () => window.clearTimeout(timer);
+  }, [fetchReports, filteredSortedDates, hasMore, isLoading, revealOlderDate]);
 
   // 결과 개수 카운트
   const totalCount = useMemo(() => countReportGroups(reports), [reports]);
