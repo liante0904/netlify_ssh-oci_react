@@ -47,7 +47,7 @@ describe('ReportItem Component', () => {
     report_type: 'COMPANY'
   };
 
-  it('should render FnGuide summary with break styles to prevent layout overflow', () => {
+  it('should render FnGuide summary with overflow-safe classes', () => {
     // ReportItem 렌더링
     // isSummaryExpanded를 true로 설정하여 요약 영역이 즉시 보이게 함
     const { container } = render(
@@ -66,10 +66,7 @@ describe('ReportItem Component', () => {
     const fnguideSummaryContainer = container.querySelector('.fnguide-summary-section .summary-text');
     expect(fnguideSummaryContainer).not.toBeNull();
 
-    // 인라인 스타일에 wordBreak: 'break-all' 및 overflowWrap: 'break-word'가 올바르게 적용되어 있는지 검증
-    const style = fnguideSummaryContainer.style;
-    expect(style.wordBreak).toBe('break-all');
-    expect(style.overflowWrap).toBe('break-word');
+    expect(fnguideSummaryContainer.className).toContain('fnguide-summary-text');
     expect(fnguideSummaryContainer.textContent).toContain('FnGuide 요약 내용입니다.');
   });
 
