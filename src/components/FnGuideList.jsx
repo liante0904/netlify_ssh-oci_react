@@ -4,33 +4,17 @@ import { useSearchParams } from 'react-router-dom';
 import { CONFIG } from '../constants/config';
 import { REPORT_SECTIONS } from '../constants/reportSections';
 import { request } from '../utils/api';
-import { calculateUpsidePercent, formatUpsidePercent } from '../utils/financial';
 import {
   buildFnGuideFacets,
   getFnGuideFacetScale,
   groupFnGuideSummaries,
   matchesFnGuideFacet,
-  tokenizeFinancialHighlights,
 } from '../utils/fnguide';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
 import LoadingSkeleton from './LoadingSkeleton';
 import './FnGuideList.css';
-
-function HighlightedSummary({ text }) {
-  return tokenizeFinancialHighlights(text).map((token, index) => (
-    token.highlighted
-      ? (
-          <strong
-            className={token.kind === 'financial' ? 'financial-highlight' : `investment-keyword-highlight ${token.kind}`}
-            key={`${token.text}-${index}`}
-          >
-            {token.text}
-          </strong>
-        )
-      : <React.Fragment key={`${index}-${token.text.slice(0, 12)}`}>{token.text}</React.Fragment>
-  ));
-}
+import FnGuideSummaryCard from './fnguide/FnGuideSummaryCard';
 
 function FnGuideList() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -212,195 +196,17 @@ function FnGuideList() {
     setSearchParams(nextParams);
   };
 
-  const renderSummaryCard = (item, { showCompany = true } = {}) => {
-    const isSelected = String(item.summary_id) === selectedSummaryId;
-    const isExpanded = expandedItems[item.summary_id];
-    const selectedIndex = isSelected
-      ? visibleSummaries.findIndex((summary) => String(summary.summary_id) === selectedSummaryId)
-      : -1;
-    const previousSummary = selectedIndex > 0 ? visibleSummaries[selectedIndex - 1] : null;
-    const nextSummary = selectedIndex >= 0 && selectedIndex < visibleSummaries.length - 1
-      ? visibleSummaries[selectedIndex + 1]
-      : null;
-    const upsidePercent = calculateUpsidePercent(item.target_price, item.prev_close);
-    const hasTargetPrice = Boolean(item.target_price && item.target_price !== '0');
-    const textLimit = 300;
-    const needsTruncate = item.summary_text && item.summary_text.length > textLimit;
-    const displayText = isExpanded
-      ? item.summary_text
-      : (item.summary_text ? `${item.summary_text.slice(0, textLimit)}${needsTruncate ? '...' : ''}` : '');
-
-    return (
-      <article
-        id={`fnguide-summary-${item.summary_id}`}
-        className={`fnguide-card ${isSelected ? 'selected-summary' : ''} ${isExpanded ? 'expanded-summary' : ''}`}
-        key={item.summary_id}
-      >
-        {isSelected && <div className="selected-summary-label">선택한 레포트</div>}
-        {isSelected && visibleSummaries.length > 1 && (
-          <nav className="summary-sequence-nav" aria-label="선택한 레포트 이동">
-            <button
-              type="button"
-              className="summary-sequence-btn"
-              disabled={!previousSummary}
-              onClick={() => previousSummary && navigateToSummary(previousSummary.summary_id)}
-              aria-label={previousSummary ? `이전 레포트: ${previousSummary.company_name}` : '이전 레포트 없음'}
-            >
-              <span aria-hidden="true">←</span>
-              <span>이전</span>
-            </button>
-            <span className="summary-sequence-position">
-              {selectedIndex + 1} / {visibleSummaries.length}
-            </span>
-            <button
-              type="button"
-              className="summary-sequence-btn"
-              disabled={!nextSummary}
-              onClick={() => nextSummary && navigateToSummary(nextSummary.summary_id)}
-              aria-label={nextSummary ? `다음 레포트: ${nextSummary.company_name}` : '다음 레포트 없음'}
-            >
-              <span>다음</span>
-              <span aria-hidden="true">→</span>
-            </button>
-          </nav>
-        )}
-        <div className="card-top-meta">
-          <span className="card-provider-badge">{item.provider || '증권사 미상'}</span>
-          {item.author && <span className="card-author-badge">{item.author}</span>}
-        </div>
-
-        {showCompany && (
-          <div className="card-company-section">
-            <span className="card-company-name">{item.company_name}</span>
-            {item.company_code && <span className="card-company-code">{item.company_code}</span>}
-          </div>
-        )}
-
-        <h3 className="card-report-title">{item.report_title}</h3>
-
-        {item.summary_text ? (
-          <div className="card-summary-text">
-            <p style={{ whiteSpace: 'pre-line' }}>
-              <HighlightedSummary text={displayText} />
-            </p>
-            {needsTruncate && (
-              <button
-                type="button"
-                className="toggle-expand-btn"
-                onClick={() => toggleExpand(item.summary_id)}
-                aria-expanded={Boolean(isExpanded)}
-              >
-                {isExpanded ? '접기 ▲' : '더보기 ▼'}
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="card-summary-empty">요약 정보 본문이 없습니다.</div>
-        )}
-
-        <div className="card-financial-grid">
-          <div className="grid-cell">
-            <span className="cell-label">투자의견</span>
-            <strong className="cell-value opinion">{item.opinion || '-'}</strong>
-          </div>
-          <div className="grid-cell">
-            <span className="cell-label">목표가</span>
-            <strong className="cell-value target-price">
-              {hasTargetPrice ? item.target_price : '-'}
-            </strong>
-          </div>
-          <div className="grid-cell">
-            <span className="cell-label">직전 종가</span>
-            <strong className="cell-value prev-close">
-              {item.prev_close && item.prev_close !== '0' ? item.prev_close : '-'}
-            </strong>
-          </div>
-          <div className="grid-cell">
-            <span className="cell-label">상승여력</span>
-            <strong className={`cell-value upside ${upsidePercent === null ? '' : upsidePercent >= 0 ? 'positive' : 'negative'}`}>
-              {upsidePercent === null ? '-' : formatUpsidePercent(upsidePercent)}
-            </strong>
-          </div>
-        </div>
-
-        {hasTargetPrice && upsidePercent === null && (
-          <p className="upside-data-note">직전 종가 데이터가 없어 상승여력을 계산하지 못했습니다.</p>
-        )}
-
-        <div className="card-actions" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '14px' }}>
-          {/* PDF 보기 버튼 (pdf_url이 있을 때만) */}
-          {item.pdf_url && (
-            <a
-              href={item.pdf_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pdf-action-btn"
-              style={{ padding: '8px 14px', fontSize: '13px', borderRadius: '8px', backgroundColor: 'rgba(211, 47, 47, 0.08)', color: '#d32f2f', border: '1px solid rgba(211, 47, 47, 0.25)', fontWeight: '500', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', transition: 'all 0.2s ease' }}
-              title="PDF 원문 보기"
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ marginRight: '6px' }}>
-                <path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 10h1V8.5H9V10zm5.5 2H15V8.5h-.5V12zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z"/>
-              </svg>
-              PDF 보기
-            </a>
-          )}
-          {(item.pdf_url || item.article_url) && (
-            <a
-              href={item.pdf_url || item.article_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="pdf-action-btn"
-              style={{ padding: '8px 14px', fontSize: '13px', borderRadius: '8px', backgroundColor: 'var(--card-action-bg-fnguide, rgba(46, 125, 50, 0.1))', color: '#2e7d32', border: '1px solid rgba(46, 125, 50, 0.2)', fontWeight: '500', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', transition: 'all 0.2s ease' }}
-            >
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ marginRight: '6px' }}>
-                <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41 9.83-9.83V9h2V3h-7z"/>
-              </svg>
-              FnGuide 원문 보기
-            </a>
-          )}
-          
-          {item.sec_reports && item.sec_reports.length > 0 && item.sec_reports.map((secReport) => {
-            const reportUrl = secReport.pdf_file_url || secReport.telegram_url;
-            if (!reportUrl) return null;
-            return (
-              <a
-                key={secReport.report_id}
-                href={reportUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="pdf-action-btn sec-pdf-btn"
-                style={{ padding: '8px 14px', fontSize: '13px', borderRadius: '8px', backgroundColor: 'rgba(21, 101, 192, 0.1)', color: '#1565c0', border: '1px solid rgba(21, 101, 192, 0.2)', fontWeight: '500', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', transition: 'all 0.2s ease' }}
-                title={`${secReport.firm_nm}: ${secReport.article_title}`}
-              >
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style={{ marginRight: '6px' }}>
-                  <path d="M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5c0 .83-.67 1.5-1.5 1.5H9v2H7.5V7H10c.83 0 1.5.67 1.5 1.5v1zm5 2c0 .83-.67 1.5-1.5 1.5h-2.5V7H15c.83 0 1.5.67 1.5 1.5v3zm4-3H19v1h1.5V11H19v2h-1.5V7h3v1.5zM9 10h1V8.5H9V10zm5.5 2H15V8.5h-.5V12zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z"/>
-                </svg>
-                {secReport.firm_nm} 원본 PDF 보기
-              </a>
-            );
-          })}
-        </div>
-      </article>
-    );
-  };
-
   useEffect(() => {
     if (!selectedSummaryId || scrolledSummaryIdRef.current === selectedSummaryId) return;
-
     const selectedItem = summaries.find((item) => String(item.summary_id) === selectedSummaryId);
     if (!selectedItem) return;
-
     const groupKey = `${selectedItem.report_date}-${selectedItem.company_code || selectedItem.company_name || `summary-${selectedItem.summary_id}`}`;
     setCollapsedCompanyGroups((prev) => ({ ...prev, [groupKey]: false }));
     setExpandedItems((prev) => ({ ...prev, [selectedItem.summary_id]: true }));
     scrolledSummaryIdRef.current = selectedSummaryId;
-
     const timeoutId = window.setTimeout(() => {
-      document
-        .getElementById(`fnguide-summary-${selectedSummaryId}`)
-        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      document.getElementById(`fnguide-summary-${selectedSummaryId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }, 80);
-
     return () => window.clearTimeout(timeoutId);
   }, [selectedSummaryId, summaries]);
 
@@ -612,7 +418,19 @@ function FnGuideList() {
                         </button>
                         {!isCollapsed && (
                           <div className="fnguide-company-reports">
-                            {companyGroup.items.map((item) => renderSummaryCard(item, { showCompany: false }))}
+                            {companyGroup.items.map((item) => (
+                              <FnGuideSummaryCard
+                                key={item.summary_id}
+                                item={item}
+                                showCompany={false}
+                                isSelected={String(item.summary_id) === selectedSummaryId}
+                                isExpanded={expandedItems[item.summary_id]}
+                                selectedIndex={visibleSummaries.findIndex((summary) => String(summary.summary_id) === String(item.summary_id))}
+                                visibleSummaries={visibleSummaries}
+                                onNavigate={navigateToSummary}
+                                onToggleExpand={toggleExpand}
+                              />
+                            ))}
                           </div>
                         )}
                       </section>
@@ -623,7 +441,22 @@ function FnGuideList() {
 
               {dateGroup.singles.length > 0 && (
                 <div className="fnguide-single-reports">
-                  {dateGroup.singles.map((companyGroup) => renderSummaryCard(companyGroup.items[0]))}
+                  {dateGroup.singles.map((companyGroup) => {
+                    const item = companyGroup.items[0];
+                    return (
+                      <FnGuideSummaryCard
+                        key={item.summary_id}
+                        item={item}
+                        showCompany
+                        isSelected={String(item.summary_id) === selectedSummaryId}
+                        isExpanded={expandedItems[item.summary_id]}
+                        selectedIndex={visibleSummaries.findIndex((summary) => String(summary.summary_id) === String(item.summary_id))}
+                        visibleSummaries={visibleSummaries}
+                        onNavigate={navigateToSummary}
+                        onToggleExpand={toggleExpand}
+                      />
+                    );
+                  })}
                 </div>
               )}
             </section>

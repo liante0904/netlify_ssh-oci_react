@@ -816,6 +816,33 @@ html[data-theme='dark'] .card-financial-grid {
 /* Action Area & PDF Buttons */
 .card-actions {
   display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.summary-preserve-lines {
+  white-space: pre-line;
+}
+
+.pdf-action-btn {
+  padding: 8px 14px;
+  font-size: 13px;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.pdf-action-btn svg { margin-right: 6px; }
+.pdf-action-primary { background-color: rgba(211, 47, 47, 0.08); color: #d32f2f; border: 1px solid rgba(211, 47, 47, 0.25); }
+.pdf-action-fnguide { background-color: var(--card-action-bg-fnguide, rgba(46, 125, 50, 0.1)); color: #2e7d32; border: 1px solid rgba(46, 125, 50, 0.2); }
+.sec-pdf-btn { background-color: rgba(21, 101, 192, 0.1); color: #1565c0; border: 1px solid rgba(21, 101, 192, 0.2); }
+
+.card-actions {
+  display: flex;
   justify-content: flex-end;
 }
 
@@ -840,6 +867,10 @@ html[data-theme='dark'] .card-financial-grid {
   box-shadow: 0 4px 10px rgba(255, 59, 48, 0.25);
   transform: translateY(-1px);
 }
+
+.pdf-action-btn.pdf-action-primary { background-color: rgba(211, 47, 47, 0.08); color: #d32f2f; border-color: rgba(211, 47, 47, 0.25); }
+.pdf-action-btn.pdf-action-fnguide { background-color: var(--card-action-bg-fnguide, rgba(46, 125, 50, 0.1)); color: #2e7d32; border-color: rgba(46, 125, 50, 0.2); }
+.pdf-action-btn.sec-pdf-btn { background-color: rgba(21, 101, 192, 0.1); color: #1565c0; border-color: rgba(21, 101, 192, 0.2); }
 
 /* Loader & Spinners */
 .list-loading-spinner {
