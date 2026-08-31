@@ -13,6 +13,7 @@ import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { useFavorites } from '../hooks/useFavorites';
 import { useFavoriteSync } from '../hooks/useFavoriteSync';
 import { useSummaryMutation } from '../hooks/useSummaryMutation';
+import ReportListFilters from './report/ReportListFilters';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import MenuSummary from './MenuSummary';
 import AsyncErrorState from './AsyncErrorState';
@@ -405,37 +406,14 @@ function ReportList({ onWriterClick }) {
           ]}
           variant="compact"
         />
-        {/* 태그 클라우드 필터 표시줄 */}
-        {tagFilter && (
-          <div className="tag-filter-bar">
-            <span className="tag-filter-label">
-              🔍 필터: <strong>{tagFilter.keyword}</strong>
-              <span className="tag-filter-type">({tagFilter.category})</span>
-            </span>
-            <button
-              className="tag-filter-clear-btn"
-              onClick={clearTagFilter}
-              title="필터 해제"
-            >
-              ✕ 해제
-            </button>
-          </div>
-        )}
-        {isOutlook && !isLoading && (
-          <div className="outlook-year-filter">
-            <button
-              className={`year-chip ${outlookYear === null ? 'active' : ''}`}
-              onClick={() => setOutlookYear(null)}
-            >전체</button>
-            {[2026, 2025, 2024, 2023].map(year => (
-              <button
-                key={year}
-                className={`year-chip ${outlookYear === year ? 'active' : ''}`}
-                onClick={() => setOutlookYear(outlookYear === year ? null : year)}
-              >{year}년</button>
-            ))}
-          </div>
-        )}
+        <ReportListFilters
+          tagFilter={tagFilter}
+          onClearTagFilter={clearTagFilter}
+          isOutlook={isOutlook}
+          isLoading={isLoading}
+          outlookYear={outlookYear}
+          onSetOutlookYear={setOutlookYear}
+        />
         {error && offset === 0 ? (
           <AsyncErrorState onRetry={retry} />
         ) : isFavoritesPage && !favoriteReports && offset === 0 && isLoading ? (
