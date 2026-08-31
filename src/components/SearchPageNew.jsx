@@ -85,11 +85,11 @@ function SearchPageNew() {
       ...prev,
       [date]: { ...prev[date], [firm]: !prev[date]?.[firm] }
     }));
-  }, [setCategory, setSearchTerm]);
+  }, []);
 
   const toggleSummary = useCallback((id) => {
     setSummaryToggles(prev => ({ ...prev, [id]: !prev[id] }));
-  }, []);
+  }, [setCategory, setSearchTerm]);
 
   const toggleFavorite = useCallback((id) => {
     const isAdding = !favorites[id];
