@@ -12,6 +12,7 @@ import { isDsReport, prefetchPdf } from '../utils/reportLinks';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 import { hasReportSummary, flattenReportGroup, datesWithReports } from '../utils/reportCollection';
 import { buildShareMenuData } from '../utils/shareMenuData';
+import { useRevealOlderDate } from '../hooks/useRevealOlderDate';
 import ReportListContent from './report/ReportListContent';
 import './ReportList.css';
 
@@ -31,7 +32,6 @@ export default function ReportList({ onWriterClick }) {
   const { triggerSummary } = useSummaryMutation();
   const [outlookYear, setOutlookYear] = useState(null);
   const [collapsedDates, setCollapsedDates] = useState({});
-  const [revealOlderDate, setRevealOlderDate] = useState(null);
   const [collapsedFirms, setCollapsedFirms] = useState({});
   const [expandedSummaries, setExpandedSummaries] = useState({});
   const [favorites, setFavorites] = useState(() => { try { return JSON.parse(localStorage.getItem('report_favorites') || '{}'); } catch { return {}; } });
@@ -51,7 +51,7 @@ export default function ReportList({ onWriterClick }) {
   const toggleDate = useCallback((date) => {
     const willCollapse = !collapsedDates[date];
     setCollapsedDates((current) => ({ ...current, [date]: willCollapse }));
-    if (isRecent && willCollapse) setRevealOlderDate(date);
+    if (isRecent && willCollapse) requestReveal(date);
   }, [collapsedDates, isRecent]);
   const toggleFirm = useCallback((date, firm) => setCollapsedFirms((current) => ({ ...current, [date]: { ...current[date], [firm]: !current[date]?.[firm] } })), []);
   const toggleSummary = useCallback((id) => setExpandedSummaries((current) => ({ ...current, [id]: !current[id] })), []);
@@ -61,27 +61,6 @@ export default function ReportList({ onWriterClick }) {
   const handleTagClick = (keyword, isSector) => handleSearch({ query: keyword, category: isSector ? 'sector' : 'title' });
   const summaryItems = [{ label: meta.title || '레포트', value: filteredDates.length, icon: '📰' }, ...(searchQuery.query ? [{ label: '검색', value: searchQuery.query, icon: '🔍' }] : [])];
   useEffect(() => { if (isLoading) return; const reportsToPrefetch = filteredDates.slice(0, 2).flatMap((date) => flattenReportGroup(displayReports[date])).filter(isDsReport).slice(0, 3); reportsToPrefetch.forEach((report, index) => window.setTimeout(() => prefetchPdf(report, window.location.origin), index * 700)); }, [displayReports, filteredDates, isLoading]);
-  useEffect(() => {
-    if (!isRecent || !revealOlderDate || isLoading) return undefined;
-
-    const currentIndex = sortedDates.indexOf(revealOlderDate);
-    const olderDate = currentIndex >= 0 ? sortedDates[currentIndex + 1] : null;
-    if (!olderDate) {
-      if (hasMore) {
-        fetchReports();
-        return undefined;
-      }
-      setRevealOlderDate(null);
-      return undefined;
-    }
-
-    const timer = window.setTimeout(() => {
-      const dateGroups = Array.from(document.querySelectorAll('[data-report-date]'));
-      const olderGroup = dateGroups.find((element) => element.dataset.reportDate === olderDate);
-      olderGroup?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setRevealOlderDate(null);
-    }, 450);
-    return () => window.clearTimeout(timer);
-  }, [fetchReports, hasMore, isLoading, isRecent, revealOlderDate, sortedDates]);
+  const { requestReveal } = useRevealOlderDate({ dates: sortedDates, hasMore, isLoading, fetchMore: fetchReports, enabled: isRecent });
   return <ReportListContent meta={{ title: meta.title || '레포트', description: meta.description, summaryItems }} filters={{ isOutlook, isLoading, outlookYear, onSetOutlookYear: setOutlookYear, tagFilter: null, onClearTagFilter: () => {} }} data={{ dates: sortedDates, displayReports, filteredDates }} controls={{ isLoading, error, offset, retry, fetchReports, hasMore }} share={{ ...share, onOpen: openShare, onClose: () => setShare((current) => ({ ...current, isOpen: false })) }} options={{ isFavoritesPage, isAiSummary, isRecent, isSearchActive: Boolean(searchQuery.query), collapsedDates, onToggleDate: toggleDate, sortBy, favorites, collapsedFirms, onToggleFirm: toggleFirm, expandedSummaries, onToggleSummary: toggleSummary, onToggleFavorite: toggleFavorite, onWriterClick, setSortBy, isAdmin, onTriggerSummary, summaryRequestedIds, summaryCompletedIds, hasSummaryContent: hasReportSummary, emptyMessage: isAiSummary ? 'AI 요약이 생성된 레포트가 없습니다.' : isOutlook ? '전망 관련 레포트가 없습니다.' : '즐겨찾기한 레포트가 없습니다.', onTagClick: handleTagClick }} />;
 }

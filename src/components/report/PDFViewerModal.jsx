@@ -3,6 +3,7 @@ import { getProxyPdfUrl } from '../../utils/reportLinks';
 import LoadingSkeleton from '../LoadingSkeleton';
 import './PDFViewerModal.css';
 import PDFPageList from './PDFPageList';
+import PDFPageCanvas from './PDFPageCanvas';
 
 // ---------------------------------------------------------------------------
 // pdf.js lazy loader
@@ -14,50 +15,6 @@ async function getPdfjs() {
   _pdfjs.GlobalWorkerOptions.workerSrc = '/lib/pdfjs/build/pdf.worker.mjs';
   return _pdfjs;
 }
-
-// ---------------------------------------------------------------------------
-// PageCanvas: 단일 PDF 페이지 → canvas
-// ---------------------------------------------------------------------------
-const MAX_DPR = 2;
-
-function PageCanvas({ page, scale }) {
-  const ref = useRef(null);
-  const renderRef = useRef(null);
-  const destroyedRef = useRef(false);
-
-  useEffect(() => {
-    destroyedRef.current = false;
-    return () => { destroyedRef.current = true; if (renderRef.current) renderRef.current.cancel(); };
-  }, [page, scale]);
-
-  useEffect(() => {
-    if (!page || !ref.current) return;
-    if (renderRef.current) renderRef.current.cancel();
-    const canvas = ref.current;
-    const ctx = canvas.getContext('2d');
-    let cancelled = false;
-
-    (async () => {
-      const vp = page.getViewport({ scale });
-      const dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
-      const pw = Math.min(Math.floor(vp.width * dpr), 2400);
-      const ph = Math.floor(vp.height * (pw / (vp.width * dpr)) * dpr);
-      canvas.width = pw;
-      canvas.height = ph;
-      canvas.style.width = `${vp.width}px`;
-      canvas.style.height = `${vp.height}px`;
-      if (cancelled || destroyedRef.current) return;
-      renderRef.current = page.render({ canvasContext: ctx, viewport: vp });
-      await renderRef.current.promise;
-    })().catch(() => {});
-
-    return () => { cancelled = true; };
-  }, [page, scale]);
-
-  return <canvas ref={ref} className="pdf-page-canvas" />;
-}
-
-const PageCanvasMemo = React.memo(PageCanvas);
 
 // ---------------------------------------------------------------------------
 // PDFViewerModal
@@ -272,7 +229,7 @@ const PDFViewerModal = ({ report, onClose }) => {
         {loading && (
           <LoadingSkeleton variant="spinner" label="PDF 불러오는 중" />
         )}
-        <PDFPageList pages={pages} scale={scale} PageCanvas={PageCanvasMemo} style={{ visibility: loading ? 'hidden' : 'visible' }} />
+        <PDFPageList pages={pages} scale={scale} PageCanvas={PDFPageCanvas} style={{ visibility: loading ? 'hidden' : 'visible' }} />
       </div>
     </div>
   );

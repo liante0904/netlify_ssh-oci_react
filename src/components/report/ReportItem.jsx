@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { getArchiveDownloadUrl, getDirectUrl, prefetchPdf } from '../../utils/reportLinks';
+import { getDirectUrl } from '../../utils/reportLinks';
 import { useReport } from '../../context/useReport';
 import ReportItemSummary from './ReportItemSummary';
 import { getReportPresentation } from '../../utils/reportItemModel';
+import { useReportItemActions } from '../../hooks/useReportItemActions';
+import './ReportSummaryControls.css';
 
 const ReportItem = ({ 
   report, 
@@ -19,74 +21,21 @@ const ReportItem = ({
   summaryCompletedIds
 }) => {
   const {
-    id, title, writer, gemini_summary, fnguide_summary, firm, pdf_file_url,
+    id, title, writer, gemini_summary, fnguide_summary, firm,
     tags, stock_names, stock_tickers, sector, rating, revision_type,
     report_type
   } = report;
-  const { setViewerReport, telegramUser, llmVisibility } = useReport();
+  const { telegramUser, llmVisibility } = useReport();
   const [showConfirm, setShowConfirm] = useState(null);
-  const [isArchiveDownloading, setIsArchiveDownloading] = useState(false);
   /* 기존 주석 유지: 요약 요청 및 완료 여부 파악 */
   const isSummaryRequested = summaryRequestedIds?.has(id);
   const isSummaryCompleted = summaryCompletedIds?.has(id);
   
-  /* 글래스모피즘 토스트 전용 컴포넌트 상태 정의 */
-  const [toast, setToast] = useState({ visible: false, message: '' });
-  
-  const showToast = (message) => {
-    setToast({ visible: true, message });
-    setTimeout(() => {
-      setToast({ visible: false, message: '' });
-    }, 3000);
-  };
-  
+  const { handleViewerClick, handleArchiveDownload, handlePrefetch, isArchiveDownloading, toast, showToast } = useReportItemActions(report);
   const finalLink = getDirectUrl(report);
   const canDownloadArchive = report.pdf_archive?.archive_status === 'ARCHIVED'
     && Boolean(report.pdf_archive?.storage_key);
 
-  const handleViewerClick = () => {
-    if (firm === '현대차증권' && pdf_file_url) {
-      setViewerReport({ ...report, link: pdf_file_url });
-    } else {
-      setViewerReport(report);
-    }
-  };
-
-  const handleArchiveDownload = async () => {
-    if (isArchiveDownloading) return;
-    setIsArchiveDownloading(true);
-    try {
-      const response = await fetch(getArchiveDownloadUrl(id));
-      if (!response.ok) throw new Error('archive download failed');
-      const blob = await response.blob();
-      const downloadUrl = URL.createObjectURL(blob);
-      const anchor = document.createElement('a');
-      anchor.href = downloadUrl;
-      anchor.download = report.pdf_archive?.file_name || `[${firm}] ${title}.pdf`;
-      document.body.appendChild(anchor);
-      anchor.click();
-      anchor.remove();
-      URL.revokeObjectURL(downloadUrl);
-    } catch {
-      showToast('아카이브 PDF를 내려받지 못했습니다. 잠시 후 다시 시도해 주세요.');
-    } finally {
-      setIsArchiveDownloading(false);
-    }
-  };
-
-  // 프리패치 로직: 서버 미리 깨우기 (Cold Start 방지)
-  const handlePrefetch = () => {
-    const origin = window.location.origin;
-    // 람다만 깨우면 되므로 복잡한 인자 생략
-    const proxyUrl = `${origin}/.netlify/functions/proxy?warmup=true`;
-    const shareUrl = `${origin}/.netlify/functions/share?warmup=true`;
-    
-    fetch(proxyUrl, { method: 'HEAD', mode: 'no-cors' }).catch(() => {});
-    fetch(shareUrl, { method: 'HEAD', mode: 'no-cors' }).catch(() => {});
-
-    prefetchPdf(report, origin);
-  };
-  
   // LLM 요약 노출 범위에 따른 판단 (기존 주석 유지 및 추가 권한 마스킹)
   const { hasSummary, hasFnguideSummary, hasAnySummary, hasUnverifiedValuation, hasDirectSignal, formattedTargetPrice } = getReportPresentation(report, { isAdmin, telegramUser, llmVisibility });
   // target_price/rating is historically almost entirely FnGuide-derived.
