@@ -62,6 +62,10 @@ export function isSocialPreviewBot(userAgent = '') {
   return /facebookexternalhit|facebot|twitterbot|slackbot|telegrambot|discordbot|linkedinbot|googlebot|bingbot|yandexbot|kakaotalk-scrap/i.test(userAgent);
 }
 
+export function isKakaoTalkBrowser(userAgent = '') {
+  return /KAKAOTALK/i.test(userAgent);
+}
+
 export function selectOriginalDocumentUrl(report = {}) {
   const pdfUrl = report.pdf_file_url;
   const telegramUrl = report.telegram_url;
@@ -89,6 +93,7 @@ export const handler = async (event) => {
   const requestOrigin = event.headers?.origin || `https://${requestHost}`;
   const userAgent = event.headers?.['user-agent'] || event.headers?.['User-Agent'] || '';
   const isIos = /iPad|iPhone|iPod/i.test(userAgent);
+  const isKakaoTalk = isKakaoTalkBrowser(userAgent);
 
   if (!id) return { statusCode: 400, body: 'ID missing' };
 
@@ -186,9 +191,11 @@ export const handler = async (event) => {
       const boardUrl = report.source_url || pdfUrl.replace('download.php', 'board.php');
       const proxyFunction = isDs ? 'proxy-ds' : 'proxy';
       const proxyUrl = `${requestOrigin}/.netlify/functions/${proxyFunction}?url=${encodeURIComponent(pdfUrl)}&filename=${encodeURIComponent(fileName)}${boardUrl ? `&referer=${encodeURIComponent(boardUrl)}` : ''}`;
-      let proxyLooksGood = isDs;
+      // KakaoTalk Android WebView often downloads a direct PDF instead of
+      // rendering it. Keep both Kakao iOS/Android on the same self-hosted viewer.
+      let proxyLooksGood = isDs || isKakaoTalk;
 
-      if (!isDs) {
+      if (!isDs && !isKakaoTalk) {
         try {
           const proxyCheck = await fetchWithTimeout(proxyUrl, { method: 'HEAD' }, 3000);
           const proxyContentType = proxyCheck.headers.get('content-type') || '';
@@ -198,14 +205,16 @@ export const handler = async (event) => {
         }
       }
 
-      if (!proxyLooksGood) {
+      if (!proxyLooksGood && !isKakaoTalk) {
         finalUrl = pdfUrl;
       } else {
         const viewerBase = `${requestOrigin}/lib/pdfjs/web/viewer.html`;
         const viewerParams = `file=${encodeURIComponent(proxyUrl)}`;
         const viewerHash = 'pagemode=none&zoom=page-width';
         // iOS와 DS는 브라우저 기본 PDF 뷰어를 사용하고, 그 외는 셀프 호스팅된 pdf.js를 사용한다.
-        finalUrl = isIos || isDs
+        finalUrl = isKakaoTalk
+          ? `${viewerBase}?${viewerParams}#${viewerHash}`
+          : isIos || isDs
           ? proxyUrl
           : `${viewerBase}?${viewerParams}#${viewerHash}`;
       }

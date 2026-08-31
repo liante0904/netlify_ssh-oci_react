@@ -5,7 +5,7 @@
  *   node test/unit/share-function.test.js
  */
 
-import { buildReportSearchUrl, isSocialPreviewBot, selectOriginalDocumentUrl } from '../../netlify/functions/share.js';
+import { buildReportSearchUrl, isKakaoTalkBrowser, isSocialPreviewBot, selectOriginalDocumentUrl } from '../../netlify/functions/share.js';
 
 let passed = 0;
 let failed = 0;
@@ -76,6 +76,8 @@ assertEqual(isSocialPreviewBot('facebookexternalhit/1.1'), true, 'Facebook crawl
 assertEqual(isSocialPreviewBot('TelegramBot (like TwitterBot)'), true, 'Telegram crawler receives OG page');
 assertEqual(isSocialPreviewBot('Mozilla/5.0 (Linux; Android 14; KAKAOTALK 25.7.3)'), false, 'Kakao in-app browser receives loading page');
 assertEqual(isSocialPreviewBot('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), false, 'mobile browser receives loading page');
+assertEqual(isKakaoTalkBrowser('Mozilla/5.0 (Linux; Android 14; KAKAOTALK 25.7.3)'), true, 'Android Kakao browser is detected');
+assertEqual(isKakaoTalkBrowser('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X)'), false, 'regular iOS browser is not Kakao');
 
 console.log('\n--- share.js DB Securities document selection ---');
 

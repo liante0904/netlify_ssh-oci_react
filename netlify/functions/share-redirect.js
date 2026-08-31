@@ -23,6 +23,10 @@ function isDsReport(report, pdfUrl = '') {
   return String(firmOrder) === '11' || String(firmId) === '11' || firm.includes('DS') || firm.includes('디에스') || /(^|\.)ds-sec\.co\.kr/i.test(pdfUrl);
 }
 
+function isKakaoTalkBrowser(userAgent = '') {
+  return /KAKAOTALK/i.test(userAgent);
+}
+
 function trimSlashes(value = '') {
   return String(value).replace(/^\/+/, '').replace(/\/+$/, '');
 }
@@ -79,6 +83,7 @@ export const handler = async (event) => {
   const requestOrigin = event.headers?.origin || `https://${requestHost}`;
   const userAgent = event.headers?.['user-agent'] || event.headers?.['User-Agent'] || '';
   const isIos = /iPad|iPhone|iPod/i.test(userAgent);
+  const isKakaoTalk = isKakaoTalkBrowser(userAgent);
 
   try {
     const apiUrl = buildReportSearchUrl(id);
@@ -167,9 +172,11 @@ export const handler = async (event) => {
       const boardUrl = report.source_url || pdfUrl.replace('download.php', 'board.php');
       const proxyFunction = isDs ? 'proxy-ds' : 'proxy';
       const proxyUrl = `${requestOrigin}/.netlify/functions/${proxyFunction}?url=${encodeURIComponent(pdfUrl)}&filename=${encodeURIComponent(fileName)}${boardUrl ? `&referer=${encodeURIComponent(boardUrl)}` : ''}`;
-      let proxyLooksGood = isDs;
+      // KakaoTalk Android WebView can download a direct PDF instead of
+      // rendering it. Use the same self-hosted viewer on both Kakao platforms.
+      let proxyLooksGood = isDs || isKakaoTalk;
 
-      if (!isDs) {
+      if (!isDs && !isKakaoTalk) {
         try {
           const proxyCheck = await fetchWithTimeout(proxyUrl, { method: 'HEAD' }, 3000);
           const proxyContentType = proxyCheck.headers.get('content-type') || '';
@@ -179,13 +186,15 @@ export const handler = async (event) => {
         }
       }
 
-      if (!proxyLooksGood) {
+      if (!proxyLooksGood && !isKakaoTalk) {
         finalUrl = pdfUrl;
       } else {
         const viewerBase = `${requestOrigin}/lib/pdfjs/web/viewer.html`;
         const viewerParams = `file=${encodeURIComponent(proxyUrl)}`;
         const viewerHash = 'pagemode=none&zoom=page-width';
-        finalUrl = isIos || isDs
+        finalUrl = isKakaoTalk
+          ? `${viewerBase}?${viewerParams}#${viewerHash}`
+          : isIos || isDs
           ? proxyUrl
           : `${viewerBase}?${viewerParams}#${viewerHash}`;
       }
