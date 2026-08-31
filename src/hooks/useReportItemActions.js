@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getArchiveDownloadUrl, prefetchPdf } from '../utils/reportLinks';
+import { warmupServerlessFunctions } from '../utils/warmupServerlessFunctions';
 import { useReport } from '../context/useReport';
 
 export function useReportItemActions(report) {
@@ -41,8 +42,7 @@ export function useReportItemActions(report) {
 
   const handlePrefetch = () => {
     const origin = window.location.origin;
-    fetch(`${origin}/.netlify/functions/proxy?warmup=true`, { method: 'HEAD', mode: 'no-cors' }).catch(() => {});
-    fetch(`${origin}/.netlify/functions/share?warmup=true`, { method: 'HEAD', mode: 'no-cors' }).catch(() => {});
+    warmupServerlessFunctions({ once: false });
     prefetchPdf(report, origin);
   };
 

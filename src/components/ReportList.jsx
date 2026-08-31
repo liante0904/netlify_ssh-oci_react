@@ -12,11 +12,10 @@ import { isDsReport, prefetchPdf } from '../utils/reportLinks';
 import { normalizeReportItem } from '../utils/reportNormalizer';
 import { hasReportSummary, flattenReportGroup, datesWithReports } from '../utils/reportCollection';
 import { buildShareMenuData } from '../utils/shareMenuData';
+import { emitSummaryNotification } from '../utils/summaryNotification';
 import { useRevealOlderDate } from '../hooks/useRevealOlderDate';
 import ReportListContent from './report/ReportListContent';
 import './ReportList.css';
-
-function emitSummary(detail) { window.dispatchEvent(new CustomEvent('ssh-summary-notification', { detail: { created_at: new Date().toISOString(), ...detail } })); }
 
 export default function ReportList({ onWriterClick }) {
   const { searchQuery, sortBy, setSortBy, telegramUser, handleSearch } = useReport();
@@ -57,7 +56,7 @@ export default function ReportList({ onWriterClick }) {
   const toggleSummary = useCallback((id) => setExpandedSummaries((current) => ({ ...current, [id]: !current[id] })), []);
   const toggleFavorite = useCallback((id) => { const next = { ...favorites, [id]: !favorites[id] }; setFavorites(next); localStorage.setItem('report_favorites', JSON.stringify(next)); mutateFavorite(id, next[id])?.catch(() => setFavorites(favorites)); }, [favorites, mutateFavorite]);
   const openShare = useCallback((event, report) => { const rect = event.currentTarget.getBoundingClientRect(); setShare({ isOpen: true, report: buildShareMenuData(report), position: { top: rect.bottom, left: rect.left + rect.width / 2 } }); }, []);
-  const onTriggerSummary = useCallback(async (reportId, engine = 'deepseek', force = false, report = null) => { const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN); if (!token || (!force && summaryRequestedIds.has(reportId))) return; const title = report?.title || report?.article_title || `리포트 #${reportId}`; setSummaryRequestedIds((current) => new Set(current).add(reportId)); emitSummary({ report_id: reportId, article_title: title, status: 'requested', message: `${engine === 'ag' ? 'Gemini' : 'DeepSeek'} 요약 요청을 접수했습니다: ${title}` }); try { const result = await triggerSummary({ reportId, engine, force }); if (result?.status === 'success' || result?.status === 'skipped') setSummaryCompletedIds((current) => new Set(current).add(reportId)); } catch { setSummaryRequestedIds((current) => { const next = new Set(current); next.delete(reportId); return next; }); } }, [summaryRequestedIds, triggerSummary]);
+  const onTriggerSummary = useCallback(async (reportId, engine = 'deepseek', force = false, report = null) => { const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN); if (!token || (!force && summaryRequestedIds.has(reportId))) return; const title = report?.title || report?.article_title || `리포트 #${reportId}`; setSummaryRequestedIds((current) => new Set(current).add(reportId)); emitSummaryNotification({ report_id: reportId, article_title: title, status: 'requested', message: `${engine === 'ag' ? 'Gemini' : 'DeepSeek'} 요약 요청을 접수했습니다: ${title}` }); try { const result = await triggerSummary({ reportId, engine, force }); if (result?.status === 'success' || result?.status === 'skipped') setSummaryCompletedIds((current) => new Set(current).add(reportId)); } catch { setSummaryRequestedIds((current) => { const next = new Set(current); next.delete(reportId); return next; }); } }, [summaryRequestedIds, triggerSummary]);
   const handleTagClick = (keyword, isSector) => handleSearch({ query: keyword, category: isSector ? 'sector' : 'title' });
   const summaryItems = [{ label: meta.title || '레포트', value: filteredDates.length, icon: '📰' }, ...(searchQuery.query ? [{ label: '검색', value: searchQuery.query, icon: '🔍' }] : [])];
   useEffect(() => { if (isLoading) return; const reportsToPrefetch = filteredDates.slice(0, 2).flatMap((date) => flattenReportGroup(displayReports[date])).filter(isDsReport).slice(0, 3); reportsToPrefetch.forEach((report, index) => window.setTimeout(() => prefetchPdf(report, window.location.origin), index * 700)); }, [displayReports, filteredDates, isLoading]);

@@ -11,19 +11,9 @@ import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import { countReportGroups, datesWithReports, hasReportSummary } from '../utils/reportCollection';
 import { useRevealOlderDate } from '../hooks/useRevealOlderDate';
 import { useSearchFilters } from '../hooks/useSearchFilters';
+import { emitSummaryNotification } from '../utils/summaryNotification';
 import './SearchPageNew.css';
 import './search/SearchResults.css';
-
-const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
-
-function emitSummaryNotification(detail) {
-  window.dispatchEvent(new CustomEvent(SUMMARY_NOTIFICATION_EVENT, {
-    detail: {
-      created_at: new Date().toISOString(),
-      ...detail,
-    },
-  }));
-}
 
 function SearchPageNew() {
   const { telegramUser } = useReport();
