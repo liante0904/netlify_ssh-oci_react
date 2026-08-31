@@ -2,221 +2,31 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useReport } from '../context/useReport';
 import { resolveSearchOverlayState } from '../utils/searchOverlay';
-import {
-  buildSearchParams,
-  createTextSearch,
-  createCompanySearch,
-  createClearedSearch,
-  getSelectedCompanyOrder,
-} from '../utils/searchSelection';
-import './SearchOverlay.css';
-import CompanySelect from './CompanySelect';
-import BoardSelect from './BoardSelect';
+import { buildSearchParams, createTextSearch, createCompanySearch, createClearedSearch, getSelectedCompanyOrder } from '../utils/searchSelection';
 import { useFocusTrap } from '../hooks/useFocusTrap';
+import SearchOverlayContent from './search/SearchOverlayContent';
+import './SearchOverlay.css';
 
 function SearchOverlay() {
-  const { 
-    isSearchOpen, 
-    toggleSearch, 
-    handleSearch: onSearch, 
-    pendingSearch,
-    setPendingSearch,
-    boards,
-    activeSearch,
-  } = useReport();
+  const { isSearchOpen, toggleSearch, handleSearch: onSearch, pendingSearch, setPendingSearch, boards, activeSearch } = useReport();
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('title');
   const [toast, setToast] = useState({ visible: false, message: '' });
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const inputRef = useRef(null);
-  const previousFocusRef = useRef(null);
   const overlayRef = useFocusTrap(isSearchOpen);
-  const selectedCompanyOrder = category === 'company'
-    ? getSelectedCompanyOrder(activeSearch, query)
-    : '';
+  const selectedCompanyOrder = category === 'company' ? getSelectedCompanyOrder(activeSearch, query) : '';
   const selectedBoard = activeSearch.category === 'company' ? activeSearch.board : null;
-
-  // 오버레이 열릴 때 상태 복원 및 외부(pendingSearch) 동기화
-  useEffect(() => {
-    if (!isSearchOpen) return;
-
-    const { query: nextQuery, category: nextCategory, companyOrder, shouldSearch, shouldClearPending } =
-      resolveSearchOverlayState({ pendingSearch, searchParams });
-
-    setQuery(nextQuery);
-    setCategory(nextCategory);
-
-    if (shouldSearch) {
-      const nextSearch = nextCategory === 'company'
-        ? createCompanySearch(companyOrder ?? nextQuery)
-        : createTextSearch(nextQuery, nextCategory);
-      onSearch(nextSearch);
-      setSearchParams(buildSearchParams(nextSearch));
-    }
-
-    if (shouldClearPending) {
-      setPendingSearch({ query: '', category: '' });
-    }
-  }, [isSearchOpen, searchParams, pendingSearch, setPendingSearch, onSearch, setSearchParams]);
-
-  useEffect(() => {
-    if (!isSearchOpen) return undefined;
-    previousFocusRef.current = document.activeElement;
-    return () => previousFocusRef.current?.focus?.();
-  }, [isSearchOpen]);
-
-  const showToast = useCallback((message) => {
-    setToast({ visible: true, message });
-    setTimeout(() => {
-      setToast({ visible: false, message: '' });
-    }, 2000);
-  }, []);
-
-  useEffect(() => {
-    if (isSearchOpen && inputRef.current && category !== 'company') {
-      inputRef.current.focus();
-    }
-  }, [isSearchOpen, category]);
-
-  const handleSearchClick = useCallback(() => {
-    const trimmedQuery = query.trim();
-    if (!trimmedQuery && category !== 'company') {
-      showToast('검색어를 입력해주세요.');
-      return;
-    }
-
-    const nextParams = buildSearchParams({ query: trimmedQuery, category });
-    setSearchParams(nextParams);
-    onSearch(category === 'company'
-      ? createCompanySearch(trimmedQuery)
-      : createTextSearch(trimmedQuery, category));
-    navigate({ pathname: '/recent', search: `?${nextParams.toString()}` });
-  }, [query, category, navigate, onSearch, setSearchParams, showToast]);
-
-  const handleKeyDown = useCallback(
-    (e) => {
-      if (e.key === 'Enter') {
-        handleSearchClick();
-      }
-    },
-    [handleSearchClick]
-  );
-
-  const handleCategoryChange = useCallback(
-    (e) => {
-      const newCategory = e.target.value;
-      setCategory(newCategory);
-      setQuery('');
-      setSearchParams({}, { replace: true });
-      if (newCategory === 'company') {
-        onSearch(createClearedSearch());
-      }
-    },
-    [onSearch, setSearchParams]
-  );
-
-  const handleCompanyChange = useCallback(
-    (e) => {
-      const selectedValue = e.target.value;
-      setQuery(selectedValue);
-      if (selectedValue) {
-        const nextSearch = createCompanySearch(selectedValue);
-        const nextParams = buildSearchParams(nextSearch);
-        setSearchParams(nextParams, { replace: true });
-        onSearch(nextSearch);
-        navigate({ pathname: '/recent', search: `?${nextParams.toString()}` });
-      } else {
-        setSearchParams({}, { replace: true });
-        onSearch(createClearedSearch());
-      }
-    },
-    [navigate, onSearch, setSearchParams]
-  );
-  
-  const handleBoardChange = useCallback(
-    (e) => {
-      const boardOrder = e.target.value;
-      if (selectedCompanyOrder) {
-        const nextSearch = {
-          query: selectedCompanyOrder,
-          category: 'company',
-          companyOrder: selectedCompanyOrder,
-          board: boardOrder ? Number(boardOrder) : null,
-        };
-        const nextParams = buildSearchParams(nextSearch);
-        setSearchParams(nextParams, { replace: true });
-        onSearch(nextSearch);
-        navigate({ pathname: '/recent', search: `?${nextParams.toString()}` });
-      }
-    },
-    [selectedCompanyOrder, navigate, onSearch, setSearchParams]
-  );
-
-  if (!isSearchOpen) {
-    return null;
-  }
-
-  return (
-    <>
-      <div className={`search-overlay ${isSearchOpen ? 'visible' : ''}`} id="searchOverlay" onClick={toggleSearch}>
-        <div ref={overlayRef} className="search-container" role="dialog" aria-modal="true" aria-labelledby="search-overlay-title" onClick={(e) => e.stopPropagation()}>
-          <h2 id="search-overlay-title" className="sr-only">리포트 검색</h2>
-          <select
-            id="searchCategory"
-            className="search-category"
-            value={category}
-            onChange={handleCategoryChange}
-          >
-            <option value="title">제목</option>
-            <option value="writer">작성자</option>
-            <option value="tags">태그</option>
-            <option value="sector">산업</option>
-            <option value="stock">종목명</option>
-            <option value="company">증권사</option>
-          </select>
-
-          {category === 'company' ? (
-            <div className="search-company-filter">
-              <CompanySelect value={selectedCompanyOrder} onChange={handleCompanyChange} className="company-select" />
-              {selectedCompanyOrder && (
-                <BoardSelect
-                  value={selectedBoard}
-                  boards={boards}
-                  onChange={handleBoardChange}
-                  className="board-select-overlay"
-                />
-              )}
-            </div>
-          ) : (
-            <input
-              type="text"
-              id="searchInput"
-              placeholder="검색어 입력..."
-              className="search-input"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={handleKeyDown}
-              ref={inputRef}
-            />
-          )}
-
-          {category !== 'company' && (
-            <button
-              className="search-submit"
-              onClick={handleSearchClick}
-            >
-              검색
-            </button>
-          )}
-        </div>
-      </div>
-      
-      <div className={`toast-container ${toast.visible ? 'visible' : ''}`}>
-        {toast.message}
-      </div>
-    </>
-  );
+  useEffect(() => { if (!isSearchOpen) return; const state = resolveSearchOverlayState({ pendingSearch, searchParams }); setQuery(state.query); setCategory(state.category); if (state.shouldSearch) { const next = state.category === 'company' ? createCompanySearch(state.companyOrder ?? state.query) : createTextSearch(state.query, state.category); onSearch(next); setSearchParams(buildSearchParams(next)); } if (state.shouldClearPending) setPendingSearch({ query: '', category: '' }); }, [isSearchOpen, onSearch, pendingSearch, searchParams, setPendingSearch, setSearchParams]);
+  useEffect(() => { if (isSearchOpen && category !== 'company') inputRef.current?.focus(); }, [category, isSearchOpen]);
+  const showToast = useCallback((message) => { setToast({ visible: true, message }); window.setTimeout(() => setToast({ visible: false, message: '' }), 2000); }, []);
+  const handleSearchClick = useCallback(() => { const value = query.trim(); if (!value && category !== 'company') return showToast('검색어를 입력해주세요.'); const next = buildSearchParams({ query: value, category }); setSearchParams(next); onSearch(category === 'company' ? createCompanySearch(value) : createTextSearch(value, category)); navigate({ pathname: '/recent', search: `?${next}` }); }, [category, navigate, onSearch, query, setSearchParams, showToast]);
+  const handleCategory = useCallback((event) => { const next = event.target.value; setCategory(next); setQuery(''); setSearchParams({}, { replace: true }); if (next === 'company') onSearch(createClearedSearch()); }, [onSearch, setSearchParams]);
+  const handleCompany = useCallback((event) => { const value = event.target.value; setQuery(value); if (!value) { setSearchParams({}, { replace: true }); onSearch(createClearedSearch()); return; } const next = createCompanySearch(value); const params = buildSearchParams(next); setSearchParams(params, { replace: true }); onSearch(next); navigate({ pathname: '/recent', search: `?${params}` }); }, [navigate, onSearch, setSearchParams]);
+  const handleBoard = useCallback((event) => { if (!selectedCompanyOrder) return; const next = { query: selectedCompanyOrder, category: 'company', companyOrder: selectedCompanyOrder, board: event.target.value ? Number(event.target.value) : null }; const params = buildSearchParams(next); setSearchParams(params, { replace: true }); onSearch(next); navigate({ pathname: '/recent', search: `?${params}` }); }, [navigate, onSearch, selectedCompanyOrder, setSearchParams]);
+  if (!isSearchOpen) return null;
+  return <SearchOverlayContent overlayRef={overlayRef} inputRef={inputRef} category={category} query={query} boards={boards} selectedCompanyOrder={selectedCompanyOrder} selectedBoard={selectedBoard} toast={toast} onClose={toggleSearch} onCategory={handleCategory} onQuery={(event) => setQuery(event.target.value)} onKeyDown={(event) => event.key === 'Enter' && handleSearchClick()} onSearch={handleSearchClick} onCompany={handleCompany} onBoard={handleBoard} />;
 }
 
 export default SearchOverlay;

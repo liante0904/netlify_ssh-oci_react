@@ -1,0 +1,2 @@
+export function formatRelativeTime(value) { const minutes = Math.floor((Date.now() - new Date(value)) / 60000); if (minutes < 1) return '방금 전'; if (minutes < 60) return `${minutes}분 전`; const hours = Math.floor(minutes / 60); return hours < 24 ? `${hours}시간 전` : `${Math.floor(hours / 24)}일 전`; }
+export function getNotificationKey(item) { return item?.notification_key || `${item?.source || 'summary'}:${item?.id}`; }

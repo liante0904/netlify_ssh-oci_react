@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getArchiveDownloadUrl, getDirectUrl, prefetchPdf } from '../../utils/reportLinks';
 import { useReport } from '../../context/useReport';
 import ReportItemSummary from './ReportItemSummary';
+import { getReportPresentation } from '../../utils/reportItemModel';
 
 const ReportItem = ({ 
   report, 
@@ -19,7 +20,7 @@ const ReportItem = ({
 }) => {
   const {
     id, title, writer, gemini_summary, fnguide_summary, firm, pdf_file_url,
-    tags, stock_names, stock_tickers, sector, target_price, rating, revision_type,
+    tags, stock_names, stock_tickers, sector, rating, revision_type,
     report_type
   } = report;
   const { setViewerReport, telegramUser, llmVisibility } = useReport();
@@ -87,39 +88,12 @@ const ReportItem = ({
   };
   
   // LLM 요약 노출 범위에 따른 판단 (기존 주석 유지 및 추가 권한 마스킹)
-  const isLlmSummaryVisible = () => {
-    const rawHasSummary = gemini_summary && gemini_summary.trim() !== "" && gemini_summary.trim() !== " ";
-    if (!rawHasSummary) return false;
-    
-    // 설정 범위에 따른 마스킹 처리
-    if (llmVisibility === 'admin') {
-      return !!isAdmin;
-    }
-    if (llmVisibility === 'telegram') {
-      return !!telegramUser;
-    }
-    // 기본적으로는 관리자만 노출
-    return !!isAdmin;
-  };
-
-  const hasSummary = isLlmSummaryVisible();
-  const hasFnguideSummary = !!fnguide_summary?.summary_text?.trim();
-  const hasAnySummary = hasSummary || hasFnguideSummary;
+  const { hasSummary, hasFnguideSummary, hasAnySummary, hasUnverifiedValuation, hasDirectSignal, formattedTargetPrice } = getReportPresentation(report, { isAdmin, telegramUser, llmVisibility });
   // target_price/rating is historically almost entirely FnGuide-derived.
   // Do not show it as a second, broker-originated signal beside the FnGuide card.
   // Industry/macro reports do not carry a single-company recommendation.
   // Historical enrichment wrote BUY/MAINTAIN defaults to some of these rows;
   // never present those defaults as an investment signal.
-  const hasCompanyContext = report_type === 'COMPANY'
-    || Boolean(stock_tickers?.length)
-    || Boolean(stock_names?.length);
-  const hasUnverifiedValuation = !fnguide_summary
-    && hasCompanyContext
-    && Boolean(target_price || rating || revision_type);
-  const hasDirectSignal = Boolean(hasUnverifiedValuation || report_type || stock_tickers?.length);
-  const formattedTargetPrice = Number.isFinite(Number(target_price)) && Number(target_price) > 0
-    ? Number(target_price).toLocaleString('ko-KR')
-    : null;
 
   return (
     <div className={`report-container-item ${hasAnySummary ? 'has-summary' : ''}`} key={id}>

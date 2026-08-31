@@ -11,6 +11,7 @@ import {
   normalizeSearchSelection,
 } from '../utils/searchSelection';
 import ReportContext from './reportContext';
+import { createReportContextValue } from './reportContextValue';
 
 export function ReportProvider({ children }) {
   const [activeSearch, setActiveSearch] = useState(createEmptySearchSelection());
@@ -186,7 +187,7 @@ export function ReportProvider({ children }) {
     setTelegramUser(null);
   }, []);
 
-  const value = useMemo(() => ({
+  const contextState = {
     searchQuery: activeSearch,
     setSearchQuery: setActiveSearch,
     pendingSearch: stagedSearch,
@@ -222,7 +223,10 @@ export function ReportProvider({ children }) {
     llmVisibility,
     updateLlmSetting,
     logout
-  }), [
+  };
+  // contextState is assembled from the explicit dependency list below.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const value = useMemo(() => createReportContextValue(contextState), [
     activeSearch,
     stagedSearch,
     isSearchOverlayOpen,

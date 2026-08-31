@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { getProxyPdfUrl } from '../../utils/reportLinks';
 import LoadingSkeleton from '../LoadingSkeleton';
 import './PDFViewerModal.css';
+import PDFPageList from './PDFPageList';
 
 // ---------------------------------------------------------------------------
 // pdf.js lazy loader
@@ -271,13 +272,7 @@ const PDFViewerModal = ({ report, onClose }) => {
         {loading && (
           <LoadingSkeleton variant="spinner" label="PDF 불러오는 중" />
         )}
-        <div className="pdf-viewer-pages" style={{ visibility: loading ? 'hidden' : 'visible' }}>
-          {pages.map(({ pageNum, page }) => (
-            <div key={pageNum} className="pdf-page-wrapper">
-              <PageCanvasMemo page={page} scale={scale} />
-            </div>
-          ))}
-        </div>
+        <PDFPageList pages={pages} scale={scale} PageCanvas={PageCanvasMemo} style={{ visibility: loading ? 'hidden' : 'visible' }} />
       </div>
     </div>
   );

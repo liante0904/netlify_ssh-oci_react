@@ -1,19 +1,15 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import InfiniteScroll from 'react-infinite-scroll-component';
 import { useSearchParams } from 'react-router-dom';
-import CompanySelect from './CompanySelect';
-import BoardSelect from './BoardSelect';
-import ShareMenu from './ShareMenu';
-import ReportGroup from './report/ReportGroup';
+import SearchFilters from './search/SearchFilters';
+import SearchResults from './search/SearchResults';
 import { useReport } from '../context/useReport';
 import { useReportFetch } from '../hooks/useReportFetch';
 import { CONFIG } from '../constants/config';
 import { buildShareMenuData } from '../utils/shareMenuData';
-import AsyncErrorState from './AsyncErrorState';
-import LoadingSkeleton from './LoadingSkeleton';
 import { useBoards } from '../hooks/useBoards';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { useSummaryMutation } from '../hooks/useSummaryMutation';
+import { countReportGroups, datesWithReports, hasReportSummary } from '../utils/reportCollection';
 import './SearchPageNew.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
@@ -244,37 +240,13 @@ function SearchPageNew() {
   }, []);
 
   const isAiSummary = selectedRoute === 'ai-summary';
-  const hasSummaryContent = (report) => {
-    return report.gemini_summary && report.gemini_summary.trim() !== "" && report.gemini_summary.trim() !== " ";
-  };
+  const hasSummaryContent = hasReportSummary;
 
-  const sortedDates = Object.keys(reports).sort((a, b) => b.localeCompare(a));
-  const filteredSortedDates = isAiSummary
-    ? sortedDates.filter(date => {
-        const items = reports[date];
-        if (Array.isArray(items)) {
-          return items.some(hasSummaryContent);
-        }
-        return Object.values(items).some(firmReports =>
-          firmReports.some(hasSummaryContent)
-        );
-      })
-    : sortedDates;
+  const sortedDates = datesWithReports(reports);
+  const filteredSortedDates = isAiSummary ? datesWithReports(reports, hasSummaryContent) : sortedDates;
 
   // 결과 개수 카운트
-  const totalCount = useMemo(() => {
-    let count = 0;
-    Object.values(reports).forEach(items => {
-      if (Array.isArray(items)) {
-        count += items.length;
-      } else {
-        Object.values(items).forEach(firmList => {
-          count += firmList.length;
-        });
-      }
-    });
-    return count;
-  }, [reports]);
+  const totalCount = useMemo(() => countReportGroups(reports), [reports]);
 
   return (
     <div className="search-page-new">
@@ -283,170 +255,33 @@ function SearchPageNew() {
         <p>조건을 선택하는 즉시 실시간으로 최적화된 리포트를 분석합니다.</p>
       </section>
 
-      {/* 프리미엄 필터 제어판 */}
-      <section className="filter-panel-card">
-        <div className="filter-grid">
-          
-          <div className="filter-item text-search-box">
-            <label className="filter-label">🔍 텍스트 검색</label>
-            <div className="text-search-fields">
-              <select
-                className="search-category-select"
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-              >
-                <option value="title">제목</option>
-                <option value="writer">작성자</option>
-                <option value="tag">태그</option>
-                <option value="sector">산업</option>
-                <option value="stock">종목명</option>
-              </select>
-              <input
-                type="text"
-                placeholder="검색어 입력..."
-                className="search-text-input"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-              {searchTerm && (
-                <button className="clear-search-btn" onClick={() => setSearchTerm('')}>✕</button>
-              )}
-            </div>
-          </div>
+      <SearchFilters
+        category={category}
+        searchTerm={searchTerm}
+        selectedCompany={selectedCompany}
+        selectedBoard={selectedBoard}
+        selectedRoute={selectedRoute}
+        selectedSort={selectedSort}
+        boards={boards}
+        onCategoryChange={(e) => setCategory(e.target.value)}
+        onSearchTermChange={(e) => setSearchTerm(e.target.value)}
+        onCompanyChange={handleCompanyChange}
+        onBoardChange={(e) => setSelectedBoard(e.target.value)}
+        onRouteChange={setSelectedRoute}
+        onSortChange={setSelectedSort}
+        onReset={handleReset}
+      />
 
-          <div className={`filter-item company-box ${selectedCompany ? 'has-boards' : ''}`}>
-            <label className="filter-label">🗂️ 증권사 필터</label>
-            <CompanySelect
-              value={selectedCompany}
-              onChange={handleCompanyChange}
-              className="search-company-select"
-            />
-          </div>
-
-          {selectedCompany && (
-            <div className="filter-item board-box">
-              <label className="filter-label">📋 게시판 필터</label>
-              <BoardSelect
-                value={selectedBoard}
-                boards={boards}
-                onChange={(e) => setSelectedBoard(e.target.value)}
-                className="search-board-select"
-              />
-            </div>
-          )}
-
-          <div className="filter-item route-box">
-            <label className="filter-label">🏷️ 조회 대상 분류</label>
-            <div className="filter-chip-group">
-              {[
-                { id: 'recent', label: '최근 레포트', icon: '🕘' },
-                { id: 'global', label: '글로벌 레포트', icon: '🌍' },
-                { id: 'industry', label: '산업 레포트', icon: '🏭' },
-                { id: 'outlook', label: '전망 레포트', icon: '🔮' },
-                { id: 'ai-summary', label: 'AI요약 리포트', icon: '🤖' },
-              ].map((route) => (
-                <button
-                  key={route.id}
-                  type="button"
-                  className={`filter-chip-item ${selectedRoute === route.id ? 'active' : ''}`}
-                  onClick={() => setSelectedRoute(route.id)}
-                >
-                  <span className="chip-icon">{route.icon}</span>
-                  <span className="chip-text">{route.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="filter-item sort-box">
-            <label className="filter-label">⚖️ 정렬 기준</label>
-            <div className="filter-chip-group">
-              {[
-                { id: 'time', label: '최근 등록일 순', icon: '⏱️' },
-                { id: 'company', label: '증권사 가나다 순', icon: '🗂️' },
-              ].map((sort) => (
-                <button
-                  key={sort.id}
-                  type="button"
-                  className={`filter-chip-item ${selectedSort === sort.id ? 'active' : ''}`}
-                  onClick={() => setSelectedSort(sort.id)}
-                >
-                  <span className="chip-icon">{sort.icon}</span>
-                  <span className="chip-text">{sort.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="filter-actions-row">
-          <button type="button" className="btn-filter-reset" onClick={handleReset}>
-            🔄 필터 초기화
-          </button>
-        </div>
-      </section>
-
-      {/* 결과 리스트 영역 */}
-      <section className="search-results-section">
-        <div className="results-header">
-          <h3>검색 결과 <span className="results-count">{totalCount}건</span></h3>
-        </div>
-
-        <div className="results-list-container">
-          {error && offset === 0 ? (
-            <AsyncErrorState onRetry={retry} />
-          ) : offset === 0 && isLoading ? (
-            <LoadingSkeleton rows={6} label="검색 결과 불러오는 중" />
-          ) : filteredSortedDates.length === 0 && !isLoading ? (
-            <div className="search-state-msg empty-msg">
-              <span className="empty-icon">📂</span>
-              <p>조건에 일치하는 리포트 데이터가 존재하지 않습니다.<br/>상단 필터 설정을 변경해 보세요.</p>
-            </div>
-          ) : (
-            <InfiniteScroll
-              dataLength={offset}
-              next={fetchReports}
-              hasMore={hasMore}
-              scrollThreshold={0.7}
-              loader={<LoadingSkeleton variant="spinner" label="검색 결과 더 불러오는 중" />}
-            >
-              {filteredSortedDates.map((date) => (
-                <ReportGroup 
-                  key={date}
-                  date={date}
-                  items={reports[date]}
-                  isCollapsed={!!dateToggles[date]}
-                  onToggleDate={toggleDate}
-                  sortBy={selectedSort}
-                  isFavoritesPage={false}
-                  favorites={favorites}
-                  collapsedFirms={firmToggles}
-                  onToggleFirm={toggleFirm}
-                  expandedSummaries={summaryToggles}
-                  onToggleSummary={toggleSummary}
-                  onToggleFavorite={toggleFavorite}
-                  onOpenShareMenu={handleOpenShareMenu}
-                  onWriterClick={handleLocalWriterClick}
-                  showSortOptions={false}
-                  setSortBy={setSelectedSort}
-                  isAdmin={isAdmin}
-                  onTriggerSummary={handleTriggerSummary}
-                  summaryRequestedIds={summaryRequestedIds}
-                  summaryCompletedIds={summaryCompletedIds}
-                  isAiSummary={isAiSummary}
-                  hasSummaryContent={hasSummaryContent}
-                />
-              ))}
-            </InfiniteScroll>
-          )}
-        </div>
-      </section>
-
-      <ShareMenu 
-        isOpen={isShareOpen} 
-        onClose={() => setIsShareOpen(false)} 
-        reportData={selectedReport}
-        position={menuPosition}
+      <SearchResults
+        totalCount={totalCount} error={error} retry={retry} offset={offset} isLoading={isLoading}
+        filteredSortedDates={filteredSortedDates} reports={reports} fetchReports={fetchReports} hasMore={hasMore}
+        dateToggles={dateToggles} toggleDate={toggleDate} selectedSort={selectedSort} favorites={favorites}
+        firmToggles={firmToggles} toggleFirm={toggleFirm} summaryToggles={summaryToggles} toggleSummary={toggleSummary}
+        toggleFavorite={toggleFavorite} handleOpenShareMenu={handleOpenShareMenu} handleLocalWriterClick={handleLocalWriterClick}
+        isAdmin={isAdmin} handleTriggerSummary={handleTriggerSummary} summaryRequestedIds={summaryRequestedIds}
+        summaryCompletedIds={summaryCompletedIds} isAiSummary={isAiSummary} hasSummaryContent={hasSummaryContent}
+        onSortChange={setSelectedSort}
+        isShareOpen={isShareOpen} setIsShareOpen={setIsShareOpen} selectedReport={selectedReport} menuPosition={menuPosition}
       />
     </div>
   );
