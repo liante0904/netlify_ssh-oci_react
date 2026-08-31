@@ -9,7 +9,7 @@ import { useBoards } from '../hooks/useBoards';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import { countReportGroups, datesWithReports, hasReportSummary } from '../utils/reportCollection';
-import { useRevealOlderDate } from '../hooks/useRevealOlderDate';
+import { useReportListInteractions } from '../hooks/useReportListInteractions';
 import { useSearchFilters } from '../hooks/useSearchFilters';
 import './SearchPageNew.css';
 import './search/SearchResults.css';
@@ -48,17 +48,14 @@ function SearchPageNew() {
   } = useReportFetch(searchQuery, fetchPathname, null, selectedSort);
 
   // 리스트 컨트롤 상태 (즐겨찾기, 토글 등)
-  const [dateToggles, setDateToggles] = useState({});
-  const [firmToggles, setFirmToggles] = useState({});
-  const [summaryToggles, setSummaryToggles] = useState({});
-  const [favorites, setFavorites] = useState(() => {
+  const initialFavorites = useState(() => {
     const saved = localStorage.getItem('report_favorites');
     try {
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
     }
-  });
+  })[0];
 
   const [summaryRequestedIds, setSummaryRequestedIds] = useState(new Set());
   const [summaryCompletedIds, setSummaryCompletedIds] = useState(new Set());
@@ -70,44 +67,14 @@ function SearchPageNew() {
   const hasSummaryContent = hasReportSummary;
   const sortedDates = datesWithReports(reports);
   const filteredSortedDates = isAiSummary ? datesWithReports(reports, hasSummaryContent) : sortedDates;
-  const { requestReveal } = useRevealOlderDate({ dates: filteredSortedDates, hasMore, isLoading, fetchMore: fetchReports });
+  const { dateToggles, firmToggles, summaryToggles, favorites, reset, toggleDate, toggleFirm, toggleSummary, toggleFavorite } = useReportListInteractions({ dates: filteredSortedDates, hasMore, isLoading, fetchMore: fetchReports, initialFavorites, mutateFavorite });
 
   // 검색 조건 변경 시 날짜 토글 및 요약 초기화
   useEffect(() => {
-    setDateToggles({});
-    setFirmToggles({});
-    setSummaryToggles({});
+    reset();
     setSummaryRequestedIds(new Set());
-  }, [searchQuery, selectedRoute, selectedSort]);
+  }, [reset, searchQuery, selectedRoute, selectedSort]);
 
-  const toggleDate = useCallback((date) => {
-    const willCollapse = !dateToggles[date];
-    setDateToggles(prev => ({ ...prev, [date]: willCollapse }));
-    if (willCollapse) requestReveal(date);
-  }, [dateToggles, requestReveal]);
-
-  const toggleFirm = useCallback((date, firm) => {
-    setFirmToggles(prev => ({
-      ...prev,
-      [date]: { ...prev[date], [firm]: !prev[date]?.[firm] }
-    }));
-  }, []);
-
-  const toggleSummary = useCallback((id) => {
-    setSummaryToggles(prev => ({ ...prev, [id]: !prev[id] }));
-  }, []);
-
-  const toggleFavorite = useCallback((id) => {
-    const isAdding = !favorites[id];
-    const previous = favorites;
-    const next = { ...favorites, [id]: isAdding };
-    setFavorites(next);
-    localStorage.setItem('report_favorites', JSON.stringify(next));
-    mutateFavorite(id, isAdding)?.catch(() => {
-      setFavorites(previous);
-      localStorage.setItem('report_favorites', JSON.stringify(previous));
-    });
-  }, [favorites, mutateFavorite]);
 
   const handleOpenShareMenu = useCallback((e, report) => {
     const rect = e.currentTarget.getBoundingClientRect();
