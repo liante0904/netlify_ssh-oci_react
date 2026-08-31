@@ -1,6 +1,16 @@
 import React from 'react';
 import { render } from '@testing-library/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import ReportList from '../../src/components/ReportList';
+
+function renderReportList(props = {}) {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <ReportList onWriterClick={jest.fn()} {...props} />
+    </QueryClientProvider>
+  );
+}
 
 // react-router-dom 모킹
 jest.mock('react-router-dom', () => ({
@@ -17,11 +27,13 @@ jest.mock('react-infinite-scroll-component', () => {
 });
 
 // context 모킹
+const mockSearchQuery = { query: '', category: '' };
+const mockSetSortBy = jest.fn();
 jest.mock('../../src/context/useReport', () => ({
   useReport: () => ({
-    searchQuery: { query: '', category: '' },
+    searchQuery: mockSearchQuery,
     sortBy: 'date',
-    setSortBy: jest.fn(),
+    setSortBy: mockSetSortBy,
     telegramUser: null
   })
 }));
@@ -116,7 +128,7 @@ describe('ReportList Component - Null Safety Refactoring Verification', () => {
     mockReportsData = null;
     mockIsLoading = false;
 
-    const { container } = render(<ReportList onWriterClick={jest.fn()} />);
+    const { container } = renderReportList();
 
     // 크래시 없이 정상적으로 컨테이너 및 래퍼가 생성되었는지 확인
     const wrapper = container.querySelector('.report-list-wrapper');
@@ -127,7 +139,7 @@ describe('ReportList Component - Null Safety Refactoring Verification', () => {
     mockReportsData = {};
     mockIsLoading = false;
 
-    const { container } = render(<ReportList onWriterClick={jest.fn()} />);
+    const { container } = renderReportList();
     const wrapper = container.querySelector('.report-list-wrapper');
     expect(wrapper).not.toBeNull();
   });
@@ -136,11 +148,11 @@ describe('ReportList Component - Null Safety Refactoring Verification', () => {
     mockReportsData = null;
     mockIsLoading = true;
 
-    const { container } = render(<ReportList onWriterClick={jest.fn()} />);
+    const { container } = renderReportList();
     
     // 로딩 문구가 정상 표시되는지 검증
-    const loadingOverlay = container.querySelector('.loading-overlay');
-    expect(loadingOverlay).not.toBeNull();
-    expect(loadingOverlay.textContent).toBe('로딩 중...');
+    const loadingSkeleton = container.querySelector('.loading-skeleton');
+    expect(loadingSkeleton).not.toBeNull();
+    expect(loadingSkeleton.getAttribute('aria-label')).toBe('리포트 불러오는 중');
   });
 });
