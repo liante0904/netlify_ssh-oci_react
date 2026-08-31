@@ -311,7 +311,7 @@ function AdminConsole() {
         <div className="section-title">
           📂 서버 로그 파일
           {logBrowser.currentPath && (
-            <span className="badge" style={{ cursor: 'pointer' }} onClick={goLogRoot}>
+            <span className="badge log-root-link" onClick={goLogRoot}>
               ← 루트
             </span>
           )}
@@ -372,7 +372,7 @@ function AdminConsole() {
       {logViewer.file && (
         <div className="section-card log-viewer-section">
           <div className="section-title">
-            <span className="log-viewer-title" onClick={goLogRoot} style={{ cursor: 'pointer' }}>
+            <span className="log-viewer-title log-root-link" onClick={goLogRoot}>
               📄 {logViewer.file.split('/').pop()}
             </span>
             <span className="badge">tail 500</span>

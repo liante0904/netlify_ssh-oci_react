@@ -1,5 +1,6 @@
 import React from 'react';
 import { DEV_AUTH_ENABLED } from '../../utils/devAuth';
+import './TelegramAuth.css';
 
 function TelegramAuth({
   telegramUser,
@@ -36,7 +37,7 @@ function TelegramAuth({
       ) : (
         <div className="telegram-user-card">
           <div className="user-info-header">
-            <span className="user-name">🔔 {telegramUser.first_name}님 <small style={{fontSize: '0.8em', color: '#8e8e93', fontWeight: 'normal'}}>(ID:{telegramUser.id})</small></span>
+            <span className="user-name">🔔 {telegramUser.first_name}님 <small className="telegram-user-id">(ID:{telegramUser.id})</small></span>
             <button className="logout-small-btn" onClick={handleLogout}>로그아웃</button>
           </div>
 

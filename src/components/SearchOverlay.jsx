@@ -177,7 +177,7 @@ function SearchOverlay() {
           </select>
 
           {category === 'company' ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '100%' }}>
+            <div className="search-company-filter">
               <CompanySelect value={selectedCompanyOrder} onChange={handleCompanyChange} className="company-select" />
               {selectedCompanyOrder && (
                 <BoardSelect

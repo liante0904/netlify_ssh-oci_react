@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CONFIG } from '../../constants/config';
+import './AdminSection.css';
 
 function AdminSection({ isAdmin }) {
   const navigate = useNavigate();
@@ -22,7 +23,6 @@ function AdminSection({ isAdmin }) {
       <a
         className="menu-item admin-link"
         onClick={() => navigate('/admin-console')}
-        style={{ cursor: 'pointer' }}
       >
         <span className="icon">🛠️</span> 관리자 콘솔
       </a>

@@ -722,3 +722,7 @@ html[data-theme='dark'] .status-item {
     max-width: 140px;
   }
 }
+
+.log-root-link {
+  cursor: pointer;
+}

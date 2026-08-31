@@ -1,0 +1,10 @@
+.reprocess-clear-log {
+  margin-top: 8px;
+  padding: 4px 12px;
+  background: transparent;
+  border: 1px solid var(--primary-color, #007aff);
+  color: var(--primary-color, #007aff);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.85em;
+}

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useFocusTrap } from '../hooks/useFocusTrap';
 import LoadingSkeleton from './LoadingSkeleton';
+import './HeaderPopovers.css';
 
 function BellIcon() {
   return (
@@ -154,7 +155,7 @@ export function NotificationPopover({
             })}
           </div>
           <div className="notification-actions-footer">
-            <span style={{ color: 'var(--text-muted)' }}>
+            <span className="notification-count">
               알림 {notifications.length}개
             </span>
             {hasUnread && (
@@ -178,16 +179,16 @@ export function NotificationPopover({
 
       {/* 텔레그램 연동 정보 및 키워드 감시 기능 가이드 */}
       {!telegramUser ? (
-        <div className="header-popover-empty" style={{ borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.02)', padding: '20px 22px' }}>
+        <div className="header-popover-empty keyword-guide">
           <strong>실시간 키워드 감시 서비스</strong>
           <p>텔레그램 로그인 후 알림 키워드를 감시해 보세요.</p>
-          <button type="button" className="header-popover-primary" onClick={onLogin} disabled={isAuthenticating} style={{ marginTop: '10px' }}>
+          <button type="button" className="header-popover-primary keyword-guide-login" onClick={onLogin} disabled={isAuthenticating}>
             {isAuthenticating ? '인증 중...' : '텔레그램 로그인'}
           </button>
         </div>
       ) : (
-        <div style={{ borderTop: '1px solid var(--glass-border)', background: 'rgba(0,0,0,0.02)', padding: '12px 16px' }}>
-          <div className="notification-status" style={{ borderBottom: 'none', padding: 0 }}>
+        <div className="keyword-status-panel">
+          <div className="notification-status keyword-status">
             <span className="notification-status-dot" />
             <span>
               <strong>키워드 텔레그램 알림 활성화됨</strong>
@@ -195,12 +196,12 @@ export function NotificationPopover({
             </span>
           </div>
           {keywords?.length > 0 && (
-            <div className="notification-keywords" style={{ padding: '8px 0 0 0', borderBottom: 'none' }}>
+            <div className="notification-keywords keyword-list-panel">
               <div className="notification-keyword-list">
                 {(keywords || []).slice(0, 4).map((item) => (
-                  <span key={item?.keyword} style={{ padding: '3px 7px', fontSize: '0.68rem' }}>{item?.keyword}</span>
+                  <span key={item?.keyword} className="keyword-chip-small">{item?.keyword}</span>
                 ))}
-                {(keywords?.length || 0) > 4 && <span style={{ padding: '3px 7px', fontSize: '0.68rem' }}>+{keywords.length - 4}</span>}
+                {(keywords?.length || 0) > 4 && <span className="keyword-chip-small">+{keywords.length - 4}</span>}
               </div>
             </div>
           )}
