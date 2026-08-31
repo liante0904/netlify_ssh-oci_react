@@ -11,6 +11,7 @@ import { useHeaderNotifications } from '../hooks/useHeaderNotifications';
 import HeaderLayout from './header/HeaderLayout';
 import './Header.css';
 import './header/HeaderNotificationToast.css';
+import './header/HeaderNotificationList.css';
 
 const Header = forwardRef(({ isNavVisible }, ref) => {
   const navigate = useNavigate();
