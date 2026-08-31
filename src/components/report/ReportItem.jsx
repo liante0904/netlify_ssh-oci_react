@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { getDirectUrl } from '../../utils/reportLinks';
 import { useReport } from '../../context/useReport';
 import ReportItemSummary from './ReportItemSummary';
+import ReportItemActions from './ReportItemActions';
 import { getReportPresentation } from '../../utils/reportItemModel';
 import { useReportItemActions } from '../../hooks/useReportItemActions';
 import './ReportSummaryControls.css';
@@ -184,7 +185,8 @@ const ReportItem = ({
             <p className={`report-writer ${onWriterClick ? 'clickable' : ''}`} onClick={() => onWriterClick?.(writer)}>
               작성자: {writer} <span className="writer-search-icon">🔍</span>
             </p>
-            <div className="report-actions">
+            <ReportItemActions report={report} id={id} isFavorite={isFavorite} canDownloadArchive={canDownloadArchive} isArchiveDownloading={isArchiveDownloading} handleArchiveDownload={handleArchiveDownload} handleViewerClick={handleViewerClick} handlePrefetch={handlePrefetch} onToggleFavorite={onToggleFavorite} onOpenShareMenu={onOpenShareMenu} />
+            {/*
               {canDownloadArchive && (
                 <button
                   className="viewer-button archive-download-button"
@@ -235,6 +237,7 @@ const ReportItem = ({
                 </svg>
               </button>
             </div>
+            */}
           </div>
         </div>
       </div>
