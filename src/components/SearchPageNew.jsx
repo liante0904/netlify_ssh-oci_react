@@ -12,6 +12,7 @@ import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import { countReportGroups, datesWithReports, hasReportSummary } from '../utils/reportCollection';
 import { useRevealOlderDate } from '../hooks/useRevealOlderDate';
 import './SearchPageNew.css';
+import './search/SearchResults.css';
 
 const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
 

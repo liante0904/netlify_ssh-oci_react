@@ -1,0 +1,12 @@
+.search-results-section { margin-top: 28px; }
+.results-header { margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--glass-border); display: flex; align-items: center; justify-content: space-between; }
+.results-header h3 { margin: 0; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; }
+.results-count { background: color-mix(in srgb, var(--primary-color) 12%, transparent); color: var(--primary-color); font-weight: 800; padding: 3px 10px; border-radius: var(--radius-full); font-size: 0.9rem; margin-left: 8px; border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent); }
+.results-list-container { min-height: 300px; min-width: 0; max-width: 100%; overflow-x: clip; }
+.search-page-new .infinite-scroll-component__outerdiv, .search-page-new .infinite-scroll-component, .search-page-new .date-group, .search-page-new .company-group-wrapper, .search-page-new .company-group, .search-page-new .report-wrapper, .search-page-new .report-container-item, .search-page-new .report, .search-page-new .report-content, .search-page-new .report-header, .search-page-new .report-title-container, .search-page-new .report-footer, .search-page-new .summary-content, .search-page-new .summary-inner-wrapper, .search-page-new .summary-inner { min-width: 0; max-width: 100%; box-sizing: border-box; }
+.search-page-new .report-content { overflow-wrap: anywhere; }
+.search-page-new .report-title { min-width: 0; overflow-wrap: anywhere; word-break: keep-all; }
+.search-page-new .report-tags, .search-page-new .report-summary-buttons, .search-page-new .admin-summary-section { min-width: 0; max-width: 100%; }
+.search-page-new .report-footer { gap: 12px; }
+.search-page-new .report-writer { min-width: 0; overflow-wrap: anywhere; }
+.search-page-new .report-actions { flex: 0 0 auto; }
