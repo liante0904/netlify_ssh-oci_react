@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { CONFIG } from '../constants/config';
 import { request } from '../utils/api';
+import { formatNotificationMessage } from '../utils/notificationMessage';
 
 export function getNotificationKey(item) {
   return item?.notification_key || `${item?.source || 'summary'}:${item?.id}`;
@@ -16,6 +17,7 @@ function normalizeNotificationItem(item) {
     telegram_url: item.telegram_url || null,
     source_url: item.source_url || null,
     sec_firm_order: item.sec_firm_order ?? null,
+    message: formatNotificationMessage(item),
   };
 }
 
