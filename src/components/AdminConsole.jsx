@@ -7,6 +7,8 @@ import { useAdminMetrics } from '../hooks/useAdminMetrics';
 import { useAdminLogs } from '../hooks/useAdminLogs';
 import './AdminConsole.css';
 import LoadingSkeleton from './LoadingSkeleton';
+import AdminLlmVisibilitySettings from './admin/AdminLlmVisibilitySettings';
+import AdminFirmHealthTable from './admin/AdminFirmHealthTable';
 
 /* ===== Main Component ===== */
 
@@ -183,7 +185,7 @@ function AdminConsole() {
         <div className="section-title">
           ⚙️ 시스템 운영 상태
           {statusLoading && <span className="badge">갱신 중...</span>}
-          {statusError && <span className="badge" style={{ background: '#ff3b30' }}>오류</span>}
+          {statusError && <span className="badge status-error-badge">오류</span>}
         </div>
         {systemStatus ? (
           <div className="status-grid">
@@ -271,111 +273,19 @@ function AdminConsole() {
         </div>
       </div>
 
-      {/* ===== LLM Summary Visibility Settings (Premium Glassmorphic Panel) ===== */}
-      <div className="section-card llm-visibility-settings">
-        <div className="section-title">
-          🧠 LLM 핵심 요약 노출 설정
-          <span className="badge">Global Policy</span>
-        </div>
-        
-        <p style={{ color: 'var(--text-muted)', fontSize: '0.9em', marginBottom: '16px' }}>
-          증권사 리포트 카드 하단에 노출되는 <strong>AI 요약(Gemini/DeepSeek 핵심 요약)</strong>의 공개 대상을 설정합니다. 
-          이 설정은 전역적으로 적용되며 즉각적으로 화면에 반영됩니다.
-        </p>
-
-        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
-          <label style={{
-            flex: '1',
-            minWidth: '240px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '16px',
-            background: llmVisibility === 'admin' ? 'var(--secondary-background-color)' : 'var(--bg-muted)',
-            border: llmVisibility === 'admin' ? '1px solid var(--primary-color)' : '1px solid var(--glass-border)',
-            boxShadow: llmVisibility === 'admin' ? '0 0 0 1px var(--primary-color)' : 'none',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease'
-          }}>
-            <input
-              type="radio"
-              name="llmVisibility"
-              value="admin"
-              checked={llmVisibility === 'admin'}
-              onChange={() => handleLlmVisibilityChange('admin')}
-              disabled={updatingLlm}
-              style={{
-                accentColor: 'var(--primary-color)',
-                width: '18px',
-                height: '18px',
-                cursor: 'pointer'
-              }}
-            />
-            <div>
-              <div style={{ fontWeight: 'bold', color: '#fff', fontSize: '0.95rem' }}>관리자만 보기 (Admin Only)</div>
-              <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '4px' }}>
-                오직 텔레그램 관리자(Admin) 권한을 가진 계정에게만 AI 요약 영역이 노출됩니다. (보안 극대화)
-              </div>
-            </div>
-          </label>
-
-          <label style={{
-            flex: '1',
-            minWidth: '240px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '16px',
-            background: llmVisibility === 'telegram' ? 'var(--secondary-background-color)' : 'var(--bg-muted)',
-            border: llmVisibility === 'telegram' ? '1px solid var(--primary-color)' : '1px solid var(--glass-border)',
-            boxShadow: llmVisibility === 'telegram' ? '0 0 0 1px var(--primary-color)' : 'none',
-            borderRadius: '12px',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease'
-          }}>
-            <input
-              type="radio"
-              name="llmVisibility"
-              value="telegram"
-              checked={llmVisibility === 'telegram'}
-              onChange={() => handleLlmVisibilityChange('telegram')}
-              disabled={updatingLlm}
-              style={{
-                accentColor: 'var(--primary-color)',
-                width: '18px',
-                height: '18px',
-                cursor: 'pointer'
-              }}
-            />
-            <div>
-              <div style={{ fontWeight: 'bold', color: '#fff', fontSize: '0.95rem' }}>텔레그램 로그인 사용자 모두 보기</div>
-              <div style={{ fontSize: '0.78rem', color: '#888', marginTop: '4px' }}>
-                텔레그램으로 로그인한 모든 사용자에게 AI 요약 보기 기능이 노출됩니다. 비로그인 유저에게는 완벽히 숨겨집니다.
-              </div>
-            </div>
-          </label>
-        </div>
-
-        {llmFeedback && (
-          <div style={{
-            marginTop: '16px',
-            fontSize: '0.85rem',
-            color: llmFeedback.includes('✅') ? '#34c759' : '#ff3b30',
-            fontWeight: '600',
-            animation: 'fadeIn 0.3s ease'
-          }}>
-            {llmFeedback}
-          </div>
-        )}
-      </div>
+      <AdminLlmVisibilitySettings
+        llmVisibility={llmVisibility}
+        updatingLlm={updatingLlm}
+        feedback={llmFeedback}
+        onChange={handleLlmVisibilityChange}
+      />
 
       {/* ===== Firm Health ===== */}
       <div className="section-card">
         <div className="section-title">
           🩺 증권사 건강검진 (마지막 레포트)
           {firmHealth && (
-            <span className="badge" style={{ marginLeft: 8 }}>
+            <span className="badge firm-health-badge">
               {firmHealth.stale_count > 0 ? `🛑 ${firmHealth.stale_count} STALE` : ''}
               {firmHealth.warn_count > 0 ? ` ⚠️ ${firmHealth.warn_count} WARN` : ''}
               {firmHealth.stale_count === 0 && firmHealth.warn_count === 0 ? '✅ All OK' : ''}
@@ -383,38 +293,7 @@ function AdminConsole() {
           )}
         </div>
         {firmHealth ? (
-          <div className="firm-health-table">
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #333', color: '#888' }}>
-                  <th style={{ textAlign: 'left', padding: '4px 8px', width: '30px' }}>#</th>
-                  <th style={{ textAlign: 'left', padding: '4px 8px' }}>증권사</th>
-                  <th style={{ textAlign: 'right', padding: '4px 8px' }}>전체</th>
-                  <th style={{ textAlign: 'right', padding: '4px 8px' }}>마지막일자</th>
-                  <th style={{ textAlign: 'right', padding: '4px 8px' }}>Days</th>
-                  <th style={{ textAlign: 'center', padding: '4px 8px' }}>상태</th>
-                </tr>
-              </thead>
-              <tbody>
-                {firmHealth.firms.map((f) => {
-                  const statusColor = f.status === 'STALE' ? '#ff3b30' : f.status === 'WARN' ? '#ff9500' : f.status === 'FUTURE' ? '#007aff' : '#34c759';
-                  const statusBg = f.status === 'STALE' ? 'rgba(255,59,48,0.12)' : f.status === 'WARN' ? 'rgba(255,149,0,0.12)' : 'rgba(52,199,89,0.08)';
-                  return (
-                    <tr key={f.sec_firm_order} style={{ borderBottom: '1px solid #1a1a2e', background: f.status !== 'OK' ? statusBg : 'transparent' }}>
-                      <td style={{ padding: '3px 8px', color: '#666', fontSize: '11px' }}>{f.sec_firm_order}</td>
-                      <td style={{ padding: '3px 8px', fontWeight: f.status === 'STALE' ? 600 : 400 }}>{f.firm_nm}</td>
-                      <td style={{ textAlign: 'right', padding: '3px 8px', color: '#888' }}>{f.total.toLocaleString()}</td>
-                      <td style={{ textAlign: 'right', padding: '3px 8px', fontFamily: 'monospace' }}>{f.last_report_date || '-'}</td>
-                      <td style={{ textAlign: 'right', padding: '3px 8px', color: statusColor, fontWeight: 600 }}>{f.days_ago >= 0 ? `${f.days_ago}d` : '?'}</td>
-                      <td style={{ textAlign: 'center', padding: '3px 8px' }}>
-                        <span style={{ color: statusColor, fontWeight: 600, fontSize: '11px' }}>{f.status}</span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <AdminFirmHealthTable firmHealth={firmHealth} />
         ) : (
           <LoadingSkeleton rows={4} label="증권사 상태 불러오는 중" />
         )}
