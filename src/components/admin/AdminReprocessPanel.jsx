@@ -1,4 +1,5 @@
 import React from 'react';
+import './AdminReprocessPanel.css';
 
 const REPROCESS_TASKS = [
   { id: 'today', label: '오늘건 재처리' },
@@ -33,16 +34,7 @@ function AdminReprocessPanel({ processing, logLines, onReprocess, onClearLog }) 
           ))}
           <button
             onClick={onClearLog}
-            style={{
-              marginTop: 8,
-              padding: '4px 12px',
-              background: 'transparent',
-              border: '1px solid var(--primary-color, #007aff)',
-              color: 'var(--primary-color, #007aff)',
-              borderRadius: 4,
-              cursor: 'pointer',
-              fontSize: '0.85em',
-            }}
+            className="reprocess-clear-log"
           >
             로그 지우기
           </button>

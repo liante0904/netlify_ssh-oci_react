@@ -59,6 +59,13 @@
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 15%, transparent);
 }
 
+.search-company-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
 /* 모바일 화면에서 입력 필드 너비 조정 */
 @media screen and (max-width: 768px) {
   .search-container {

@@ -24,7 +24,7 @@ function FloatingMenu({ isFloatingNavVisible }) {
   return (
     <>
       {isFloatingNavVisible && (
-        <nav className="floating-nav" style={{ zIndex: 10 }}>
+        <nav className="floating-nav">
           <button className="floating-button theme-fab" onClick={toggleTheme} title="테마 변경">
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
@@ -44,20 +44,11 @@ function FloatingMenu({ isFloatingNavVisible }) {
         <div
           className="floating-menu-overlay"
           onClick={handleOverlayClick}
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100vw',
-            height: '100vh',
-            zIndex: 9,
-          }}
         >
           <div
             className={`floating-menu ${isOpen ? 'open' : ''}`}
             id="floatingMenu"
             onClick={(e) => e.stopPropagation()}
-            style={{ zIndex: 10 }}
           >
             <div className="floating-menu-content">
               <div className="menu-item" onClick={() => { navigate('/'); toggleMenu(); }}>
