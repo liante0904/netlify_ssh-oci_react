@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { getArchiveDownloadUrl, getDirectUrl, prefetchPdf } from '../../utils/reportLinks';
 import { useReport } from '../../context/useReport';
+import ReportItemSummary from './ReportItemSummary';
 
 const ReportItem = ({ 
   report, 
@@ -138,7 +137,7 @@ const ReportItem = ({
                 </span>
               )}
               {hasFnguideSummary && (
-                <span className="ai-badge fnguide-badge-title" onClick={() => onToggleSummary(id)} style={{ backgroundColor: '#2e7d32', marginLeft: '6px' }}>
+                <span className="ai-badge fnguide-badge-title" onClick={() => onToggleSummary(id)}>
                   FnGuide 요약
                 </span>
               )}
@@ -172,8 +171,8 @@ const ReportItem = ({
           
           {/* 관리자 요약 요청 버튼 영역 (report-tags 아래 배치하여 가시성 및 사용성 개선) */}
           {isAdmin && (
-            <div className="admin-summary-section" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '12px', color: 'var(--text-color-secondary, #888)', fontWeight: 'bold' }}>AI 요약 요청:</span>
+            <div className="admin-summary-section">
+              <span className="admin-summary-label">AI 요약 요청:</span>
               {!isSummaryRequested && !isSummaryCompleted && (
                 <span className="admin-summary-confirm">
                   <button 
@@ -181,7 +180,7 @@ const ReportItem = ({
                     onClick={() => setShowConfirm(showConfirm === 'deepseek' ? null : 'deepseek')}
                     title={hasSummary ? "DeepSeek AI 요약 재처리 요청" : "DeepSeek AI 요약 생성"}
                   >
-                    <span className="summary-btn-icon" style={{ fontSize: '14px', fontWeight: '900', lineHeight: 1, marginRight: '2px' }}>!</span>
+                    <span className="summary-btn-icon summary-btn-icon-deepseek">!</span>
                     <span>DeepSeek</span>
                   </button>
                   <button 
@@ -189,31 +188,17 @@ const ReportItem = ({
                     onClick={() => setShowConfirm(showConfirm === 'ag' ? null : 'ag')}
                     title={hasSummary ? "Gemini AI 요약 재처리 요청" : "Gemini AI 요약 생성"}
                   >
-                    <span className="summary-btn-icon" style={{ fontSize: '11px', lineHeight: 1, marginRight: '2px' }}>▲</span>
+                    <span className="summary-btn-icon summary-btn-icon-gemini">▲</span>
                     <span>Gemini</span>
                   </button>
                   {showConfirm && (
-                    <span className="admin-summary-confirm-btns-wrapper" style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <span className="admin-summary-confirm-btns-wrapper">
                       {hasSummary && (
-                        <span className="re-summarize-tooltip" style={{
-                          position: 'absolute',
-                          bottom: '100%',
-                          left: '50%',
-                          transform: 'translateX(-50%) translateY(-6px)',
-                          backgroundColor: 'rgba(0, 0, 0, 0.85)',
-                          color: '#fff',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
-                          fontSize: '11px',
-                          whiteSpace: 'nowrap',
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                          zIndex: 10,
-                          fontWeight: 'normal'
-                        }}>
+                        <span className="re-summarize-tooltip">
                           ⚠️ 이미 요약이 존재합니다. 재처리하시겠습니까?
                         </span>
                       )}
-                      <span className="admin-summary-confirm-btns" style={{ display: 'inline-flex', gap: '4px' }}>
+                      <span className="admin-summary-confirm-btns">
                         <button 
                           className="confirm-yes" 
                           onClick={() => { 
@@ -246,25 +231,11 @@ const ReportItem = ({
           
           {/* 요약 토글 버튼 영역 (태그 영역 아래 배치하여 작성자 뭉개짐 방지 및 개별 요약 가시성 증대) */}
           {hasAnySummary && (
-            <div className="report-summary-buttons" style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+            <div className="report-summary-buttons">
               {hasSummary && (
                 <button 
                   className={`summary-toggle-btn ai-summary-btn ${isSummaryExpanded ? 'active' : ''}`}
                   onClick={() => onToggleSummary(id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '0.82em',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    background: isSummaryExpanded ? 'linear-gradient(135deg, #6e8efb, #a777e3)' : 'rgba(110, 142, 251, 0.1)',
-                    color: isSummaryExpanded ? '#fff' : '#6e8efb',
-                    border: '1px solid rgba(110, 142, 251, 0.3)'
-                  }}
                 >
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                     <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
@@ -276,20 +247,6 @@ const ReportItem = ({
                 <button 
                   className={`summary-toggle-btn fnguide-summary-btn ${isSummaryExpanded ? 'active' : ''}`}
                   onClick={() => onToggleSummary(id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '0.82em',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    background: isSummaryExpanded ? '#2e7d32' : 'rgba(46, 125, 50, 0.1)',
-                    color: isSummaryExpanded ? '#fff' : '#2e7d32',
-                    border: '1px solid rgba(46, 125, 50, 0.3)'
-                  }}
                 >
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
                     <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
@@ -301,7 +258,7 @@ const ReportItem = ({
           )}
 
           <div className="report-footer">
-            <p className="report-writer" onClick={() => onWriterClick?.(writer)} style={{cursor: onWriterClick ? 'pointer' : 'default'}}>
+            <p className={`report-writer ${onWriterClick ? 'clickable' : ''}`} onClick={() => onWriterClick?.(writer)}>
               작성자: {writer} <span className="writer-search-icon">🔍</span>
             </p>
             <div className="report-actions">
@@ -360,77 +317,16 @@ const ReportItem = ({
       </div>
       {hasAnySummary && (
         <div className={`summary-content ${isSummaryExpanded ? 'expanded' : 'collapsed'}`}>
-          <div className="summary-inner-wrapper" style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '12px', boxSizing: 'border-box', width: '100%', maxWidth: '100%' }}>
-            {hasSummary && (
-              <div className="summary-inner" style={{ width: '100%', boxSizing: 'border-box' }}>
-                <div className="summary-title-row">
-                  <svg viewBox="0 0 24 24" width="18" height="18" fill="var(--primary-color)" style={{marginRight: '6px'}}>
-                    <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
-                  </svg>
-                  AI 핵심 요약
-                </div>
-                <div className="summary-text">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {gemini_summary}
-                  </ReactMarkdown>
-                </div>
-              </div>
-            )}
-            
-            {hasFnguideSummary && (
-              <div className="summary-inner fnguide-summary-section" style={{ 
-                borderTop: hasSummary ? '1px dashed var(--border-color, #e0e0e0)' : 'none', 
-                paddingTop: hasSummary ? '14px' : '0',
-                width: '100%',
-                boxSizing: 'border-box'
-              }}>
-                <div className="summary-title-row" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <svg viewBox="0 0 24 24" width="18" height="18" fill="#2e7d32" style={{marginRight: '6px'}}>
-                      <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                    </svg>
-                    <span style={{ fontWeight: 'bold' }}>FnGuide 요약</span>
-                  </div>
-                  <div className="fnguide-meta-badges" style={{ display: 'flex', gap: '6px' }}>
-                    {fnguide_summary?.opinion && (
-                      <span className={`fnguide-badge opinion-badge`} style={{
-                        fontSize: '11px',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        fontWeight: 'bold',
-                        backgroundColor: 'rgba(46, 125, 50, 0.1)',
-                        color: '#2e7d32',
-                        border: '1px solid rgba(46, 125, 50, 0.3)'
-                      }}>
-                        의견: {fnguide_summary?.opinion}
-                      </span>
-                    )}
-                    {fnguide_summary?.target_price && fnguide_summary?.target_price !== '0' && fnguide_summary?.target_price !== '-' && (
-                      <span className="fnguide-badge target-price-badge" style={{
-                        fontSize: '11px',
-                        padding: '2px 8px',
-                        borderRadius: '12px',
-                        fontWeight: 'bold',
-                        backgroundColor: 'rgba(123, 31, 162, 0.1)',
-                        color: '#7b1fa2',
-                        border: '1px solid rgba(123, 31, 162, 0.3)'
-                      }}>
-                        목표가: {fnguide_summary?.target_price}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="summary-text" style={{ marginTop: '8px', color: 'var(--text-color-secondary, #666)', fontSize: '13.5px', lineHeight: '1.6', whiteSpace: 'pre-wrap', wordBreak: 'break-all', overflowWrap: 'break-word' }}>
-                  {fnguide_summary.summary_text}
-                </div>
-              </div>
-            )}
-          </div>
+          <ReportItemSummary
+            geminiSummary={gemini_summary}
+            fnguideSummary={hasFnguideSummary ? fnguide_summary : null}
+            hasSummary={hasSummary}
+          />
         </div>
       )}
       {/* 글래스모피즘 토스트 UI 렌더링 */}
       {toast.visible && (
-        <div className={`toast-container ${toast.visible ? 'visible' : ''}`} style={{ transition: 'all 0.3s ease' }}>
+        <div className={`toast-container ${toast.visible ? 'visible' : ''}`}>
           {toast.message}
         </div>
       )}
