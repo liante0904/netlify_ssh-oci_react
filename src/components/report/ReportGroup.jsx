@@ -56,7 +56,7 @@ function ReportGroup({
   const companyGroups = getCompanyGroups(items);
 
   return (
-    <div className="date-group">
+    <div className="date-group" data-report-date={date}>
       <div className="date-header">
         <div 
           className={`date-title ${!isCollapsed ? 'expanded' : ''}`} 
