@@ -89,7 +89,7 @@ function SearchPageNew() {
 
   const toggleSummary = useCallback((id) => {
     setSummaryToggles(prev => ({ ...prev, [id]: !prev[id] }));
-  }, [setCategory, setSearchTerm]);
+  }, []);
 
   const toggleFavorite = useCallback((id) => {
     const isAdding = !favorites[id];
@@ -181,7 +181,7 @@ function SearchPageNew() {
     setCategory('writer');
     setSearchTerm(writer);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, []);
+  }, [setCategory, setSearchTerm]);
 
   const isAiSummary = selectedRoute === 'ai-summary';
   const hasSummaryContent = hasReportSummary;
