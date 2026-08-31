@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { getDirectUrl } from '../utils/reportLinks';
-import { SUMMARY_NOTIFICATION_EVENT } from '../utils/summaryNotification';
 import { getNotificationKey } from './useNotifications';
 
+const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
 const TOAST_TIMEOUT = 4500;
 
 function normalizeLocalSummaryEvent(detail) {

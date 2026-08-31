@@ -376,9 +376,6 @@ body {
 }
 
 .container {
-  width: 100%;
-  padding: 16px;
-  box-sizing: border-box;
   padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px));
 }
 
@@ -399,6 +396,13 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 1000;
+}
+
+/* 공통 컨테이너 스타일 */
+.container {
+  width: 100%;
+  padding: 16px;
+  box-sizing: border-box;
 }
 
 /* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
