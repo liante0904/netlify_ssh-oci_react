@@ -6,6 +6,7 @@ import AdminSection from './menu/AdminSection';
 import { useTelegramAuth } from '../hooks/useTelegramAuth';
 import { useReport } from '../context/useReport';
 import './HamburgerMenu.css';
+import './menu/KeywordManager.css';
 
 function HamburgerMenu({
   isOpen,
