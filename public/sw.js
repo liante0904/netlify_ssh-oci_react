@@ -29,7 +29,7 @@ self.addEventListener('fetch', (event) => {
   ) return;
 
   event.respondWith(
-    fetch(request)
+    fetch(request, request.destination === 'document' ? { cache: 'no-store' } : undefined)
       .then((response) => {
         if (response.ok) {
           const responseClone = response.clone();
