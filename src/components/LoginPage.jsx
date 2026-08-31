@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTelegramAuth } from '../hooks/useTelegramAuth';
 import { CONFIG } from '../constants/config';
+import './LoginPage.css';
 
 /**
  * 로그인 페이지 — Header의 '로그인' 버튼과 동일한 loginWithTelegram 사용.
@@ -23,13 +24,13 @@ export default function LoginPage({ reason, user }) {
 
   if (reason === 'pending_approval') {
     return (
-      <div style={s.container}>
-        <div style={s.card}>
-          <div style={s.icon}>⏳</div>
-          <h2 style={s.title}>승인 대기 중</h2>
-          <p style={s.sub}>{(user || {}).first_name || 'User'}님, 관리자 승인 후 이용 가능합니다.</p>
-          <button style={s.btn} onClick={() => window.location.reload()}>새로고침</button>
-          <a href="/" style={s.link}>메인으로 돌아가기</a>
+      <div className="login-page">
+        <div className="login-card">
+          <div className="login-icon">⏳</div>
+          <h2 className="login-title">승인 대기 중</h2>
+          <p className="login-subtitle">{(user || {}).first_name || 'User'}님, 관리자 승인 후 이용 가능합니다.</p>
+          <button className="login-button" onClick={() => window.location.reload()}>새로고침</button>
+          <a href="/" className="login-link">메인으로 돌아가기</a>
         </div>
       </div>
     );
@@ -38,38 +39,27 @@ export default function LoginPage({ reason, user }) {
   const isSessionExpired = reason === 'session_expired';
 
   return (
-    <div style={s.container}>
-      <div style={s.card}>
-        <div style={s.icon}>📊</div>
-        <h2 style={s.title}>리포트 허브</h2>
-        <p style={s.sub}>
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-icon">📊</div>
+        <h2 className="login-title">리포트 허브</h2>
+        <p className="login-subtitle">
           {isSessionExpired ? '세션이 만료되었습니다. 다시 로그인해 주세요.' : '증권사 리서치 리포트 통합 뷰어'}
         </p>
 
         <button
-          style={{ ...s.btn, background: '#0088cc', opacity: isAuthenticating ? 0.6 : 1 }}
+          className="login-button login-button-telegram"
           onClick={loginWithTelegram}
           disabled={isAuthenticating}
         >
           {isAuthenticating ? '인증 중...' : '로그인'}
         </button>
 
-        <p style={s.hint}>
+        <p className="login-hint">
           Header의 로그인 버튼과 동일하게 동작합니다.
         </p>
-        <a href="/" style={s.link}>메인으로 돌아가기</a>
+        <a href="/" className="login-link">메인으로 돌아가기</a>
       </div>
     </div>
   );
 }
-
-const s = {
-  container: { display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: '#f5f5f5', padding: '20px' },
-  card: { background: 'white', borderRadius: '12px', padding: '40px', maxWidth: '400px', width: '100%', textAlign: 'center', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' },
-  icon: { fontSize: '48px', marginBottom: '16px' },
-  title: { fontSize: '24px', fontWeight: 700, margin: '0 0 8px 0' },
-  sub: { fontSize: '15px', color: '#666', margin: '0 0 24px 0' },
-  btn: { width: '100%', padding: '14px', background: '#1976d2', color: 'white', border: 'none', borderRadius: '8px', fontSize: '16px', cursor: 'pointer' },
-  hint: { fontSize: '11px', color: '#aaa', margin: '12px 0 0 0' },
-  link: { fontSize: '12px', color: '#1976d2', display: 'block', marginTop: '8px', textDecoration: 'none' },
-};
