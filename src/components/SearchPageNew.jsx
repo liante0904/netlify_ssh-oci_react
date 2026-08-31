@@ -66,6 +66,12 @@ function SearchPageNew() {
   const [selectedReport, setSelectedReport] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
 
+  const isAiSummary = selectedRoute === 'ai-summary';
+  const hasSummaryContent = hasReportSummary;
+  const sortedDates = datesWithReports(reports);
+  const filteredSortedDates = isAiSummary ? datesWithReports(reports, hasSummaryContent) : sortedDates;
+  const { requestReveal } = useRevealOlderDate({ dates: filteredSortedDates, hasMore, isLoading, fetchMore: fetchReports });
+
   // 검색 조건 변경 시 날짜 토글 및 요약 초기화
   useEffect(() => {
     setDateToggles({});
@@ -182,14 +188,6 @@ function SearchPageNew() {
     setSearchTerm(writer);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [setCategory, setSearchTerm]);
-
-  const isAiSummary = selectedRoute === 'ai-summary';
-  const hasSummaryContent = hasReportSummary;
-
-  const sortedDates = datesWithReports(reports);
-  const filteredSortedDates = isAiSummary ? datesWithReports(reports, hasSummaryContent) : sortedDates;
-
-  const { requestReveal } = useRevealOlderDate({ dates: filteredSortedDates, hasMore, isLoading, fetchMore: fetchReports });
 
   // 결과 개수 카운트
   const totalCount = useMemo(() => countReportGroups(reports), [reports]);

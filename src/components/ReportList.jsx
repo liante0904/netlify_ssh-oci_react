@@ -48,6 +48,7 @@ export default function ReportList({ onWriterClick }) {
   const sortedDates = datesWithReports(displayReports);
   const filteredDates = isFavoritesPage && favoriteReports ? sortedDates : sortedDates.filter((date) => flattenReportGroup(displayReports[date]).some((item) => (!isFavoritesPage || favorites[item.id]) && (!isAiSummary || hasReportSummary(item))));
   const meta = getReportSectionByPath(location.pathname) || {};
+  const { requestReveal } = useRevealOlderDate({ dates: sortedDates, hasMore, isLoading, fetchMore: fetchReports, enabled: isRecent });
   const toggleDate = useCallback((date) => {
     const willCollapse = !collapsedDates[date];
     setCollapsedDates((current) => ({ ...current, [date]: willCollapse }));
@@ -61,6 +62,5 @@ export default function ReportList({ onWriterClick }) {
   const handleTagClick = (keyword, isSector) => handleSearch({ query: keyword, category: isSector ? 'sector' : 'title' });
   const summaryItems = [{ label: meta.title || '레포트', value: filteredDates.length, icon: '📰' }, ...(searchQuery.query ? [{ label: '검색', value: searchQuery.query, icon: '🔍' }] : [])];
   useEffect(() => { if (isLoading) return; const reportsToPrefetch = filteredDates.slice(0, 2).flatMap((date) => flattenReportGroup(displayReports[date])).filter(isDsReport).slice(0, 3); reportsToPrefetch.forEach((report, index) => window.setTimeout(() => prefetchPdf(report, window.location.origin), index * 700)); }, [displayReports, filteredDates, isLoading]);
-  const { requestReveal } = useRevealOlderDate({ dates: sortedDates, hasMore, isLoading, fetchMore: fetchReports, enabled: isRecent });
   return <ReportListContent meta={{ title: meta.title || '레포트', description: meta.description, summaryItems }} filters={{ isOutlook, isLoading, outlookYear, onSetOutlookYear: setOutlookYear, tagFilter: null, onClearTagFilter: () => {} }} data={{ dates: sortedDates, displayReports, filteredDates }} controls={{ isLoading, error, offset, retry, fetchReports, hasMore }} share={{ ...share, onOpen: openShare, onClose: () => setShare((current) => ({ ...current, isOpen: false })) }} options={{ isFavoritesPage, isAiSummary, isRecent, isSearchActive: Boolean(searchQuery.query), collapsedDates, onToggleDate: toggleDate, sortBy, favorites, collapsedFirms, onToggleFirm: toggleFirm, expandedSummaries, onToggleSummary: toggleSummary, onToggleFavorite: toggleFavorite, onWriterClick, setSortBy, isAdmin, onTriggerSummary, summaryRequestedIds, summaryCompletedIds, hasSummaryContent: hasReportSummary, emptyMessage: isAiSummary ? 'AI 요약이 생성된 레포트가 없습니다.' : isOutlook ? '전망 관련 레포트가 없습니다.' : '즐겨찾기한 레포트가 없습니다.', onTagClick: handleTagClick }} />;
 }
