@@ -1,4 +1,5 @@
 import MenuSummary from '../MenuSummary';
+import LoadingSkeleton from '../LoadingSkeleton';
 import FnGuideSummaryCard from './FnGuideSummaryCard';
 import { DateChips, Facets } from './FnGuideControls';
 import { REPORT_SECTIONS } from '../../constants/reportSections';
