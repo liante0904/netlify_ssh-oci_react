@@ -1,0 +1,13 @@
+.report-writer.clickable { cursor: pointer; }
+.fnguide-summary-section.has-gemini-summary { border-top: 1px dashed var(--border-color, #e0e0e0); padding-top: 14px; }
+.fnguide-summary-title-row { justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.fnguide-summary-title, .fnguide-meta-badges { display: flex; align-items: center; }
+.fnguide-meta-badges { gap: 6px; }
+.fnguide-badge { font-size: 11px; padding: 2px 8px; border-radius: 12px; font-weight: bold; }
+.opinion-badge { background-color: rgba(46, 125, 50, 0.1); color: #2e7d32; border: 1px solid rgba(46, 125, 50, 0.3); }
+.target-price-badge { background-color: rgba(123, 31, 162, 0.1); color: #7b1fa2; border: 1px solid rgba(123, 31, 162, 0.3); }
+.fnguide-summary-text { margin-top: 8px; color: var(--text-color-secondary, #666); font-size: 13.5px; line-height: 1.6; white-space: pre-wrap; }
+.summary-title-row { display: flex; align-items: center; font-weight: bold; font-size: 0.9em; color: var(--primary-color); margin-bottom: 8px; }
+.summary-text { font-size: 0.95em; line-height: 1.6; color: var(--text-color); word-break: break-all !important; overflow-wrap: break-word !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; }
+.summary-text, .summary-text p, .summary-text ul, .summary-text ol, .summary-text li, .summary-text blockquote, .summary-text pre, .summary-text code { width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; word-break: break-all !important; overflow-wrap: break-word !important; }
+.report-content { flex: 1; }

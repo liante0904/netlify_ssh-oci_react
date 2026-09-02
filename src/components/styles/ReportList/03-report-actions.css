@@ -1,0 +1,9 @@
+.favorite-button, .viewer-button, .share-button { background: none; border: none; color: var(--primary-color); cursor: pointer; padding: 4px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s, transform 0.2s; flex-shrink: 0; }
+.favorite-button:hover { background-color: rgba(255, 215, 0, 0.1); transform: scale(1.1); }
+.favorite-button.active { color: #FFD700; }
+.viewer-button:hover { background-color: rgba(110, 142, 251, 0.1); transform: scale(1.1); }
+.share-button:hover { background-color: rgba(0, 122, 255, 0.1); transform: scale(1.1); }
+.viewer-button svg, .favorite-button svg, .share-button svg { display: block; }
+.empty-favorites { text-align: center; padding: 100px 20px; color: var(--text-color); }
+.empty-favorites .empty-icon { font-size: 4em; margin-bottom: 20px; color: #FFD700; opacity: 0.5; }
+.empty-favorites p { font-size: 1.1em; line-height: 1.6; opacity: 0.8; }
