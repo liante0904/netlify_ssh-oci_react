@@ -1,0 +1,14 @@
+.loading-skeleton { display: grid; gap: 10px; width: 100%; padding: 12px 0; }
+.skeleton-row { display: grid; grid-template-columns: 52px minmax(0, 1fr) 96px; align-items: center; gap: 12px; min-height: 42px; padding: 10px 12px; border-radius: 10px; background: color-mix(in srgb, var(--card-bg, #fff) 88%, var(--primary-color, #1976d2)); }
+.skeleton-block, .skeleton-chip { display: block; border-radius: 6px; background: linear-gradient(90deg, rgba(128,128,128,.12) 25%, rgba(128,128,128,.24) 37%, rgba(128,128,128,.12) 63%); background-size: 400% 100%; animation: skeleton-shimmer 1.4s ease-in-out infinite; }
+.skeleton-block { height: 12px; }
+.skeleton-block-small { width: 42px; }
+.skeleton-block-main { width: 75%; }
+.skeleton-block-meta { width: 72px; justify-self: end; }
+.loading-skeleton-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.skeleton-chip { width: 74px; height: 30px; border-radius: 999px; }
+.loading-skeleton-spinner { display: grid; place-items: center; min-height: 96px; }
+.skeleton-spinner { width: 28px; height: 28px; border: 3px solid rgba(25,118,210,.2); border-top-color: var(--primary-color, #1976d2); border-radius: 50%; animation: skeleton-spin .8s linear infinite; }
+@keyframes skeleton-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+@keyframes skeleton-spin { to { transform: rotate(360deg); } }
+@media (max-width: 600px) { .skeleton-row { grid-template-columns: 36px minmax(0, 1fr); } .skeleton-block-meta { display: none; } }
