@@ -1,48 +1,4 @@
-.search-page-new {
-  width: min(1200px, calc(100% - 40px));
-  margin: 0 auto;
-  padding-bottom: calc(100px + env(safe-area-inset-bottom, 20px));
-  color: var(--text-color);
-  animation: searchPageFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  box-sizing: border-box;
-  overflow-x: clip;
-}
-
-@keyframes searchPageFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* 헤더 디자인 강화 */
-.search-page-header {
-  margin-top: 10px;
-  margin-bottom: 24px;
-  border-left: 4px solid var(--primary-color);
-  padding-left: 16px;
-}
-
-.search-page-header h1 {
-  margin: 0 0 6px;
-  font-size: 2.1rem;
-  font-weight: 800;
-  letter-spacing: -0.8px;
-  background: linear-gradient(135deg, var(--text-color) 30%, var(--primary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.search-page-header p {
-  margin: 0;
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.6;
-}
+@import './search/SearchPageLayout.css';
 
 /* 프리미엄 글래스모피즘 필터 카드 */
 .filter-panel-card {
@@ -297,48 +253,6 @@
 .btn-filter-reset:hover {
   background: var(--secondary-background-color);
   border-color: var(--primary-color);
-}
-
-/* 결과 섹션 뷰포트 장식 */
-.search-state-msg {
-  padding: 60px 20px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 1rem;
-  font-weight: 700;
-  letter-spacing: -0.2px;
-}
-
-.search-state-msg.empty-msg {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 80px 20px;
-  background: var(--glass-bg);
-  border: 1px dashed var(--glass-border);
-  border-radius: var(--radius-lg);
-}
-
-.empty-icon {
-  font-size: 3.5rem;
-  opacity: 0.7;
-  animation: bounceSlow 2s infinite ease-in-out;
-}
-
-@keyframes bounceSlow {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-8px);
-  }
-}
-
-.search-state-msg.empty-msg p {
-  margin: 0;
-  line-height: 1.7;
-  font-size: 0.95rem;
 }
 
 /* 태블릿/PC 반응형 설계 */
