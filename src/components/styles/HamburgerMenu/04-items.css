@@ -1,5 +1,5 @@
 /* 메뉴 아이템 스타일 */
-.menu-item {
+.menu-panel .menu-item {
   color: var(--primary-color);
   font-weight: bold;
   text-decoration: none;
@@ -17,11 +17,11 @@
   justify-content: center;
 }
 
-.menu-item:hover {
+.menu-panel .menu-item:hover {
   background-color: color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color));
   transform: translateY(-1px);
 }
 
-.menu-item:active {
+.menu-panel .menu-item:active {
   transform: scale(0.98);
 }

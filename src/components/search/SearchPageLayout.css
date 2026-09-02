@@ -5,6 +5,6 @@
 .search-page-header p { margin:0; color:var(--text-muted); font-size:.95rem; line-height:1.6; }
 .search-state-msg { padding:60px 20px; text-align:center; color:var(--text-muted); font-size:1rem; font-weight:700; letter-spacing:-.2px; }
 .search-state-msg.empty-msg { display:flex; flex-direction:column; align-items:center; gap:16px; padding:80px 20px; background:var(--glass-bg); border:1px dashed var(--glass-border); border-radius:var(--radius-lg); }
-.empty-icon { font-size:3.5rem; opacity:.7; animation:bounceSlow 2s infinite ease-in-out; }
+.search-page-new .empty-icon { font-size:3.5rem; opacity:.7; animation:bounceSlow 2s infinite ease-in-out; }
 @keyframes bounceSlow { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-8px); } }
 .search-state-msg.empty-msg p { margin:0; line-height:1.7; font-size:.95rem; }
