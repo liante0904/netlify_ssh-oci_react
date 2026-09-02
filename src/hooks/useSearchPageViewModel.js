@@ -37,7 +37,13 @@ export function useSearchPageViewModel() {
     setIsShareOpen(true);
   }, []);
   const handleLocalWriterClick = useCallback((writer) => { setCategory('writer'); setSearchTerm(writer); window.scrollTo({ top: 0, behavior: 'smooth' }); }, [setCategory, setSearchTerm]);
+  const handleLocalTagClick = useCallback((value, type) => {
+    const nextCategory = ({ sector: 'sector', stock: 'stock', keyword: 'tags' }[type] || 'tags');
+    setCategory(nextCategory);
+    setSearchTerm(value);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [setCategory, setSearchTerm]);
   const totalCount = useMemo(() => countReportGroups(reports), [reports]);
 
-  return { isAdmin, searchTerm, setSearchTerm, category, setCategory, selectedCompany, selectedBoard, setSelectedBoard, selectedRoute, setSelectedRoute, selectedSort, setSelectedSort, boards, handleCompanyChange, resetFilters, totalCount, error, retry, offset, isLoading, filteredSortedDates, reports, fetchReports, hasMore, dateToggles, toggleDate, favorites, firmToggles, toggleFirm, summaryToggles, toggleSummary, toggleFavorite, handleOpenShareMenu, handleLocalWriterClick, handleTriggerSummary, summaryRequestedIds, summaryCompletedIds, isAiSummary, hasSummaryContent: hasReportSummary, isShareOpen, setIsShareOpen, selectedReport, menuPosition };
+  return { isAdmin, searchTerm, setSearchTerm, category, setCategory, selectedCompany, selectedBoard, setSelectedBoard, selectedRoute, setSelectedRoute, selectedSort, setSelectedSort, boards, handleCompanyChange, resetFilters, totalCount, error, retry, offset, isLoading, filteredSortedDates, reports, fetchReports, hasMore, dateToggles, toggleDate, favorites, firmToggles, toggleFirm, summaryToggles, toggleSummary, toggleFavorite, handleOpenShareMenu, handleLocalWriterClick, handleLocalTagClick, handleTriggerSummary, summaryRequestedIds, summaryCompletedIds, isAiSummary, hasSummaryContent: hasReportSummary, isShareOpen, setIsShareOpen, selectedReport, menuPosition };
 }

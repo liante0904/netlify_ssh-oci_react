@@ -9,7 +9,7 @@ export default function SearchResults({
   hasMore, dateToggles, toggleDate, selectedSort, favorites, firmToggles, toggleFirm,
   summaryToggles, toggleSummary, toggleFavorite, handleOpenShareMenu, handleLocalWriterClick,
   isAdmin, handleTriggerSummary, summaryRequestedIds, summaryCompletedIds, isAiSummary,
-  hasSummaryContent, isShareOpen, setIsShareOpen, selectedReport, menuPosition, onSortChange,
+  hasSummaryContent, isShareOpen, setIsShareOpen, selectedReport, menuPosition, onSortChange, onTagClick,
 }) {
   return (
     <section className="search-results-section">
@@ -24,7 +24,7 @@ export default function SearchResults({
         ) : (
           <InfiniteScroll dataLength={offset} next={fetchReports} hasMore={hasMore} scrollThreshold={0.7} loader={<LoadingSkeleton variant="spinner" label="검색 결과 더 불러오는 중" />}>
             {filteredSortedDates.map((date) => (
-              <ReportGroup key={date} date={date} items={reports[date]} isCollapsed={!!dateToggles[date]} onToggleDate={toggleDate} sortBy={selectedSort} isFavoritesPage={false} favorites={favorites} collapsedFirms={firmToggles} onToggleFirm={toggleFirm} expandedSummaries={summaryToggles} onToggleSummary={toggleSummary} onToggleFavorite={toggleFavorite} onOpenShareMenu={handleOpenShareMenu} onWriterClick={handleLocalWriterClick} showSortOptions={false} setSortBy={onSortChange} isAdmin={isAdmin} onTriggerSummary={handleTriggerSummary} summaryRequestedIds={summaryRequestedIds} summaryCompletedIds={summaryCompletedIds} isAiSummary={isAiSummary} hasSummaryContent={hasSummaryContent} />
+              <ReportGroup key={date} date={date} items={reports[date]} isCollapsed={!!dateToggles[date]} onToggleDate={toggleDate} sortBy={selectedSort} isFavoritesPage={false} favorites={favorites} collapsedFirms={firmToggles} onToggleFirm={toggleFirm} expandedSummaries={summaryToggles} onToggleSummary={toggleSummary} onToggleFavorite={toggleFavorite} onOpenShareMenu={handleOpenShareMenu} onWriterClick={handleLocalWriterClick} onTagClick={onTagClick} showSortOptions={false} setSortBy={onSortChange} isAdmin={isAdmin} onTriggerSummary={handleTriggerSummary} summaryRequestedIds={summaryRequestedIds} summaryCompletedIds={summaryCompletedIds} isAiSummary={isAiSummary} hasSummaryContent={hasSummaryContent} />
             ))}
           </InfiniteScroll>
         )}

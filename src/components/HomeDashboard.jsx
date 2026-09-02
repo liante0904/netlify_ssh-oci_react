@@ -13,7 +13,7 @@ function formatPreviewDate(rawDate) {
   if (/^\d{8}$/.test(value)) {
     return `${value.slice(4, 6)}.${value.slice(6, 8)}`;
   }
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  const match = value.match(/^(\d{4})[-./](\d{2})[-./](\d{2})/);
   return match ? `${match[2]}.${match[3]}` : value;
 }
 
@@ -22,6 +22,7 @@ function normalizeFnGuideItem(item) {
     id: item.summary_id,
     title: item.report_title || '제목 없음',
     meta: [item.company_name, item.provider].filter(Boolean).join(' · '),
+    author: item.author || '',
     date: formatPreviewDate(item.report_date),
   };
 }
@@ -32,7 +33,8 @@ function normalizeReportPreview(item) {
   return {
     id: report.id,
     title: report.title,
-    meta: [report.firm, report.writer].filter(Boolean).join(' · '),
+    meta: report.firm || '',
+    author: report.writer || '',
     date: formatPreviewDate(report.date),
     rawReport: report,
   };

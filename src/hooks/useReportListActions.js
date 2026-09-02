@@ -9,8 +9,11 @@ export function useReportListActions({ setShare, handleSearch }) {
     const rect = event.currentTarget.getBoundingClientRect();
     setShare({ isOpen: true, report: buildShareMenuData(report), position: { top: rect.bottom, left: rect.left + rect.width / 2 } });
   }, [setShare]);
-  const handleTagClick = useCallback((keyword, isSector) => {
-    const nextSearch = createTextSearch(keyword, isSector ? 'sector' : 'title');
+  const handleTagClick = useCallback((keyword, typeOrIsSector) => {
+    const category = typeof typeOrIsSector === 'string'
+      ? ({ sector: 'sector', stock: 'stock', keyword: 'tags' }[typeOrIsSector] || 'tags')
+      : (typeOrIsSector ? 'sector' : 'title');
+    const nextSearch = createTextSearch(keyword, category);
     handleSearch(nextSearch);
     const params = buildSearchParams(nextSearch);
     navigate({ pathname: '/recent', search: `?${params.toString()}` });

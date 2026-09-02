@@ -11,7 +11,7 @@ import { useReportItemActions } from '../../hooks/useReportItemActions';
 import './ReportSummaryControls.css';
 import './ReportSummaryContent.css';
 
-const ReportItem = ({ report, isFavorite, isSummaryExpanded, onToggleFavorite, onToggleSummary, onOpenShareMenu, showFirmTag, onWriterClick, isAdmin, onTriggerSummary, summaryRequestedIds, summaryCompletedIds }) => {
+const ReportItem = ({ report, isFavorite, isSummaryExpanded, onToggleFavorite, onToggleSummary, onOpenShareMenu, showFirmTag, onWriterClick, onTagClick, isAdmin, onTriggerSummary, summaryRequestedIds, summaryCompletedIds }) => {
   const { telegramUser, llmVisibility } = useReport();
   const viewModel = getReportItemViewModel(report, { isAdmin, telegramUser, llmVisibility });
   const { id, title, writer, firm, geminiSummary, fnguideSummary, rating, revisionType, reportType, stockTickers, visibleTags, canDownloadArchive, hasSummary, hasFnguideSummary, hasAnySummary, hasUnverifiedValuation, hasDirectSignal, formattedTargetPrice } = viewModel;
@@ -24,7 +24,7 @@ const ReportItem = ({ report, isFavorite, isSummaryExpanded, onToggleFavorite, o
     <div className={`report-container-item ${hasAnySummary ? 'has-summary' : ''}`} key={id}>
       <div className="report">
         <div className="report-content">
-          <ReportItemMetadata firm={firm} title={title} finalLink={finalLink} showFirmTag={showFirmTag} hasSummary={hasSummary} hasFnguideSummary={hasFnguideSummary} onToggleSummary={onToggleSummary} id={id} hasDirectSignal={hasDirectSignal} hasUnverifiedValuation={hasUnverifiedValuation} rating={rating} formattedTargetPrice={formattedTargetPrice} revisionType={revisionType} reportType={reportType} stockTickers={stockTickers} visibleTags={visibleTags} />
+          <ReportItemMetadata firm={firm} title={title} finalLink={finalLink} showFirmTag={showFirmTag} hasSummary={hasSummary} hasFnguideSummary={hasFnguideSummary} onToggleSummary={onToggleSummary} id={id} hasDirectSignal={hasDirectSignal} hasUnverifiedValuation={hasUnverifiedValuation} rating={rating} formattedTargetPrice={formattedTargetPrice} revisionType={revisionType} reportType={reportType} stockTickers={stockTickers} visibleTags={visibleTags} onTagClick={onTagClick} />
           {isAdmin && <ReportItemAdminSummary id={id} report={report} hasSummary={hasSummary} isSummaryRequested={isSummaryRequested} isSummaryCompleted={isSummaryCompleted} onTriggerSummary={onTriggerSummary} showToast={showToast} />}
           <ReportItemSummaryButtons id={id} hasSummary={hasSummary} hasFnguideSummary={hasFnguideSummary} expanded={isSummaryExpanded} onToggle={onToggleSummary} />
           <div className="report-footer">
