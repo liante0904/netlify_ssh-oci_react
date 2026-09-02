@@ -1,5 +1,5 @@
 import React from 'react';
-import ReportItem from './ReportItem';
+import ReportGroupItems from './ReportGroupItems';
 import TagCloud from './TagCloud';
 import { getReportsArray, getCompanyGroups } from '../../utils/reportGroupModel';
 
@@ -68,27 +68,7 @@ function ReportGroup({
         {isTimeSort ? (
           /* 평탄화 리스트 (시간순, 즐겨찾기, 또는 데이터가 아직 배열인 경우) */
           <div className="report-wrapper">
-            {reportsArray
-              .filter(r => !isFavoritesPage || favorites[r.id])
-              .filter(r => !isAiSummary || hasSummaryContent(r))
-              .map(report => (
-                <ReportItem 
-                  key={report.id}
-                  report={report}
-                  isFavorite={!!favorites[report.id]}
-                  isSummaryExpanded={expandedSummaries[report.id]}
-                  onToggleFavorite={onToggleFavorite}
-                  onToggleSummary={onToggleSummary}
-                  onOpenShareMenu={onOpenShareMenu}
-                  showFirmTag={true}
-                  onWriterClick={onWriterClick}
-                  isAdmin={isAdmin}
-                  onTriggerSummary={onTriggerSummary}
-                  summaryRequestedIds={summaryRequestedIds}
-                  summaryCompletedIds={summaryCompletedIds}
-                />
-              ))
-            }
+            <ReportGroupItems reports={reportsArray} isFavoritesPage={isFavoritesPage} favorites={favorites} isAiSummary={isAiSummary} hasSummaryContent={hasSummaryContent} showFirmTag expandedSummaries={expandedSummaries} onToggleFavorite={onToggleFavorite} onToggleSummary={onToggleSummary} onOpenShareMenu={onOpenShareMenu} onWriterClick={onWriterClick} isAdmin={isAdmin} onTriggerSummary={onTriggerSummary} summaryRequestedIds={summaryRequestedIds} summaryCompletedIds={summaryCompletedIds} />
           </div>
         ) : (
           /* 증권사별 그룹화 리스트 (회사별 모드 + 데이터가 객체인 경우) */
@@ -101,25 +81,7 @@ function ReportGroup({
                 {firm}
               </div>
               <div className={`report-wrapper ${collapsedFirms[date]?.[firm] ? 'collapsed' : ''}`}>
-                {Array.isArray(firmReports) ? firmReports
-                  .filter(r => !isAiSummary || hasSummaryContent(r))
-                  .map(report => (
-                  <ReportItem 
-                     key={report.id}
-                     report={report}
-                     isFavorite={!!favorites[report.id]}
-                     isSummaryExpanded={expandedSummaries[report.id]}
-                     onToggleFavorite={onToggleFavorite}
-                     onToggleSummary={onToggleSummary}
-                     onOpenShareMenu={onOpenShareMenu}
-                     showFirmTag={false}
-                     onWriterClick={onWriterClick}
-                     isAdmin={isAdmin}
-                     onTriggerSummary={onTriggerSummary}
-                     summaryRequestedIds={summaryRequestedIds}
-                     summaryCompletedIds={summaryCompletedIds}
-                  />
-                )) : null}
+                {Array.isArray(firmReports) ? <ReportGroupItems reports={firmReports} favorites={favorites} isAiSummary={isAiSummary} hasSummaryContent={hasSummaryContent} showFirmTag={false} expandedSummaries={expandedSummaries} onToggleFavorite={onToggleFavorite} onToggleSummary={onToggleSummary} onOpenShareMenu={onOpenShareMenu} onWriterClick={onWriterClick} isAdmin={isAdmin} onTriggerSummary={onTriggerSummary} summaryRequestedIds={summaryRequestedIds} summaryCompletedIds={summaryCompletedIds} /> : null}
               </div>
             </div>
           ))
