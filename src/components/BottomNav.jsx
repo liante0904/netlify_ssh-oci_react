@@ -25,9 +25,9 @@ function BottomNav({ isNavVisible, onHomeClick }) {
 
   return (
     <nav className={`bottom-nav ${isNavVisible ? '' : 'hidden'}`}>
-      <button className="nav-button" onClick={() => {
-        onHomeClick();
-        navigate('/');
+      <button type="button" className="nav-button" onClick={() => {
+        onHomeClick?.();
+        navigate('/', { replace: true });
       }} title="홈">
         <span>🏠</span>
         <small>홈</small>

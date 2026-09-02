@@ -73,9 +73,13 @@ function AppContent() {
   };
 
   const handleHomeClick = () => {
-    setSearchQuery({ query: '', category: '', board: null });
-    if (isTopMenuOpen) setIsTopMenuOpen(false);
-    if (isMenuOpen) setIsMenuOpen(false);
+    const emptySearch = { query: '', category: '', board: null, companyOrder: null };
+    setSearchQuery(emptySearch);
+    setPendingSearch(emptySearch);
+    setIsSearchOpen(false);
+    setIsTopMenuOpen(false);
+    setIsMenuOpen(false);
+    setViewerReport(null);
   };
 
   return (
