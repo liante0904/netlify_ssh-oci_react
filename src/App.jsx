@@ -1,23 +1,16 @@
-import React, { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import Header from './components/Header';
 import SearchOverlay from './components/SearchOverlay';
-import HomeDashboard from './components/HomeDashboard';
+import AppRoutes from './components/AppRoutes';
 import BottomNav from './components/BottomNav';
 import { ReportProvider } from './context/ReportContext';
 import { useReport } from './context/useReport';
 import { useAppLayout } from './hooks/useAppLayout';
 import PDFViewerModal from './components/report/PDFViewerModal';
-import RequireAuth from './components/RequireAuth';
 import NetworkStatusBanner from './components/NetworkStatusBanner';
-import NotFoundPage from './components/NotFoundPage';
 import LoadingSkeleton from './components/LoadingSkeleton';
 import './index.css';
-
-const ReportList = lazy(() => import('./components/ReportList'));
-const SearchPageNew = lazy(() => import('./components/SearchPageNew'));
-const AdminConsole = lazy(() => import('./components/AdminConsole'));
-const FnGuideList = lazy(() => import('./components/FnGuideList'));
 
 function RouteLoadingFallback() {
   return <LoadingSkeleton variant="list" rows={7} label="화면 불러오는 중" />;
@@ -104,20 +97,7 @@ function AppContent() {
         }}
       >
         <Suspense fallback={<RouteLoadingFallback />}>
-          <Routes>
-          {/* 메인 페이지만 공개, 나머지는 인증 필요 */}
-          <Route path="/" element={<HomeDashboard />} />
-          <Route path="/recent" element={<RequireAuth><ReportList key="recent" onWriterClick={handleWriterSearch} /></RequireAuth>} />
-          <Route path="/global" element={<RequireAuth><ReportList key="global" onWriterClick={handleWriterSearch} /></RequireAuth>} />
-          <Route path="/industry" element={<RequireAuth><ReportList key="industry" onWriterClick={handleWriterSearch} /></RequireAuth>} />
-          <Route path="/favorites" element={<RequireAuth><ReportList key="favorites" onWriterClick={handleWriterSearch} /></RequireAuth>} />
-          <Route path="/outlook" element={<RequireAuth><ReportList key="outlook" onWriterClick={handleWriterSearch} /></RequireAuth>} />
-          <Route path="/ai-summary" element={<RequireAuth><ReportList key="ai-summary" onWriterClick={handleWriterSearch} /></RequireAuth>} />
-          <Route path="/fnguide" element={<RequireAuth><FnGuideList /></RequireAuth>} />
-          <Route path="/admin-console" element={<RequireAuth><AdminConsole /></RequireAuth>} />
-          <Route path="/search-new" element={<RequireAuth><SearchPageNew /></RequireAuth>} />
-          <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <AppRoutes onWriterClick={handleWriterSearch} />
         </Suspense>
       </main>
       <SearchOverlay />
