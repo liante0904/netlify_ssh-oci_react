@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useReport } from '../context/useReport';
 import './BottomNav.css';
 
@@ -24,19 +24,16 @@ function BottomNav({ isNavVisible, onHomeClick }) {
   };
 
   const handleHomeClick = (event) => {
-    event.preventDefault();
     event.stopPropagation();
-    // Route first so a stale overlay/report state cannot block the home transition.
-    navigate('/', { replace: true });
     onHomeClick?.();
   };
 
   return (
     <nav className={`bottom-nav ${isNavVisible ? '' : 'hidden'}`}>
-      <button type="button" className="nav-button" onClick={handleHomeClick} title="홈" aria-label="홈으로 이동">
+      <Link className="nav-button" to="/" replace onClick={handleHomeClick} title="홈" aria-label="홈으로 이동">
         <span>🏠</span>
         <small>홈</small>
-      </button>
+      </Link>
       <button type="button" className="nav-button" onClick={handleSearchClick} title="검색 및 필터">
         <span>🔍</span>
         <small>검색</small>
