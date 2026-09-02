@@ -9,11 +9,11 @@ import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import { CONFIG } from '../constants/config';
 import { getReportSectionByPath } from '../constants/reportSections';
 import { isDsReport, prefetchPdf } from '../utils/reportLinks';
-import { normalizeReportItem } from '../utils/reportNormalizer';
 import { hasReportSummary, flattenReportGroup, datesWithReports } from '../utils/reportCollection';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import { useReportListInteractions } from '../hooks/useReportListInteractions';
 import { useSearchSummaryActions } from '../hooks/useSearchSummaryActions';
+import { useReportFavorites } from '../hooks/useReportFavorites';
 import ReportListContent from './report/ReportListContent';
 import './ReportList.css';
 
@@ -31,10 +31,10 @@ export default function ReportList({ onWriterClick }) {
   const { triggerSummary } = useSummaryMutation();
   const [outlookYear, setOutlookYear] = useState(null);
   const initialFavorites = useState(() => { try { return JSON.parse(localStorage.getItem('report_favorites') || '{}'); } catch { return {}; } })[0];
-  const [favoriteReports, setFavoriteReports] = useState(null);
   const [share, setShare] = useState({ isOpen: false, report: null, position: { top: 0, left: 0 } });
   const { reports, isLoading, hasMore, offset, fetchReports, error, retry } = useReportFetch(searchQuery, location.pathname, outlookYear, sortBy);
   const { summaryRequestedIds, summaryCompletedIds, handleTriggerSummary, reset: resetSummary } = useSearchSummaryActions(triggerSummary);
+  const favoriteReports = useReportFavorites({ favoriteItems, isFavoritesPage });
   const displayReports = isFavoritesPage && favoriteReports ? favoriteReports : reports;
   const sortedDates = datesWithReports(displayReports);
   const filteredDates = sortedDates.filter((date) => flattenReportGroup(displayReports[date]).some((item) => !isAiSummary || hasReportSummary(item)));
@@ -42,7 +42,6 @@ export default function ReportList({ onWriterClick }) {
   const { dateToggles: collapsedDates, firmToggles: collapsedFirms, summaryToggles: expandedSummaries, favorites, setFavorites, reset, toggleDate, toggleFirm, toggleSummary, toggleFavorite } = useReportListInteractions({ dates: sortedDates, hasMore, isLoading, fetchMore: fetchReports, revealEnabled: isRecent, initialFavorites, mutateFavorite });
   useEffect(() => { if (!telegramUser || localStorage.getItem('report_favorites_synced')) return; const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN); if (!token) return; const ids = Object.keys(favorites).filter((id) => favorites[id]).map(Number); if (ids.length) syncFavoriteIds(ids); localStorage.setItem('report_favorites_synced', '1'); }, [favorites, syncFavoriteIds, telegramUser]);
   useEffect(() => { if (!favoriteItems.length) return; setFavorites((current) => { const next = { ...current }; favoriteItems.forEach((item) => { next[item.report_id] = true; }); localStorage.setItem('report_favorites', JSON.stringify(next)); return next; }); }, [favoriteItems, setFavorites]);
-  useEffect(() => { if (!isFavoritesPage || !favoriteItems.length) { if (isFavoritesPage) setFavoriteReports({}); return; } const grouped = {}; favoriteItems.map(normalizeReportItem).filter(Boolean).forEach((item) => { grouped[item.date] ||= []; if (!grouped[item.date].some((row) => row.id === item.id)) grouped[item.date].push(item); }); setFavoriteReports(grouped); }, [favoriteItems, isFavoritesPage]);
   useEffect(() => { reset(); resetSummary(); window.scrollTo(0, 0); }, [location.pathname, reset, resetSummary, searchQuery, sortBy]);
   const openShare = useCallback((event, report) => { const rect = event.currentTarget.getBoundingClientRect(); setShare({ isOpen: true, report: buildShareMenuData(report), position: { top: rect.bottom, left: rect.left + rect.width / 2 } }); }, []);
   const handleTagClick = (keyword, isSector) => handleSearch({ query: keyword, category: isSector ? 'sector' : 'title' });
