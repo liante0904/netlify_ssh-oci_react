@@ -62,27 +62,6 @@ body {
   }
 }
 
-.menu-item {
-  color: var(--primary-color); 
-  font-weight: bold; 
-  text-decoration: none; 
-  font-size: 1.1em; 
-  margin: 10px 0;
-  padding: 10px 15px; 
-  border-radius: var(--radius-md); 
-  background-color: var(--background-color); 
-  text-align: center;
-  transition: var(--transition-smooth);
-  width: 100%; 
-  box-sizing: border-box; 
-  display: block;
-}
-
-.menu-item:hover {
-  background-color: var(--secondary-background-color);
-  transform: translateY(-1px);
-}
-
 .menu-title {
   font-size: 1.2em; 
   font-weight: bold; 
