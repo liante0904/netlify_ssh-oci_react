@@ -11,7 +11,7 @@ describe('TelegramAuth', () => {
     const { container } = render(<TelegramAuth telegramUser={{ id: 7, first_name: '신승훈' }} />);
 
     expect(container.querySelector('.user-name').textContent).toContain('신승훈님');
-    expect(screen.queryByRole('button', { name: /내 설정/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /내 설정/ })).toBeTruthy();
     expect(screen.queryByRole('button', { name: /화면 모드/ })).toBeNull();
   });
 

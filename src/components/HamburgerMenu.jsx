@@ -17,6 +17,7 @@ function HamburgerMenu({
   boards = [],
   selectedBoard,
   handleBoardChange,
+  keywordState,
 }) {
   const { telegramUser, logout, theme, themePreference, toggleTheme } = useReport();
   const {
@@ -27,6 +28,13 @@ function HamburgerMenu({
 
   const handleMenuItemClick = (key) => {
     handleHeaderClick(key);
+  };
+
+  const handleOpenKeywordOverlay = (event) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    if (isOpen) toggleMenu();
+    keywordState.openKeywordOverlay();
   };
 
   return (
@@ -50,6 +58,7 @@ function HamburgerMenu({
                 loginWithTelegram={loginWithTelegram}
                 loginWithDevBypass={loginWithDevBypass}
                 handleLogout={logout}
+                toggleKeywordOverlay={handleOpenKeywordOverlay}
               />
             </section>
 
