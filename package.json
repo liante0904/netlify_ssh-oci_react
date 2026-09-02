@@ -13,7 +13,7 @@
     "preview": "vite preview",
     "test": "node test/run-all.js && npm run test:components",
     "test:unit": "node test/unit/utils.test.js && node test/unit/proxy-ds.test.js && jest test/unit/AsyncErrorState.test.jsx --runInBand",
-    "test:components": "jest --runInBand test/unit/ReportList.test.js test/unit/ReportItem.test.js test/unit/AsyncErrorState.test.jsx test/unit/PDFViewerModal.test.jsx",
+    "test:components": "jest --runInBand test/unit/ReportList.test.js test/unit/ReportItem.test.js test/unit/AsyncErrorState.test.jsx test/unit/PDFViewerModal.test.jsx test/unit/TelegramAuth.test.jsx",
     "test:integration": "node test/integration/api.test.js",
     "test:e2e": "node test/admin-status.test.js",
     "test:coverage": "node test/verify-api-coverage.js",
