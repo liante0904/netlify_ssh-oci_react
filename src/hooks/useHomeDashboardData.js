@@ -4,7 +4,7 @@ import { CONFIG } from '../constants/config';
 import { HOME_SECTIONS } from '../constants/reportSections';
 import { request } from '../utils/api';
 
-const PREVIEW_LIMIT = 5;
+const PREVIEW_LIMIT = 3;
 
 export function useHomeDashboardData(normalizeFnGuideItem, normalizeReportPreview) {
   const queryClient = useQueryClient();
