@@ -1,0 +1,1 @@
+@media (max-width: 820px) { .home-dashboard { width: min(100% - 24px, 600px); } .home-section-grid { grid-template-columns: 1fr; gap: 16px; } .home-section-card, .home-section-card.wide { grid-column: auto; min-height: 250px; padding: 18px; } .home-section-heading { align-items: flex-start; } .home-section-heading button { padding: 8px 12px; font-size: 0.82rem; } }
