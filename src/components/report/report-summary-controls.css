@@ -1,0 +1,8 @@
+.summary-toggle-btn { background: none; border: none; color: var(--primary-color); cursor: pointer; display: flex; align-items: center; gap: 4px; padding: 6px 12px; border-radius: 20px; font-size: 0.82em; font-weight: bold; transition: opacity 0.2s; }
+.summary-toggle-btn:hover { opacity: 0.8; }
+.summary-toggle-btn .chevron-icon { transition: transform 0.3s ease; }
+.summary-toggle-btn.active .chevron-icon { transform: rotate(180deg); }
+.summary-toggle-btn.ai-summary-btn { background: rgba(110, 142, 251, 0.1); color: #6e8efb; border: 1px solid rgba(110, 142, 251, 0.3); }
+.summary-toggle-btn.ai-summary-btn.active { background: linear-gradient(135deg, #6e8efb, #a777e3); color: #fff; }
+.summary-toggle-btn.fnguide-summary-btn { background: rgba(46, 125, 50, 0.1); color: #2e7d32; border: 1px solid rgba(46, 125, 50, 0.3); }
+.summary-toggle-btn.fnguide-summary-btn.active { background: #2e7d32; color: #fff; }
