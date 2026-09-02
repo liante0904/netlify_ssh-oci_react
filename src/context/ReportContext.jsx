@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useBoards } from '../hooks/useBoards';
 import { useLlmVisibilityMutation } from '../hooks/useLlmVisibilityMutation';
@@ -13,6 +13,8 @@ import {
 import ReportContext from './reportContext';
 import { createReportContextValue } from './reportContextValue';
 import { useTelegramSession } from '../hooks/useTelegramSession';
+
+const getSystemTheme = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 
 export function ReportProvider({ children }) {
   const [activeSearch, setActiveSearch] = useState(createEmptySearchSelection());
@@ -57,19 +59,41 @@ export function ReportProvider({ children }) {
   const companyIndex = getSelectedCompanyOrder(activeSearch, null);
   const { boards, isLoadingBoards } = useBoards(companyIndex);
 
+  const [themePreference, setThemePreference] = useState(() => localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) || 'system');
+  const skipThemePersistRef = useRef(false);
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
-    const userPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    return savedTheme || (userPrefersDark ? 'dark' : 'light');
+    const preference = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) || 'system';
+    return preference === 'system' ? getSystemTheme() : preference;
   });
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem(CONFIG.STORAGE_KEYS.THEME, theme);
-  }, [theme]);
+    if (!telegramUser?.id) return;
+    const savedTheme = localStorage.getItem(`${CONFIG.STORAGE_KEYS.THEME}:${telegramUser.id}`);
+    if (savedTheme) {
+      skipThemePersistRef.current = true;
+      setThemePreference(savedTheme);
+    }
+  }, [telegramUser?.id]);
+
+  useEffect(() => {
+    if (skipThemePersistRef.current) {
+      skipThemePersistRef.current = false;
+      return undefined;
+    }
+    const resolvedTheme = themePreference === 'system' ? getSystemTheme() : themePreference;
+    setTheme(resolvedTheme);
+    document.documentElement.setAttribute('data-theme', resolvedTheme);
+    const storageKey = telegramUser?.id ? `${CONFIG.STORAGE_KEYS.THEME}:${telegramUser.id}` : CONFIG.STORAGE_KEYS.THEME;
+    localStorage.setItem(storageKey, themePreference);
+    if (themePreference !== 'system') return undefined;
+    const media = window.matchMedia?.('(prefers-color-scheme: dark)');
+    const handleSystemTheme = () => setTheme(media.matches ? 'dark' : 'light');
+    media?.addEventListener('change', handleSystemTheme);
+    return () => media?.removeEventListener('change', handleSystemTheme);
+  }, [telegramUser?.id, themePreference]);
 
   const toggleTheme = useCallback(() => {
-    setTheme(prevTheme => (prevTheme === 'light' ? 'dark' : 'light'));
+    setThemePreference((preference) => preference === 'system' ? 'light' : preference === 'light' ? 'dark' : 'system');
   }, []);
 
   const handleSearch = useCallback(({ query, category, board = null, companyOrder = null }) => {
@@ -116,7 +140,8 @@ export function ReportProvider({ children }) {
     firm_names: companyNames,
     companyNames,
     theme,
-    setTheme,
+    themePreference,
+    setTheme: setThemePreference,
     toggleTheme,
     telegramUser,
     setTelegramUser,
@@ -140,6 +165,7 @@ export function ReportProvider({ children }) {
     viewerReport,
     companyNames,
     theme,
+    themePreference,
     telegramUser,
     isVerifying,
     authStatus,

@@ -1,0 +1,4 @@
+.account-settings-btn { display:flex; align-items:center; gap:10px; width:100%; margin-top:12px; padding:12px; border:1px solid var(--glass-border); border-radius:var(--radius-md); background:var(--secondary-background-color); color:var(--text-color); text-align:left; cursor:pointer; }
+.account-settings-btn:hover { border-color:var(--primary-color); background:color-mix(in srgb, var(--primary-color) 8%, var(--secondary-background-color)); }
+.account-settings-btn > span:last-child { display:flex; flex-direction:column; gap:3px; }
+.account-settings-btn small { color:var(--text-muted); }

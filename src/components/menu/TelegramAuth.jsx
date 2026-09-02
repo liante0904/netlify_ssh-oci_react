@@ -1,6 +1,7 @@
 import React from 'react';
 import { DEV_AUTH_ENABLED } from '../../utils/devAuth';
 import './TelegramAuth.css';
+import './AccountSettings.css';
 
 function TelegramAuth({
   telegramUser,
@@ -8,6 +9,7 @@ function TelegramAuth({
   loginWithTelegram,
   loginWithDevBypass,
   handleLogout,
+  toggleKeywordOverlay,
 }) {
   const botName = import.meta.env.VITE_TELEGRAM_BOT_NAME || 'ebest_noti_bot';
 
@@ -52,6 +54,10 @@ function TelegramAuth({
               <span className="icon">🚀</span> 텔레그램 봇 연결하기 (최초 1회 필수)
             </a>
           </div>
+          <button type="button" className="account-settings-btn" onClick={toggleKeywordOverlay}>
+            <span className="menu-setting-icon">🔔</span>
+            <span><strong>내 설정</strong><small>키워드와 텔레그램 알림 관리</small></span>
+          </button>
         </div>
       )}
     </div>
