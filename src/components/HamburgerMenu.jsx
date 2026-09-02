@@ -60,12 +60,15 @@ function HamburgerMenu({
                 loginWithDevBypass={loginWithDevBypass}
                 handleLogout={logout}
                 toggleKeywordOverlay={handleOpenKeywordOverlay}
+                theme={theme}
+                themePreference={themePreference}
+                toggleTheme={toggleTheme}
               />
             </section>
 
             <HamburgerNavigation onNavigate={handleMenuItemClick} />
             <HamburgerFilters selectedCompany={selectedCompany} onCompanyChange={handleCompanyChange} boards={boards} selectedBoard={selectedBoard} onBoardChange={handleBoardChange} closeMenu={toggleMenu} />
-            <HamburgerSettings theme={theme} themePreference={themePreference} onToggleTheme={toggleTheme} />
+            {!telegramUser && <HamburgerSettings theme={theme} themePreference={themePreference} onToggleTheme={toggleTheme} />}
 
             <AdminSection isAdmin={telegramUser?.is_admin} />
           </div>

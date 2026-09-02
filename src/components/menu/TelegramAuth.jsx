@@ -10,6 +10,9 @@ function TelegramAuth({
   loginWithDevBypass,
   handleLogout,
   toggleKeywordOverlay,
+  theme,
+  themePreference,
+  toggleTheme,
 }) {
   const botName = import.meta.env.VITE_TELEGRAM_BOT_NAME || 'ebest_noti_bot';
 
@@ -57,6 +60,10 @@ function TelegramAuth({
           <button type="button" className="account-settings-btn" onClick={toggleKeywordOverlay}>
             <span className="menu-setting-icon">🔔</span>
             <span><strong>내 설정</strong><small>키워드와 텔레그램 알림 관리</small></span>
+          </button>
+          <button type="button" className="account-settings-btn" onClick={toggleTheme}>
+            <span className="menu-setting-icon">{themePreference === 'system' ? '🖥️' : theme === 'light' ? '🌙' : '☀️'}</span>
+            <span><strong>화면 모드</strong><small>{themePreference === 'system' ? `시스템 설정 (${theme === 'dark' ? '다크' : '라이트'})` : `${theme === 'light' ? '라이트' : '다크'} 모드 · 다음: ${theme === 'light' ? '다크' : '시스템'}`}</small></span>
           </button>
         </div>
       )}
