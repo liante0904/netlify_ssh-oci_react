@@ -3,7 +3,6 @@ import SearchFilters from './search/SearchFilters';
 import SearchResults from './search/SearchResults';
 import { useReport } from '../context/useReport';
 import { useReportFetch } from '../hooks/useReportFetch';
-import { CONFIG } from '../constants/config';
 import { buildShareMenuData } from '../utils/shareMenuData';
 import { useBoards } from '../hooks/useBoards';
 import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
@@ -11,19 +10,9 @@ import { useSummaryMutation } from '../hooks/useSummaryMutation';
 import { countReportGroups, datesWithReports, hasReportSummary } from '../utils/reportCollection';
 import { useReportListInteractions } from '../hooks/useReportListInteractions';
 import { useSearchFilters } from '../hooks/useSearchFilters';
+import { useSearchSummaryActions } from '../hooks/useSearchSummaryActions';
 import './SearchPageNew.css';
 import './search/SearchResults.css';
-
-const SUMMARY_NOTIFICATION_EVENT = 'ssh-summary-notification';
-
-function emitSummaryNotification(detail) {
-  window.dispatchEvent(new CustomEvent(SUMMARY_NOTIFICATION_EVENT, {
-    detail: {
-      created_at: new Date().toISOString(),
-      ...detail,
-    },
-  }));
-}
 
 function SearchPageNew() {
   const { telegramUser } = useReport();
@@ -57,8 +46,6 @@ function SearchPageNew() {
     }
   })[0];
 
-  const [summaryRequestedIds, setSummaryRequestedIds] = useState(new Set());
-  const [summaryCompletedIds, setSummaryCompletedIds] = useState(new Set());
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -68,12 +55,13 @@ function SearchPageNew() {
   const sortedDates = datesWithReports(reports);
   const filteredSortedDates = isAiSummary ? datesWithReports(reports, hasSummaryContent) : sortedDates;
   const { dateToggles, firmToggles, summaryToggles, favorites, reset, toggleDate, toggleFirm, toggleSummary, toggleFavorite } = useReportListInteractions({ dates: filteredSortedDates, hasMore, isLoading, fetchMore: fetchReports, initialFavorites, mutateFavorite });
+  const { summaryRequestedIds, summaryCompletedIds, handleTriggerSummary, reset: resetSummary } = useSearchSummaryActions(triggerSummary);
 
   // 검색 조건 변경 시 날짜 토글 및 요약 초기화
   useEffect(() => {
     reset();
-    setSummaryRequestedIds(new Set());
-  }, [reset, searchQuery, selectedRoute, selectedSort]);
+    resetSummary();
+  }, [reset, resetSummary, searchQuery, selectedRoute, selectedSort]);
 
 
   const handleOpenShareMenu = useCallback((e, report) => {
@@ -85,70 +73,6 @@ function SearchPageNew() {
     setSelectedReport(buildShareMenuData(report));
     setIsShareOpen(true);
   }, []);
-
-  const handleTriggerSummary = useCallback(async (reportId, engine = 'deepseek', force = false, report = null) => {
-    const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN);
-    if (!token) return;
-    const title = report?.title || report?.article_title || `리포트 #${reportId}`;
-    const firm = report?.firm || report?.firm_nm || '';
-    const modelLabel = engine === 'ag' ? 'Gemini' : 'DeepSeek';
-
-    /* 기존 주석 유지: 중복 요청 방지 (force=true일 때는 우회를 위해 상태 초기화) */
-    if (force) {
-      setSummaryCompletedIds(prev => {
-        const next = new Set(prev);
-        next.delete(reportId);
-        return next;
-      });
-      setSummaryRequestedIds(prev => {
-        const next = new Set(prev);
-        next.delete(reportId);
-        return next;
-      });
-    } else if (summaryRequestedIds.has(reportId)) {
-      return;
-    }
-
-    setSummaryRequestedIds(prev => new Set(prev).add(reportId));
-    emitSummaryNotification({
-      report_id: reportId,
-      article_title: title,
-      firm_nm: firm,
-      summary_model: engine === 'ag' ? 'gemini' : engine,
-      status: 'requested',
-      message: `${modelLabel} 요약 요청을 접수했습니다: ${title}`,
-    });
-
-    try {
-      const result = await triggerSummary({ reportId, engine, force });
-      if (result?.status === 'success' || result?.status === 'skipped') {
-        setSummaryCompletedIds(prev => new Set(prev).add(reportId));
-        emitSummaryNotification({
-          report_id: reportId,
-          article_title: title,
-          firm_nm: firm,
-          summary_model: engine === 'ag' ? 'gemini' : engine,
-          status: result.status === 'skipped' ? 'skipped' : 'completed',
-          message: `${modelLabel} 요약이 ${result.status === 'skipped' ? '이미 완료되어 있습니다' : '완료되었습니다'}: ${title}`,
-        });
-      }
-    } catch (error) {
-      console.error('[Admin] ❌ 요약 실패:', error.message);
-      setSummaryRequestedIds(prev => {
-        const next = new Set(prev);
-        next.delete(reportId);
-        return next;
-      });
-      emitSummaryNotification({
-        report_id: reportId,
-        article_title: title,
-        firm_nm: firm,
-        summary_model: engine === 'ag' ? 'gemini' : engine,
-        status: 'failed',
-        message: `${modelLabel} 요약 요청에 실패했습니다: ${title}`,
-      });
-    }
-  }, [summaryRequestedIds, triggerSummary]);
 
   const handleLocalWriterClick = useCallback((writer) => {
     setCategory('writer');
