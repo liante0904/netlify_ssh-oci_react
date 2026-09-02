@@ -5,7 +5,8 @@ import './PDFViewerModal.css';
 import PDFPageList from './PDFPageList';
 import PDFPageCanvas from './PDFPageCanvas';
 import { usePdfDocument } from '../../hooks/usePdfDocument';
-import { usePdfModalLifecycle, usePdfViewport } from '../../hooks/usePdfModalLifecycle';
+import { usePdfModalLifecycle } from '../../hooks/usePdfModalLifecycle';
+import { usePdfViewport } from '../../hooks/usePdfViewport';
 
 // ---------------------------------------------------------------------------
 // PDFViewerModal
