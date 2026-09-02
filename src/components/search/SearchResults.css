@@ -1,3 +1,8 @@
+/* Search results render the same report cards as ReportList. Keep the shared
+   entrypoint here so refactoring the report styles cannot leave this route
+   without its card/date/mobile rules. */
+@import '../ReportList.css';
+
 .search-results-section { margin-top: 28px; }
 .results-header { margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid var(--glass-border); display: flex; align-items: center; justify-content: space-between; }
 .results-header h3 { margin: 0; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.3px; }
