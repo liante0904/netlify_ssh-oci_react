@@ -1,6 +1,11 @@
 /* Account popover owns profile and account actions. */
 .account-popover-profile {
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  border-bottom: 1px solid var(--glass-border);
 }
 
 .account-popover-avatar {
