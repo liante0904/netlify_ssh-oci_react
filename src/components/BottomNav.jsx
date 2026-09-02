@@ -23,24 +23,29 @@ function BottomNav({ isNavVisible, onHomeClick }) {
     setIsTopMenuOpen(true);
   };
 
+  const handleHomeClick = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    // Route first so a stale overlay/report state cannot block the home transition.
+    navigate('/', { replace: true });
+    onHomeClick?.();
+  };
+
   return (
     <nav className={`bottom-nav ${isNavVisible ? '' : 'hidden'}`}>
-      <button type="button" className="nav-button" onClick={() => {
-        onHomeClick?.();
-        navigate('/', { replace: true });
-      }} title="홈">
+      <button type="button" className="nav-button" onClick={handleHomeClick} title="홈" aria-label="홈으로 이동">
         <span>🏠</span>
         <small>홈</small>
       </button>
-      <button className="nav-button" onClick={handleSearchClick} title="검색 및 필터">
+      <button type="button" className="nav-button" onClick={handleSearchClick} title="검색 및 필터">
         <span>🔍</span>
         <small>검색</small>
       </button>
-      <button className="nav-button" onClick={handleFnGuideClick} title="종목요약">
+      <button type="button" className="nav-button" onClick={handleFnGuideClick} title="종목요약">
         <span>📄</span>
         <small>종목요약</small>
       </button>
-      <button className="nav-button" onClick={handleMenuClick} title="메뉴">
+      <button type="button" className="nav-button" onClick={handleMenuClick} title="메뉴">
         <span>☰</span>
         <small>메뉴</small>
       </button>
