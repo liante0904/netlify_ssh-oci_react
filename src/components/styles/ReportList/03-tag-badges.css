@@ -1,0 +1,12 @@
+/* Report tags and enricher signal badges. */
+.report-tags { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 0; }
+.report-signals { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0; }
+.signal { font-size: 0.68em; padding: 2px 6px; border-radius: var(--radius-sm); font-weight: 700; white-space: nowrap; }
+.signal-rating, .signal-revision { color: #0d47a1; background: #e3f2fd; }
+.signal-target { color: #1b5e20; background: #e8f5e9; }
+.signal-type, .signal-ticker { color: #4a148c; background: #f3e5f5; }
+.tag { font-size: 0.65em; padding: 2px 6px; border-radius: var(--radius-sm); font-weight: 600; white-space: nowrap; line-height: 1.5; }
+.tag-sector { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+.tag-stock { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
+.tag-keyword { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
+.fnguide-badge-title { background-color: #2e7d32; margin-left: 6px; }

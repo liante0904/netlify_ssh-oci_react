@@ -1,6 +1,7 @@
 /* Section entrypoint. Import order is intentionally preserved. */
 @import './styles/ReportList/01-section-1.css';
 @import './styles/ReportList/02-mobile-stack.css';
+@import './styles/ReportList/03-tag-badges.css';
 @import './styles/ReportList/03-tag-badges-enricher.css';
 @import './styles/ReportList/04-outlook-filter.css';
 @import './styles/ReportList/05-tag-cloud.css';
