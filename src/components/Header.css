@@ -1,12 +1,12 @@
 /* Section entrypoint. Import order is intentionally preserved. */
-@import './styles/Header/01-헤더-스타일.css';
-@import './styles/Header/02-첫-줄-스타일.css';
-@import './styles/Header/03-제목-스타일.css';
-@import './styles/Header/04-햄버거-메뉴-스타일.css';
-@import './styles/Header/05-두-번째-줄-네비게이션-스타일.css';
-@import './styles/Header/06-네비게이션-버튼-스타일.css';
-@import './styles/Header/07-텔레그램-로그인-배지.css';
-@import './styles/Header/08-미로그인-상태-배지.css';
-@import './styles/Header/09-태블릿-작은-데스크탑.css';
-@import './styles/Header/10-데스크탑-화면.css';
-@import './styles/Header/11-모바일-화면.css';
+@import './styles/Header/01-header.css';
+@import './styles/Header/02-top-row.css';
+@import './styles/Header/03-title.css';
+@import './styles/Header/04-hamburger.css';
+@import './styles/Header/05-secondary-nav.css';
+@import './styles/Header/06-nav-buttons.css';
+@import './styles/Header/07-account-badge.css';
+@import './styles/Header/08-logged-out-badge.css';
+@import './styles/Header/09-tablet.css';
+@import './styles/Header/10-desktop.css';
+@import './styles/Header/11-mobile.css';

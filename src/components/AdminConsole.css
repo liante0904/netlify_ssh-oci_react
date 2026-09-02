@@ -1,13 +1,13 @@
 /* Section entrypoint. Import order is intentionally preserved. */
-@import './styles/AdminConsole/01-관리자-콘솔-스타일.css';
+@import './styles/AdminConsole/01-console.css';
 @import './styles/AdminConsole/02-refresh-bar.css';
-@import './styles/AdminConsole/03-요약-카드-행.css';
-@import './styles/AdminConsole/04-섹션-공통.css';
-@import './styles/AdminConsole/05-pdf-아카이브-테이블.css';
-@import './styles/AdminConsole/06-증권사별-레코드-건수.css';
-@import './styles/AdminConsole/07-운영-상태.css';
-@import './styles/AdminConsole/08-아카이브-히스토리-차트-간단-바.css';
-@import './styles/AdminConsole/09-다크모드-대응.css';
+@import './styles/AdminConsole/03-summary-rows.css';
+@import './styles/AdminConsole/04-sections.css';
+@import './styles/AdminConsole/05-pdf-archive.css';
+@import './styles/AdminConsole/06-firm-records.css';
+@import './styles/AdminConsole/07-operations.css';
+@import './styles/AdminConsole/08-archive-history.css';
+@import './styles/AdminConsole/09-dark-mode.css';
 @import './styles/AdminConsole/10-log-browser.css';
 @import './styles/AdminConsole/11-log-viewer.css';
-@import './styles/AdminConsole/12-모바일-대응.css';
+@import './styles/AdminConsole/12-mobile.css';
