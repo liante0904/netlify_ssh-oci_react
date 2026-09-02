@@ -11,7 +11,7 @@
   overflow-x: hidden;
 }
 
-.keyword-delete-btn {
+.keyword-setup-overlay .keyword-delete-btn {
   background: none;
   border: none;
   color: var(--danger-color);
@@ -24,7 +24,7 @@
   transition: var(--transition-smooth);
 }
 
-.keyword-delete-btn:hover {
+.keyword-setup-overlay .keyword-delete-btn:hover {
   background-color: color-mix(in srgb, var(--danger-color) 12%, transparent);
 }
 
@@ -34,7 +34,7 @@
   color: #8e8e93;
 }
 
-.empty-icon {
+.keyword-setup-overlay .keyword-empty-state .empty-icon {
   font-size: 3em;
   margin-bottom: 15px;
   opacity: 0.5;
