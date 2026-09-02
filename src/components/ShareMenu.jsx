@@ -1,29 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useShareMenuPosition } from '../hooks/useShareMenuPosition';
 import './ShareMenu.css';
 
 function ShareMenu({ isOpen, onClose, reportData, position }) {
   const menuRef = useRef(null);
   const [showToast, setShowToast] = useState(false);
 
-  useEffect(() => {
-    if (isOpen && menuRef.current && position) {
-      const menu = menuRef.current;
-      const { top, left } = position;
-      
-      const menuWidth = 280; // 버튼이 늘어나서 너비를 조금 키웁니다
-      let adjustedLeft = left - menuWidth / 2;
-      
-      if (adjustedLeft + menuWidth > window.innerWidth - 20) {
-        adjustedLeft = window.innerWidth - menuWidth - 20;
-      }
-      if (adjustedLeft < 20) {
-        adjustedLeft = 20;
-      }
-
-      menu.style.top = `${top + 10}px`;
-      menu.style.left = `${adjustedLeft}px`;
-    }
-  }, [isOpen, position]);
+  useShareMenuPosition(menuRef, isOpen, position);
 
   useEffect(() => {
     if (!isOpen) setShowToast(false);

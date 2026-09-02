@@ -1,29 +1,7 @@
 import React from 'react';
 import ReportItem from './ReportItem';
 import TagCloud from './TagCloud';
-import { getFirmOrderByName } from '../../constants/firms';
-
-function getReportsArray(items) {
-  return Array.isArray(items) ? items : Object.values(items || {}).flat();
-}
-
-function getCompanyGroups(items) {
-  const grouped = new Map();
-
-  getReportsArray(items).forEach((report) => {
-    const firm = report.firm || 'Unknown';
-    if (!grouped.has(firm)) grouped.set(firm, []);
-    grouped.get(firm).push(report);
-  });
-
-  return Array.from(grouped.entries()).sort(([firmA], [firmB]) => {
-    const orderA = getFirmOrderByName(firmA);
-    const orderB = getFirmOrderByName(firmB);
-    const normalizedA = orderA === null ? Number.MAX_SAFE_INTEGER : orderA;
-    const normalizedB = orderB === null ? Number.MAX_SAFE_INTEGER : orderB;
-    return normalizedA - normalizedB || firmA.localeCompare(firmB, 'ko');
-  });
-}
+import { getReportsArray, getCompanyGroups } from '../../utils/reportGroupModel';
 
 function ReportGroup({ 
   date, 
