@@ -1,0 +1,1 @@
+@media (max-width: 640px) { .floating-menu { right: 20px; bottom: 140px; max-width: 160px; transform: translateY(20px); } .floating-menu.open { transform: translateY(0); } .floating-menu .menu-item { height: 46px; font-size: 14px; } .floating-company-select { padding: 0 25px 0 40px !important; } }

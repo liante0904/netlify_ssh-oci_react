@@ -1,0 +1,4 @@
+.floating-nav { position: fixed; bottom: 75px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1000; }
+.floating-button { background-color: var(--primary-color); color: white; border: none; border-radius: 50%; width: 56px; height: 56px; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 16px color-mix(in srgb, var(--primary-color) 35%, transparent); cursor: pointer; transition: var(--transition-smooth); }
+.floating-button:hover { transform: scale(1.08) translateY(-2px); box-shadow: 0 6px 20px color-mix(in srgb, var(--primary-color) 50%, transparent); }
+.floating-button:active { transform: scale(0.95); }

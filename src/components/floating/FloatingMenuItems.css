@@ -1,0 +1,11 @@
+.floating-menu .menu-item { background: linear-gradient(135deg, var(--primary-color) 0%, color-mix(in srgb, var(--primary-color) 75%, #000) 100%); color: white; height: 42px; padding: 0 16px; border-radius: var(--radius-md); text-align: center; text-decoration: none; font-size: 0.92rem; font-weight: 700; transition: var(--transition-smooth); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; width: 100%; box-sizing: border-box; }
+.floating-menu .menu-item:hover { background: linear-gradient(135deg, color-mix(in srgb, var(--primary-color) 85%, #000) 0%, color-mix(in srgb, var(--primary-color) 60%, #000) 100%); transform: translateY(-2px); box-shadow: 0 4px 12px color-mix(in srgb, var(--primary-color) 35%, transparent); }
+.floating-menu .menu-item:active { transform: scale(0.98); }
+.floating-menu.open .menu-item { animation: floatingMenuSlideIn 0.3s ease forwards; }
+.floating-menu .menu-item:nth-child(1) { animation-delay: 0.08s; } .floating-menu .menu-item:nth-child(2) { animation-delay: 0.12s; } .floating-menu .menu-item:nth-child(3) { animation-delay: 0.16s; } .floating-menu .menu-item:nth-child(4) { animation-delay: 0.2s; } .floating-menu .menu-item:nth-child(5) { animation-delay: 0.24s; }
+.menu-divider { height: 1px; background-color: color-mix(in srgb, var(--text-color) 12%, transparent); margin: 4px 0; }
+.company-filter-item { position: relative; padding: 0 !important; overflow: hidden; display: flex; align-items: center; }
+.company-filter-item .icon { position: absolute; left: 15px; pointer-events: none; z-index: 2; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+.floating-company-select { width: 100%; height: 100%; padding: 0 25px 0 40px !important; background: transparent !important; border: none !important; color: white !important; font-size: 0.92rem !important; font-weight: 700 !important; cursor: pointer; appearance: none; text-align: center; z-index: 1; }
+.company-filter-item::after { content: '▼'; position: absolute; right: 12px; font-size: 8px; color: rgba(255, 255, 255, 0.85); pointer-events: none; z-index: 2; }
+@keyframes floatingMenuSlideIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
