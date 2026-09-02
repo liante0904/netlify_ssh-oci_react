@@ -1,0 +1,2 @@
+@media screen and (max-width: 768px) { .search-container { flex-direction: column; width: 90%; max-width: none; } .search-category, .search-input, .search-submit, .search-select-wrapper { width: 100%; } .search-input { width: 100%; } }
+@media screen and (min-width: 769px) { .search-overlay { align-items: center; padding-top: 0; } .search-container { max-width: 800px; padding: 30px; } .search-category { min-width: 120px; } .search-input { flex-grow: 1; width: auto; } .search-submit { padding: 12px 24px; font-size: 1.1em; } }
