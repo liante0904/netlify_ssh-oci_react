@@ -1,0 +1,10 @@
+.filter-panel-card { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 26px; box-shadow: var(--glass-shadow); margin-bottom: 28px; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); transition: var(--transition-smooth); box-sizing: border-box; }
+.filter-panel-card:hover { box-shadow: var(--glass-shadow), 0 12px 40px color-mix(in srgb, var(--primary-color) 8%, transparent); }
+.filter-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+.filter-item { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.filter-item.text-search-box, .filter-item.company-box, .filter-item.company-box.has-boards, .filter-item.board-box { grid-column: span 1; }
+.filter-item.company-box { transition: var(--transition-smooth); }
+.filter-item.board-box { animation: slideDown 0.3s ease-out; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+.filter-item.route-box, .filter-item.sort-box { grid-column: span 2; border-top: 1px dashed var(--glass-border); padding-top: 16px; }
+.filter-label { font-size: 0.85rem; font-weight: 800; letter-spacing: 0.3px; text-transform: uppercase; color: var(--text-color); display: flex; align-items: center; gap: 6px; }
