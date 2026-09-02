@@ -6,7 +6,6 @@ import { useFavoriteMutation } from '../hooks/useFavoriteMutation';
 import { useFavorites } from '../hooks/useFavorites';
 import { useFavoriteSync } from '../hooks/useFavoriteSync';
 import { useSummaryMutation } from '../hooks/useSummaryMutation';
-import { CONFIG } from '../constants/config';
 import { getReportSectionByPath } from '../constants/reportSections';
 import { hasReportSummary } from '../utils/reportCollection';
 import { buildShareMenuData } from '../utils/shareMenuData';
@@ -14,6 +13,7 @@ import { useReportListInteractions } from '../hooks/useReportListInteractions';
 import { useSearchSummaryActions } from '../hooks/useSearchSummaryActions';
 import { useReportFavorites } from '../hooks/useReportFavorites';
 import { useReportListViewData } from '../hooks/useReportListViewData';
+import { useReportFavoritePersistence } from '../hooks/useReportFavoritePersistence';
 import ReportListContent from './report/ReportListContent';
 import './ReportList.css';
 
@@ -38,8 +38,7 @@ export default function ReportList({ onWriterClick }) {
   const meta = getReportSectionByPath(location.pathname) || {};
   const { displayReports, sortedDates, filteredDates, summaryItems } = useReportListViewData({ reports, favoriteReports, isFavoritesPage, isAiSummary, searchQuery, meta, isLoading });
   const { dateToggles: collapsedDates, firmToggles: collapsedFirms, summaryToggles: expandedSummaries, favorites, setFavorites, reset, toggleDate, toggleFirm, toggleSummary, toggleFavorite } = useReportListInteractions({ dates: sortedDates, hasMore, isLoading, fetchMore: fetchReports, revealEnabled: isRecent, initialFavorites, mutateFavorite });
-  useEffect(() => { if (!telegramUser || localStorage.getItem('report_favorites_synced')) return; const token = localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN); if (!token) return; const ids = Object.keys(favorites).filter((id) => favorites[id]).map(Number); if (ids.length) syncFavoriteIds(ids); localStorage.setItem('report_favorites_synced', '1'); }, [favorites, syncFavoriteIds, telegramUser]);
-  useEffect(() => { if (!favoriteItems.length) return; setFavorites((current) => { const next = { ...current }; favoriteItems.forEach((item) => { next[item.report_id] = true; }); localStorage.setItem('report_favorites', JSON.stringify(next)); return next; }); }, [favoriteItems, setFavorites]);
+  useReportFavoritePersistence({ telegramUser, favorites, setFavorites, favoriteItems, syncFavoriteIds });
   useEffect(() => { reset(); resetSummary(); window.scrollTo(0, 0); }, [location.pathname, reset, resetSummary, searchQuery, sortBy]);
   const openShare = useCallback((event, report) => { const rect = event.currentTarget.getBoundingClientRect(); setShare({ isOpen: true, report: buildShareMenuData(report), position: { top: rect.bottom, left: rect.left + rect.width / 2 } }); }, []);
   const handleTagClick = (keyword, isSector) => handleSearch({ query: keyword, category: isSector ? 'sector' : 'title' });
