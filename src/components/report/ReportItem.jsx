@@ -5,6 +5,7 @@ import ReportItemSummary from './ReportItemSummary';
 import ReportItemActions from './ReportItemActions';
 import ReportItemAdminSummary from './ReportItemAdminSummary';
 import ReportItemSummaryButtons from './ReportItemSummaryButtons';
+import ReportItemMetadata from './ReportItemMetadata';
 import { getReportItemViewModel } from '../../utils/reportItemViewModel';
 import { useReportItemActions } from '../../hooks/useReportItemActions';
 import './ReportSummaryControls.css';
@@ -23,22 +24,7 @@ const ReportItem = ({ report, isFavorite, isSummaryExpanded, onToggleFavorite, o
     <div className={`report-container-item ${hasAnySummary ? 'has-summary' : ''}`} key={id}>
       <div className="report">
         <div className="report-content">
-          <div className="report-header">
-            {showFirmTag && <span className="firm-tag">{firm}</span>}
-            <div className="report-title-container">
-              <a href={finalLink} target="_blank" rel="noopener noreferrer" className="report-title">{title}</a>
-              {hasSummary && <span className="ai-badge" onClick={() => onToggleSummary(id)}>AI 요약</span>}
-              {hasFnguideSummary && <span className="ai-badge fnguide-badge-title" onClick={() => onToggleSummary(id)}>FnGuide 요약</span>}
-            </div>
-          </div>
-          {hasDirectSignal && <div className="report-signals" aria-label="리포트 투자 신호">
-            {hasUnverifiedValuation && rating && <span className="signal signal-rating">출처 확인 필요 · 의견 {rating}</span>}
-            {hasUnverifiedValuation && formattedTargetPrice && <span className="signal signal-target">출처 확인 필요 · 목표가 {formattedTargetPrice}</span>}
-            {hasUnverifiedValuation && revisionType && <span className="signal signal-revision">출처 확인 필요 · {revisionType}</span>}
-            {reportType && <span className="signal signal-type">{reportType}</span>}
-            {stockTickers.map((ticker) => <span key={`ticker-${ticker}`} className="signal signal-ticker">{ticker}</span>)}
-          </div>}
-          {visibleTags.length > 0 && <div className="report-tags">{visibleTags.map(({ value, type }, index) => <span key={`${type}-${index}`} className={`tag tag-${type}`}>{value}</span>)}</div>}
+          <ReportItemMetadata firm={firm} title={title} finalLink={finalLink} showFirmTag={showFirmTag} hasSummary={hasSummary} hasFnguideSummary={hasFnguideSummary} onToggleSummary={onToggleSummary} id={id} hasDirectSignal={hasDirectSignal} hasUnverifiedValuation={hasUnverifiedValuation} rating={rating} formattedTargetPrice={formattedTargetPrice} revisionType={revisionType} reportType={reportType} stockTickers={stockTickers} visibleTags={visibleTags} />
           {isAdmin && <ReportItemAdminSummary id={id} report={report} hasSummary={hasSummary} isSummaryRequested={isSummaryRequested} isSummaryCompleted={isSummaryCompleted} onTriggerSummary={onTriggerSummary} showToast={showToast} />}
           <ReportItemSummaryButtons id={id} hasSummary={hasSummary} hasFnguideSummary={hasFnguideSummary} expanded={isSummaryExpanded} onToggle={onToggleSummary} />
           <div className="report-footer">
