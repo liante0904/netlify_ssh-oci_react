@@ -7,7 +7,6 @@ import HamburgerSettings from './menu/HamburgerSettings';
 import { useTelegramAuth } from '../hooks/useTelegramAuth';
 import { useReport } from '../context/useReport';
 import './HamburgerMenu.css';
-import './menu/KeywordManager.css';
 
 function HamburgerMenu({
   isOpen,

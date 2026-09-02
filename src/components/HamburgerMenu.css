@@ -1,18 +1,5 @@
 /* Section entrypoint. Import order is intentionally preserved. */
-@import './styles/HamburgerMenu/01-메뉴-오버레이-스타일.css';
-@import './styles/HamburgerMenu/02-메뉴-패널-스타일.css';
-@import './styles/HamburgerMenu/03-메뉴-타이틀-스타일.css';
-@import './styles/HamburgerMenu/04-메뉴-아이템-스타일.css';
-@import './styles/HamburgerMenu/05-아이콘-스타일.css';
-@import './styles/HamburgerMenu/06-메뉴-아이템-애니메이션.css';
-@import './styles/HamburgerMenu/07-증권사-선택-스타일-메뉴-내부용.css';
-@import './styles/HamburgerMenu/08-텔레그램-섹션-스타일.css';
-@import './styles/HamburgerMenu/09-알림-설정-오버레이-전용-스타일.css';
-@import './styles/HamburgerMenu/10-삭제-취소-바-스타일.css';
-@import './styles/HamburgerMenu/11-모바일-태블릿-여백-최적화.css';
-@import './styles/HamburgerMenu/12-태블릿-768px-이상.css';
-@import './styles/HamburgerMenu/13-pc-1024px-이상.css';
-@import './styles/HamburgerMenu/14-전역-가로-스크롤-방지-보강.css';
-@import './styles/HamburgerMenu/15-메뉴-패널-내부-스크롤-허용-아이템이-많아질-경우-대비.css';
-@import './styles/HamburgerMenu/16-모바일-화면-최대-너비-1023px-이하일-때.css';
-@import './styles/HamburgerMenu/17-데스크탑-화면-최소-너비-1024px-이상일-때.css';
+@import './styles/HamburgerMenu/00-core.css';
+@import './styles/HamburgerMenu/10-overlay.css';
+@import './styles/HamburgerMenu/20-responsive.css';
+@import './styles/HamburgerMenu/30-guards.css';
