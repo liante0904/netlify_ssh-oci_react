@@ -1,0 +1,6 @@
+/* Shared application layout primitives. */
+.container { width: 100%; padding: 16px; box-sizing: border-box; padding-bottom: calc(90px + env(safe-area-inset-bottom, 20px)); }
+.loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; padding: 24px; font-size: 1.1em; font-weight: 700; color: var(--text-color); background-color: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: var(--radius-lg); box-shadow: var(--glass-shadow); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 1000; }
+@media (min-width: 1024px) { .container { max-width: 1200px; margin: auto; } }
+@media (max-width: 1023px) { .container { max-width: 800px; margin: auto; padding: 12px; } }
+@media (max-width: 767px) { .container { max-width: 600px; margin: auto; padding: 10px; } }
