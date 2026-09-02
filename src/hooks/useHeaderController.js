@@ -23,7 +23,13 @@ export function useHeaderController(isNavVisible) {
   const { visibleNotifications, unreadCount, notificationToast, handleNotificationItemClick } = useHeaderNotifications({ telegramUser, notifications, readNotifyIds, markAllAsRead, markAsRead, handleSearch, navigate, setActivePopover });
   const closePopover = useCallback(() => { const trigger = triggerRef.current; triggerRef.current = null; setActivePopover(null); window.setTimeout(() => trigger?.focus(), 0); }, []);
   const handleBadge = (event) => { triggerRef.current = event.currentTarget; setActivePopover((current) => current === 'account' ? null : 'account'); };
-  const handleOpenSettings = () => { setActivePopover(null); if (!telegramUser) loginWithTelegram(); else keywordState.openKeywordOverlay(); };
+  const handleOpenSettings = (event) => {
+    event?.preventDefault();
+    event?.stopPropagation();
+    setActivePopover(null);
+    if (!telegramUser) loginWithTelegram();
+    else keywordState.openKeywordOverlay();
+  };
   const handleNotificationClick = (event) => { triggerRef.current = event.currentTarget; setActivePopover((current) => current === 'notifications' ? null : 'notifications'); };
   const handleButtonClick = (name) => { if (isTopMenuOpen) toggleMenuTop(); if (isMenuOpen) toggleMenu(); if (name !== 'search') clearSearchState({ navigateHome: false }); if (name === 'recent') setSortBy('time'); if (HEADER_PATHS[name] && name !== 'search') navigate({ pathname: HEADER_PATHS[name] }); if (name === 'search') handleSearchButtonClick(); };
   useEffect(() => { if (isTopMenuOpen || !isNavVisible) setActivePopover(null); }, [isNavVisible, isTopMenuOpen]);
