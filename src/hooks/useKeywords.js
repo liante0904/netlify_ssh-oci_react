@@ -4,24 +4,18 @@ import { useReport } from '../context/useReport';
 import { CONFIG } from '../constants/config';
 import { request } from '../utils/api';
 import { DEV_AUTH_ENABLED } from '../utils/devAuth';
+import { normalizeKeywordList } from '../utils/keywordModel';
+import { useKeywordOverlayState } from './useKeywordOverlayState';
 
 export const useKeywords = (telegramUser) => {
   const { logout } = useReport();
   const queryClient = useQueryClient();
   const [devKeywords, setDevKeywords] = useState([]);
   const [newKeyword, setNewKeyword] = useState('');
-  const [isKeywordOverlayOpen, setIsKeywordOverlayOpen] = useState(false);
-  const [lastDeleted, setLastDeleted] = useState(null);
+  const { isKeywordOverlayOpen, setIsKeywordOverlayOpen, lastDeleted, setLastDeleted, toggleKeywordOverlay, openKeywordOverlay, closeKeywordOverlay } = useKeywordOverlayState();
 
   const hasAuthToken = Boolean(localStorage.getItem(CONFIG.STORAGE_KEYS.AUTH_TOKEN));
   const isDevBypassSession = DEV_AUTH_ENABLED && !hasAuthToken;
-
-  const normalizeKeywordList = (data) => {
-    if (Array.isArray(data)) return data;
-    if (Array.isArray(data?.items)) return data.items;
-    if (Array.isArray(data?.keywords)) return data.keywords;
-    return [];
-  };
 
   const queryKey = ['keywords', telegramUser?.id ?? null];
   const keywordsQuery = useQuery({
@@ -95,21 +89,6 @@ export const useKeywords = (telegramUser) => {
     const restoredKeywords = [...new Set([...currentKeywordList, ...lastDeleted.data])];
 
     syncKeywords(restoredKeywords);
-    setLastDeleted(null);
-  };
-
-  const toggleKeywordOverlay = () => {
-    setIsKeywordOverlayOpen(!isKeywordOverlayOpen);
-    setLastDeleted(null);
-  };
-
-  const openKeywordOverlay = () => {
-    setIsKeywordOverlayOpen(true);
-    setLastDeleted(null);
-  };
-
-  const closeKeywordOverlay = () => {
-    setIsKeywordOverlayOpen(false);
     setLastDeleted(null);
   };
 
