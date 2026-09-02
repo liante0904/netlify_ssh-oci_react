@@ -1,10 +1,7 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState, useCallback, useMemo } from 'react';
 import { useBoards } from '../hooks/useBoards';
-import { useLlmVisibilityMutation } from '../hooks/useLlmVisibilityMutation';
 import { CONFIG } from '../constants/config';
 import { FIRM_NAMES } from '../constants/firms';
-import { request } from '../utils/api';
 import {
   createEmptySearchSelection,
   getSelectedCompanyOrder,
@@ -14,6 +11,7 @@ import ReportContext from './reportContext';
 import { createReportContextValue } from './reportContextValue';
 import { useTelegramSession } from '../hooks/useTelegramSession';
 import { useThemePreference } from '../hooks/useThemePreference';
+import { useLlmVisibilitySettings } from '../hooks/useLlmVisibilitySettings';
 
 export function ReportProvider({ children }) {
   const [activeSearch, setActiveSearch] = useState(createEmptySearchSelection());
@@ -25,31 +23,7 @@ export function ReportProvider({ children }) {
 
   const { telegramUser, setTelegramUser, isVerifying, authStatus, logout } = useTelegramSession();
 
-  // LLM 요약 노출 범위 설정 ('admin' 또는 'telegram')
-  const [llmVisibility, setLlmVisibility] = useState('admin');
-
-  const llmSettingQuery = useQuery({
-    queryKey: ['llm-visibility'],
-    queryFn: () => request(CONFIG.API.LLM_SETTING_URL),
-    staleTime: 60_000,
-  });
-  const llmVisibilityMutation = useLlmVisibilityMutation();
-
-  useEffect(() => {
-    if (llmSettingQuery.data?.visibility) setLlmVisibility(llmSettingQuery.data.visibility);
-  }, [llmSettingQuery.data]);
-
-  // LLM 노출 설정 변경 (관리자 전용)
-  const updateLlmSetting = useCallback(async (newVisibility) => {
-    try {
-      const data = await llmVisibilityMutation.mutateAsync(newVisibility);
-      setLlmVisibility(data.visibility);
-      return { success: true, visibility: data.visibility };
-    } catch (error) {
-      console.error('Failed to update LLM visibility setting:', error);
-      return { success: false, message: error.message };
-    }
-  }, [llmVisibilityMutation]);
+  const { llmVisibility, updateLlmSetting } = useLlmVisibilitySettings();
 
   const [sortBy, setSortBy] = useState('time');
   const [viewerReport, setViewerReport] = useState(null);
