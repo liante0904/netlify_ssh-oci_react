@@ -67,8 +67,9 @@ export function ReportProvider({ children }) {
   });
 
   useEffect(() => {
-    if (!telegramUser?.id) return;
-    const savedTheme = localStorage.getItem(`${CONFIG.STORAGE_KEYS.THEME}:${telegramUser.id}`);
+    const savedTheme = telegramUser?.id
+      ? localStorage.getItem(`${CONFIG.STORAGE_KEYS.THEME}:${telegramUser.id}`)
+      : localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
     if (savedTheme) {
       skipThemePersistRef.current = true;
       setThemePreference(savedTheme);
