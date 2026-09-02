@@ -29,7 +29,11 @@ export function useSearchOverlayController() {
     }
     if (state.shouldClearPending) setPendingSearch({ query: '', category: '' });
   }, [isSearchOpen, onSearch, pendingSearch, searchParams, setPendingSearch, setSearchParams]);
-  useEffect(() => { if (isSearchOpen && category !== 'company') inputRef.current?.focus(); }, [category, isSearchOpen]);
+  useEffect(() => {
+    if (!isSearchOpen || category === 'company') return undefined;
+    const frame = window.requestAnimationFrame(() => inputRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [category, isSearchOpen]);
 
   const showToast = useCallback((message) => { setToast({ visible: true, message }); window.setTimeout(() => setToast({ visible: false, message: '' }), 2000); }, []);
   const handleSearchClick = useCallback(() => { const value = query.trim(); if (!value && category !== 'company') return showToast('검색어를 입력해주세요.'); const next = buildSearchParams({ query: value, category }); setSearchParams(next); onSearch(category === 'company' ? createCompanySearch(value) : createTextSearch(value, category)); navigate({ pathname: '/recent', search: `?${next}` }); }, [category, navigate, onSearch, query, setSearchParams, showToast]);
