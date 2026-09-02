@@ -1,4 +1,5 @@
 @import './styles/global-tokens.css';
+@import './styles/global-feedback.css';
 
 html, body {
   margin: 0;
@@ -138,57 +139,6 @@ body {
   min-height: 100vh;
 }
 
-/* 글래스모피즘 로딩 오버레이 */
-.loading-overlay {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 24px;
-  background-color: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  color: var(--text-color);
-  border-radius: var(--radius-full);
-  font-weight: 700;
-  font-size: 0.92em;
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  z-index: 2000;
-  white-space: nowrap;
-  animation: searchPageFadeIn 0.3s ease-out;
-}
-
-/* 글래스모피즘 토스트 메시지 */
-.toast-container {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(100px);
-  background-color: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  color: var(--text-color);
-  padding: 12px 24px;
-  border-radius: var(--radius-full);
-  font-size: 0.9em;
-  font-weight: 700;
-  z-index: 3000;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  opacity: 0;
-  pointer-events: none;
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-.toast-container.visible {
-  transform: translateX(-50%) translateY(0);
-  opacity: 1;
-}
-
 .not-found-page {
   min-height: 60vh;
   display: grid;
@@ -259,36 +209,6 @@ body {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* 회전하는 스피너 */
-.loading-overlay::before {
-  content: '';
-  width: 16px;
-  height: 16px;
-  border: 2.5px solid color-mix(in srgb, var(--text-color) 20%, transparent);
-  border-top-color: var(--primary-color);
-  border-radius: 50%;
-  animation: loading-spin 0.75s infinite linear;
-}
-
-@keyframes loading-spin {
-  to { transform: rotate(360deg); }
-}
-
-.network-status-banner {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 3000;
-  padding: 9px 16px;
-  color: #5f3b00;
-  background: #fff3cd;
-  border-bottom: 1px solid #f0d98c;
-  text-align: center;
-  font-size: 13px;
-  font-weight: 600;
 }
 
 .container {
