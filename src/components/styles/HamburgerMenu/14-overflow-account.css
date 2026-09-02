@@ -1,0 +1,8 @@
+.user-info-header { display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 12px; }
+.bot-connect-banner { background-color: #fff9db; border: 1px solid #ffe066; border-radius: 12px; padding: 12px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 10px; }
+.bot-connect-desc { font-size: 0.85em; color: #856404; margin: 0; line-height: 1.4; }
+.bot-connect-btn { background-color: #0088cc; color: white; text-decoration: none; padding: 10px; border-radius: 10px; font-weight: bold; font-size: 0.9em; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(0, 136, 204, 0.2); }
+.bot-connect-btn:hover { background-color: #0077b5; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 136, 204, 0.3); }
+.bot-connect-btn:active { transform: translateY(0); }
+.logout-small-btn { background: none; border: 1px solid #d1d1d6; color: #8e8e93; font-size: 0.75em; padding: 4px 8px; border-radius: 8px; cursor: pointer; }
+.loading-text, .empty-text { font-size: 0.85em; color: #8e8e93; text-align: center; margin: 10px 0; }

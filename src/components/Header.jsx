@@ -12,7 +12,9 @@ import HeaderLayout from './header/HeaderLayout';
 import HeaderAccountBadge from './header/HeaderAccountBadge';
 import './Header.css';
 import './header/HeaderNotificationToast.css';
-import './header/HeaderNotificationList.css';
+import './header/NotificationListShell.css';
+import './header/NotificationListItems.css';
+import './header/NotificationListActions.css';
 
 const Header = forwardRef(({ isNavVisible }, ref) => {
   const navigate = useNavigate();
