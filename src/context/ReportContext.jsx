@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useBoards } from '../hooks/useBoards';
 import { useLlmVisibilityMutation } from '../hooks/useLlmVisibilityMutation';
@@ -13,8 +13,7 @@ import {
 import ReportContext from './reportContext';
 import { createReportContextValue } from './reportContextValue';
 import { useTelegramSession } from '../hooks/useTelegramSession';
-
-const getSystemTheme = () => window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+import { useThemePreference } from '../hooks/useThemePreference';
 
 export function ReportProvider({ children }) {
   const [activeSearch, setActiveSearch] = useState(createEmptySearchSelection());
@@ -59,43 +58,7 @@ export function ReportProvider({ children }) {
   const companyIndex = getSelectedCompanyOrder(activeSearch, null);
   const { boards, isLoadingBoards } = useBoards(companyIndex);
 
-  const [themePreference, setThemePreference] = useState(() => localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) || 'system');
-  const skipThemePersistRef = useRef(false);
-  const [theme, setTheme] = useState(() => {
-    const preference = localStorage.getItem(CONFIG.STORAGE_KEYS.THEME) || 'system';
-    return preference === 'system' ? getSystemTheme() : preference;
-  });
-
-  useEffect(() => {
-    const savedTheme = telegramUser?.id
-      ? localStorage.getItem(`${CONFIG.STORAGE_KEYS.THEME}:${telegramUser.id}`)
-      : localStorage.getItem(CONFIG.STORAGE_KEYS.THEME);
-    if (savedTheme) {
-      skipThemePersistRef.current = true;
-      setThemePreference(savedTheme);
-    }
-  }, [telegramUser?.id]);
-
-  useEffect(() => {
-    if (skipThemePersistRef.current) {
-      skipThemePersistRef.current = false;
-      return undefined;
-    }
-    const resolvedTheme = themePreference === 'system' ? getSystemTheme() : themePreference;
-    setTheme(resolvedTheme);
-    document.documentElement.setAttribute('data-theme', resolvedTheme);
-    const storageKey = telegramUser?.id ? `${CONFIG.STORAGE_KEYS.THEME}:${telegramUser.id}` : CONFIG.STORAGE_KEYS.THEME;
-    localStorage.setItem(storageKey, themePreference);
-    if (themePreference !== 'system') return undefined;
-    const media = window.matchMedia?.('(prefers-color-scheme: dark)');
-    const handleSystemTheme = () => setTheme(media.matches ? 'dark' : 'light');
-    media?.addEventListener('change', handleSystemTheme);
-    return () => media?.removeEventListener('change', handleSystemTheme);
-  }, [telegramUser?.id, themePreference]);
-
-  const toggleTheme = useCallback(() => {
-    setThemePreference((preference) => preference === 'system' ? 'light' : preference === 'light' ? 'dark' : 'system');
-  }, []);
+  const { theme, themePreference, setTheme: setThemePreference, toggleTheme } = useThemePreference(CONFIG.STORAGE_KEYS.THEME, telegramUser?.id);
 
   const handleSearch = useCallback(({ query, category, board = null, companyOrder = null }) => {
     const nextSearch = normalizeSearchSelection({ query, category, board, companyOrder });
