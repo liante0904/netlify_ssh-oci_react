@@ -16,7 +16,8 @@ function renderReportList(props = {}) {
 jest.mock('react-router-dom', () => ({
   useLocation: () => ({
     pathname: '/recent'
-  })
+  }),
+  useNavigate: () => jest.fn()
 }));
 
 // react-infinite-scroll-component 모킹
