@@ -3,7 +3,7 @@ import { getDirectUrl } from '../../utils/reportLinks';
 import { useReport } from '../../context/useReport';
 import ReportItemSummary from './ReportItemSummary';
 import ReportItemActions from './ReportItemActions';
-import { getReportPresentation } from '../../utils/reportItemModel';
+import { getReportItemViewModel } from '../../utils/reportItemViewModel';
 import { useReportItemActions } from '../../hooks/useReportItemActions';
 import './ReportSummaryControls.css';
 import './ReportSummaryContent.css';
@@ -22,24 +22,16 @@ const ReportItem = ({
   summaryRequestedIds,
   summaryCompletedIds
 }) => {
-  const {
-    id, title, writer, gemini_summary, fnguide_summary, firm,
-    tags, stock_names, stock_tickers, sector, rating, revision_type,
-    report_type
-  } = report;
   const { telegramUser, llmVisibility } = useReport();
   const [showConfirm, setShowConfirm] = useState(null);
+  const viewModel = getReportItemViewModel(report, { isAdmin, telegramUser, llmVisibility });
+  const { id, title, writer, firm, geminiSummary, fnguideSummary, rating, revisionType, reportType, stockTickers, visibleTags, canDownloadArchive, hasSummary, hasFnguideSummary, hasAnySummary, hasUnverifiedValuation, hasDirectSignal, formattedTargetPrice } = viewModel;
   /* 기존 주석 유지: 요약 요청 및 완료 여부 파악 */
   const isSummaryRequested = summaryRequestedIds?.has(id);
   const isSummaryCompleted = summaryCompletedIds?.has(id);
   
   const { handleViewerClick, handleArchiveDownload, handlePrefetch, isArchiveDownloading, toast, showToast } = useReportItemActions(report);
   const finalLink = getDirectUrl(report);
-  const canDownloadArchive = report.pdf_archive?.archive_status === 'ARCHIVED'
-    && Boolean(report.pdf_archive?.storage_key);
-
-  // LLM 요약 노출 범위에 따른 판단 (기존 주석 유지 및 추가 권한 마스킹)
-  const { hasSummary, hasFnguideSummary, hasAnySummary, hasUnverifiedValuation, hasDirectSignal, formattedTargetPrice } = getReportPresentation(report, { isAdmin, telegramUser, llmVisibility });
   // target_price/rating is historically almost entirely FnGuide-derived.
   // Do not show it as a second, broker-originated signal beside the FnGuide card.
   // Industry/macro reports do not carry a single-company recommendation.
@@ -72,27 +64,14 @@ const ReportItem = ({
             <div className="report-signals" aria-label="리포트 투자 신호">
               {hasUnverifiedValuation && rating && <span className="signal signal-rating">출처 확인 필요 · 의견 {rating}</span>}
               {hasUnverifiedValuation && formattedTargetPrice && <span className="signal signal-target">출처 확인 필요 · 목표가 {formattedTargetPrice}</span>}
-              {hasUnverifiedValuation && revision_type && <span className="signal signal-revision">출처 확인 필요 · {revision_type}</span>}
-              {report_type && <span className="signal signal-type">{report_type}</span>}
-              {stock_tickers?.slice(0, 3).map((ticker) => (
+              {hasUnverifiedValuation && revisionType && <span className="signal signal-revision">출처 확인 필요 · {revisionType}</span>}
+              {reportType && <span className="signal signal-type">{reportType}</span>}
+              {stockTickers.map((ticker) => (
                 <span key={`ticker-${ticker}`} className="signal signal-ticker">{ticker}</span>
               ))}
             </div>
           )}
-          {(tags && tags.length > 0 || stock_names && stock_names.length > 0 || sector) && (
-            <div className="report-tags">
-              {sector && <span className="tag tag-sector">{sector}</span>}
-              {stock_names && stock_names.slice(0, 3).map((s, i) => (
-                <span key={`stock-${i}`} className="tag tag-stock">{s}</span>
-              ))}
-              {tags && tags
-                .filter(t => t !== sector && !stock_names?.includes(t))
-                .slice(0, 5)
-                .map((t, i) => (
-                  <span key={`tag-${i}`} className="tag tag-keyword">{t}</span>
-                ))}
-            </div>
-          )}
+          {visibleTags.length > 0 && <div className="report-tags">{visibleTags.map(({ value, type }, index) => <span key={`${type}-${index}`} className={`tag tag-${type}`}>{value}</span>)}</div>}
           
           {/* 관리자 요약 요청 버튼 영역 (report-tags 아래 배치하여 가시성 및 사용성 개선) */}
           {isAdmin && (
@@ -245,8 +224,8 @@ const ReportItem = ({
       {hasAnySummary && (
         <div className={`summary-content ${isSummaryExpanded ? 'expanded' : 'collapsed'}`}>
           <ReportItemSummary
-            geminiSummary={gemini_summary}
-            fnguideSummary={hasFnguideSummary ? fnguide_summary : null}
+            geminiSummary={geminiSummary}
+            fnguideSummary={hasFnguideSummary ? fnguideSummary : null}
             hasSummary={hasSummary}
           />
         </div>
