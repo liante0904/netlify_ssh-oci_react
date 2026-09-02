@@ -10,3 +10,25 @@
 .tag-stock { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
 .tag-keyword { background: #f3e5f5; color: #7b1fa2; border: 1px solid #ce93d8; }
 .fnguide-badge-title { background-color: #2e7d32; margin-left: 6px; }
+
+html[data-theme='dark'] .report-writer {
+  color: var(--text-color);
+}
+
+html[data-theme='dark'] .tag-sector {
+  background: color-mix(in srgb, #66bb6a 18%, var(--card-background-color));
+  color: #a5d6a7;
+  border-color: #388e3c;
+}
+
+html[data-theme='dark'] .tag-stock {
+  background: color-mix(in srgb, #42a5f5 18%, var(--card-background-color));
+  color: #90caf9;
+  border-color: #1976d2;
+}
+
+html[data-theme='dark'] .tag-keyword {
+  background: color-mix(in srgb, #ab47bc 18%, var(--card-background-color));
+  color: #e1bee7;
+  border-color: #8e24aa;
+}
