@@ -26,7 +26,7 @@
   }
 
   .tg-badge {
-    max-width: 80px;
+    max-width: none;
     font-size: 0.7em;
     padding: 3px 8px;
     gap: 3px;

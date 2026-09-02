@@ -17,6 +17,11 @@
   font-family: inherit;
 }
 
+.tg-badge-on {
+  max-width: none;
+  flex-shrink: 0;
+}
+
 .tg-badge-icon {
   font-size: 0.9em;
   color: #0088cc; /* 텔레그램 브랜드 블루 유지 */
@@ -24,8 +29,8 @@
 }
 
 .tg-badge-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+  text-overflow: clip;
   white-space: nowrap;
 }
 

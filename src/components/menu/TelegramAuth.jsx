@@ -12,14 +12,10 @@ function TelegramAuth({
   loginWithTelegram,
   loginWithDevBypass,
   handleLogout,
-  toggleKeywordOverlay,
-  theme,
-  themePreference,
-  toggleTheme,
 }) {
   const botName = CONFIG.TELEGRAM.BOT_NAME;
 
-  return <div className="telegram-section">{telegramUser ? <TelegramUserPanel user={telegramUser} botName={botName} onLogout={handleLogout} onOpenSettings={toggleKeywordOverlay} theme={theme} themePreference={themePreference} onToggleTheme={toggleTheme} /> : <TelegramLoginPanel isAuthenticating={isAuthenticating} loginWithTelegram={loginWithTelegram} loginWithDevBypass={loginWithDevBypass} devAuth={DEV_AUTH_ENABLED} />}</div>;
+  return <div className="telegram-section">{telegramUser ? <TelegramUserPanel user={telegramUser} botName={botName} onLogout={handleLogout} /> : <TelegramLoginPanel isAuthenticating={isAuthenticating} loginWithTelegram={loginWithTelegram} loginWithDevBypass={loginWithDevBypass} devAuth={DEV_AUTH_ENABLED} />}</div>;
 }
 
 export default TelegramAuth;
