@@ -25,12 +25,10 @@ export default defineConfig({
     rollupOptions: {
       external: ['/lib/pdfjs/build/pdf.mjs', '/lib/pdfjs/build/pdf.worker.mjs'],
       output: {
-        // 매뉴얼 청크 분리: 벤더 라이브러리(React 등)를 별도 파일로 분리하여 캐싱 효율 극대화
+        // 모든 외부 라이브러리를 하나의 안정적인 청크로 묶어 순환 청크를 방지한다.
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react-router-dom')) return 'vendor-router';
-            if (id.includes('react')) return 'vendor-react';
-            return 'vendor'; // 기타 라이브러리
+            return 'vendor';
           }
         },
         // 에셋 파일 이름 규칙

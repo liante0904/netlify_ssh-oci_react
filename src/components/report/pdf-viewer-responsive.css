@@ -1,0 +1,1 @@
+@media (max-width: 768px) { .pdf-viewer-header { min-height: calc(48px + env(safe-area-inset-top, 0px)); padding: env(safe-area-inset-top, 0px) 8px 0 12px; } .pdf-viewer-firm-badge { font-size: 10px; padding: 2px 6px; } .pdf-viewer-title { font-size: 13px; } .pdf-viewer-body { padding-bottom: env(safe-area-inset-bottom, 0px); } .pdf-viewer-iframe { min-width: 0; } }

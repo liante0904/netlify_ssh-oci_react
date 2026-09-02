@@ -1,0 +1,11 @@
+.pdf-viewer-header { min-height: calc(50px + env(safe-area-inset-top, 0px)); background-color: #1a1a1a; display: flex; justify-content: space-between; align-items: center; padding: env(safe-area-inset-top, 0px) 12px 0; color: white; box-sizing: border-box; flex: 0 0 auto; gap: 8px; }
+.pdf-viewer-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; overflow: hidden; }
+.pdf-viewer-firm-badge { display: inline-block; padding: 3px 8px; background: rgba(255, 255, 255, 0.12); border-radius: var(--radius-sm); font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.7); white-space: nowrap; flex-shrink: 0; }
+.pdf-viewer-header-actions { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+.pdf-viewer-title { font-size: 14px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pdf-viewer-close, .pdf-viewer-share-btn { background: none; border: none; color: white; cursor: pointer; display: grid; place-items: center; padding: 0; border-radius: var(--radius-sm); }
+.pdf-viewer-share-btn { color: rgba(255, 255, 255, 0.6); width: 36px; height: 36px; transition: var(--transition-fast); }
+.pdf-viewer-share-btn:hover, .pdf-viewer-share-btn:active { background: rgba(255, 255, 255, 0.12); color: white; }
+.pdf-viewer-close { width: 44px; height: 44px; line-height: 0; flex: 0 0 44px; }
+.pdf-viewer-close svg { display: block; fill: currentColor; }
+.pdf-viewer-close:active { background-color: rgba(255, 255, 255, 0.14); }
