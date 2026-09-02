@@ -1,131 +1,27 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { getProxyPdfUrl } from '../../utils/reportLinks';
 import LoadingSkeleton from '../LoadingSkeleton';
 import './PDFViewerModal.css';
 import PDFPageList from './PDFPageList';
 import PDFPageCanvas from './PDFPageCanvas';
 import { usePdfDocument } from '../../hooks/usePdfDocument';
+import { usePdfModalLifecycle, usePdfViewport } from '../../hooks/usePdfModalLifecycle';
 
 // ---------------------------------------------------------------------------
 // PDFViewerModal
 // ---------------------------------------------------------------------------
 const PDFViewerModal = ({ report, onClose }) => {
-  const histRef = useRef(false);
   const bodyRef = useRef(null);
   const modalRef = useRef(null);
   const closeButtonRef = useRef(null);
-  const previousActiveElementRef = useRef(null);
   const [copied, setCopied] = useState(false);
-  const onCloseRef = useRef(onClose);
-
-  useEffect(() => { onCloseRef.current = onClose; }, [onClose]);
-
-  // body lock + viewport pinch-zoom toggle
-  useEffect(() => {
-    if (!report) return;
-    const vp = document.querySelector('meta[name="viewport"]');
-    const prevVP = vp?.getAttribute('content') || '';
-    const prevO = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=10.0, user-scalable=yes, viewport-fit=cover');
-    return () => {
-      document.body.style.overflow = prevO;
-      if (vp) vp.setAttribute('content', prevVP);
-    };
-  }, [report]);
-
-  // 키보드 사용자도 동일한 닫기 동작을 사용할 수 있게 한다.
-  useEffect(() => {
-    if (!report) return;
-    previousActiveElementRef.current = document.activeElement;
-    requestAnimationFrame(() => closeButtonRef.current?.focus());
-    return () => previousActiveElementRef.current?.focus?.();
-  }, [report]);
-
-  useEffect(() => {
-    if (!report) return;
-    const handleKeyDown = (event) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        onCloseRef.current();
-        return;
-      }
-      if (event.key !== 'Tab' || !modalRef.current) return;
-      const focusable = [...modalRef.current.querySelectorAll(
-        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-      )];
-      if (focusable.length === 0) return;
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [report]);
-
-  // iOS PWA height
-  useEffect(() => {
-    if (!report) return;
-    const setH = () => document.documentElement.style.setProperty('--pdf-viewer-height', `${window.visualViewport?.height || window.innerHeight}px`);
-    setH();
-    window.visualViewport?.addEventListener('resize', setH);
-    window.addEventListener('resize', setH);
-    return () => { window.visualViewport?.removeEventListener('resize', setH); window.removeEventListener('resize', setH); document.documentElement.style.removeProperty('--pdf-viewer-height'); };
-  }, [report]);
-
-  // history back
-  useEffect(() => {
-    if (!report) return;
-    window.history.pushState({ ...window.history.state, pdf: 1 }, '', window.location.href);
-    histRef.current = true;
-    const h = () => { histRef.current = false; onCloseRef.current(); };
-    window.addEventListener('popstate', h);
-    return () => { window.removeEventListener('popstate', h); if (histRef.current && window.history.state?.pdf) { histRef.current = false; window.history.back(); } };
-  }, [report]);
+  usePdfModalLifecycle({ report, onClose, modalRef, closeButtonRef });
 
   const { title = '', firm = '', writer = '', shareUrl = '' } = report || {};
   const proxyUrl = useMemo(() => report ? getProxyPdfUrl(report, window.location.origin) : '', [report]);
   const { loading, pages, scale, setScale, pageWidthRef } = usePdfDocument({ report, proxyUrl, bodyRef });
 
-  // pinch zoom (user-scalable=no 환경에서도 동작)
-  const zoomRef = useRef(1);
-  const pinchRef = useRef({ dist: 0, base: 1 });
-  useEffect(() => {
-    const el = bodyRef.current;
-    if (!el) return;
-    const dist = (t) => { const dx = t[0].clientX - t[1].clientX; const dy = t[0].clientY - t[1].clientY; return Math.sqrt(dx * dx + dy * dy); };
-    const onStart = (e) => { if (e.touches.length === 2) { pinchRef.current = { dist: dist(e.touches), base: zoomRef.current }; } };
-    const onMove = (e) => {
-      if (e.touches.length !== 2 || !pinchRef.current.dist) return;
-      const z = Math.max(0.5, Math.min(5, pinchRef.current.base * (dist(e.touches) / pinchRef.current.dist)));
-      zoomRef.current = z;
-      setScale((pageWidthRef.current && bodyRef.current) ? (bodyRef.current.clientWidth / pageWidthRef.current) * z : z);
-    };
-    const onEnd = () => { pinchRef.current = { dist: 0, base: 1 }; };
-    el.addEventListener('touchstart', onStart, { passive: false });
-    el.addEventListener('touchmove', onMove, { passive: false });
-    el.addEventListener('touchend', onEnd);
-    el.addEventListener('touchcancel', onEnd);
-    return () => { el.removeEventListener('touchstart', onStart); el.removeEventListener('touchmove', onMove); el.removeEventListener('touchend', onEnd); el.removeEventListener('touchcancel', onEnd); };
-  }, [pageWidthRef, setScale]);
-
-  // resize → scale 재계산
-  useEffect(() => {
-    const onR = () => {
-      if (!bodyRef.current || !pageWidthRef.current) return;
-      const cw = bodyRef.current.clientWidth;
-      if (cw > 0) setScale(cw / pageWidthRef.current);
-    };
-    window.addEventListener('resize', onR);
-    window.visualViewport?.addEventListener('resize', onR);
-    return () => { window.removeEventListener('resize', onR); window.visualViewport?.removeEventListener('resize', onR); };
-  }, [pageWidthRef, setScale]);
+  usePdfViewport({ bodyRef, pageWidthRef, setScale });
 
   const copyUrl = useCallback(async () => { try { await navigator.clipboard.writeText(shareUrl || window.location.href); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* clipboard unavailable */ } }, [shareUrl]);
 
