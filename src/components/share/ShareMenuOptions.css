@@ -1,0 +1,10 @@
+.share-options-compact { display: flex; justify-content: space-around; align-items: center; }
+.share-option-compact { display: flex; flex-direction: column; align-items: center; gap: 7px; background: none; border: none; cursor: pointer; padding: 0; flex: 1; }
+.share-option-compact:active { opacity: 0.6; }
+.icon-compact { width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; transition: var(--transition-smooth); }
+.icon-compact.kakao { background-color: #FEE500; }
+.icon-compact.telegram { background-color: #2AABEE; }
+.icon-compact.link, .icon-compact.more { background-color: var(--secondary-background-color); }
+.icon-compact.kakao img { width: 22px; height: 22px; }
+.icon-compact.link svg, .icon-compact.more svg { color: var(--text-color); }
+.share-option-compact span { font-size: 11px; color: var(--text-color); letter-spacing: -0.3px; font-weight: 600; }
