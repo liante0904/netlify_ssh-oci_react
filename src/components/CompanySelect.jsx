@@ -1,5 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
+import GridSelectOverlay from './GridSelectOverlay';
 import { useGridOverlay } from '../hooks/useGridOverlay';
 import { hasGridSelection } from '../utils/gridSelect';
 import { getFirmNameByOrder, getFirmOrderByName } from '../constants/firms';
@@ -47,27 +48,7 @@ function CompanySelect({ value, onChange, className = '' }) {
   );
 
   const overlay = (
-    <div className="grid-overlay-portal company-grid-overlay">
-      <div className="grid-overlay-header">
-        <div className="grid-header-top">
-          <h3>증권사 선택</h3>
-          <button className="grid-close-btn" onClick={closeOverlay} aria-label="증권사 선택 닫기">
-            <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-            </svg>
-          </button>
-        </div>
-        <div className="grid-search-wrapper">
-          <input
-            type="text"
-            placeholder="찾으시는 증권사를 입력하세요"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
-
-      <div className="grid-overlay-content">
+    <GridSelectOverlay type="company" title="증권사 선택" closeLabel="증권사 선택 닫기" searchPlaceholder="찾으시는 증권사를 입력하세요" searchTerm={searchTerm} onSearchTermChange={setSearchTerm} onClose={closeOverlay}>
         <div className="firm-checkerboard">
           <div
             className={`checker-item all ${selectedValue === "" ? 'active' : ''}`}
@@ -95,8 +76,7 @@ function CompanySelect({ value, onChange, className = '' }) {
             );
           })}
         </div>
-      </div>
-    </div>
+    </GridSelectOverlay>
   );
 
   return (
