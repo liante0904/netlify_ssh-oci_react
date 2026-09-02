@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { HOME_SECTIONS } from '../constants/reportSections';
 import { normalizeReportItem } from '../utils/reportNormalizer';
-import { getDirectUrl } from '../utils/reportLinks';
 import { useReport } from '../context/useReport';
 import { useHomeDashboardData } from '../hooks/useHomeDashboardData';
 import AsyncState from './AsyncState';
+import HomePreviewRow from './HomePreviewRow';
 import './HomeDashboard.css';
 
 function formatPreviewDate(rawDate) {
@@ -83,43 +83,7 @@ function HomeDashboard() {
                 empty={<div className="home-preview-state">표시할 항목이 없습니다.</div>}
                 loadingLabel={`${section.title} 불러오는 중`}
               >
-                {sections[section.key].items.map((item) => {
-                  const isFnGuide = section.key === 'fnguide';
-                  if (isFnGuide) {
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        className="home-preview-row"
-                        onClick={() => { if (requireAuth(section.path)) navigate(`${section.path}?summary_id=${item.id}`); }}
-                      >
-                        <span className="home-preview-main">
-                          <span className="home-preview-title">{item.title}</span>
-                          {item.meta && <span className="home-preview-meta">{item.meta}</span>}
-                        </span>
-                        {item.date && <span className="home-preview-date">{item.date}</span>}
-                      </button>
-                    );
-                  }
-
-                  const directUrl = getDirectUrl(item.rawReport);
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      className="home-preview-row"
-                      onClick={() => {
-                        if (requireAuth()) window.open(directUrl, '_blank', 'noopener,noreferrer');
-                      }}
-                    >
-                      <span className="home-preview-main">
-                        <span className="home-preview-title">{item.title}</span>
-                        {item.meta && <span className="home-preview-meta">{item.meta}</span>}
-                      </span>
-                      {item.date && <span className="home-preview-date">{item.date}</span>}
-                    </button>
-                  );
-                })}
+                {sections[section.key].items.map((item) => <HomePreviewRow key={item.id} item={item} isFnGuide={section.key === 'fnguide'} route={section.path} onRequireAuth={requireAuth} onNavigate={navigate} />)}
               </AsyncState>
             </div>
           </article>
