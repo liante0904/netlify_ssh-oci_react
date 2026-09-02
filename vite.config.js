@@ -28,8 +28,8 @@ export default defineConfig({
         // 매뉴얼 청크 분리: 벤더 라이브러리(React 등)를 별도 파일로 분리하여 캐싱 효율 극대화
         manualChunks(id) {
           if (id.includes('node_modules')) {
-            if (id.includes('react')) return 'vendor-react';
             if (id.includes('react-router-dom')) return 'vendor-router';
+            if (id.includes('react')) return 'vendor-react';
             return 'vendor'; // 기타 라이브러리
           }
         },
