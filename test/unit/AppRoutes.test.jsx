@@ -28,6 +28,7 @@ jest.mock('../../src/components/SearchPageNew', () => () => (
 
 jest.mock('../../src/components/AdminConsole', () => () => <div>admin</div>);
 jest.mock('../../src/components/FnGuideList', () => () => <div>fnguide</div>);
+jest.mock('../../src/components/NotificationsPage', () => () => <div>notifications</div>);
 
 const reportRoutes = ['/recent', '/global', '/industry', '/outlook', '/favorites', '/ai-summary'];
 
@@ -40,6 +41,11 @@ function renderRoute(path) {
 }
 
 describe('public report route lazy loading', () => {
+  test('/notifications loads the notification page', async () => {
+    renderRoute('/notifications');
+    expect(await screen.findByText('notifications')).not.toBeNull();
+  });
+
   test.each(reportRoutes)('%s loads data and tolerates interaction clicks', async (path) => {
     renderRoute(path);
 
