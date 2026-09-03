@@ -23,6 +23,8 @@
     padding: 2px 0;
   }
 
+  .hamburger-menu.is-open { display: none; }
+
   .hamburger-menu div {
     width: 34px;
     height: 4px;

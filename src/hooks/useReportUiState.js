@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react';
 export function useReportUiState() {
   const [isSearchOverlayOpen, setIsSearchOverlayOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isTopMenuOpen, setIsTopMenuOpen] = useState(false);
+  const [isTopMenuOpen, setIsTopMenuOpen] = useState(() => typeof window !== 'undefined' && window.matchMedia?.('(min-width: 1280px)').matches);
   const [sortBy, setSortBy] = useState('time');
   const [viewerReport, setViewerReport] = useState(null);
   const toggleSearch = useCallback(() => setIsSearchOverlayOpen((current) => !current), []);

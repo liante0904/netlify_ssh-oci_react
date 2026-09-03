@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import TelegramAuth from './menu/TelegramAuth';
 import AdminSection from './menu/AdminSection';
 import HamburgerNavigation from './menu/HamburgerNavigation';
@@ -19,6 +19,7 @@ function HamburgerMenu({
   handleBoardChange,
   keywordState,
 }) {
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia?.('(min-width: 1280px)').matches);
   const { telegramUser, logout, theme, themePreference, toggleTheme } = useReport();
   const {
     isAuthenticating,
@@ -37,9 +38,20 @@ function HamburgerMenu({
     keywordState.openKeywordOverlay();
   };
 
+  useEffect(() => {
+    if (!window.matchMedia) return undefined;
+    const mediaQuery = window.matchMedia('(min-width: 1280px)');
+    const handleMediaChange = (event) => setIsDesktop(event.matches);
+    setIsDesktop(mediaQuery.matches);
+    mediaQuery.addEventListener?.('change', handleMediaChange);
+    return () => mediaQuery.removeEventListener?.('change', handleMediaChange);
+  }, []);
+
+  const shouldRender = isOpen || isDesktop;
+
   return (
     <>
-      {isOpen && (
+      {shouldRender && (
         <div className={`menu-overlay ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
           <div className={`menu-panel ${isOpen ? 'open' : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className="menu-panel-header">
