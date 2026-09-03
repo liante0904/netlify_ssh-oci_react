@@ -5,6 +5,12 @@
     margin: auto;
   }
 
+  header.menu-open {
+    right: var(--desktop-menu-width, 350px);
+    width: auto;
+    transition: right 240ms ease, transform 240ms ease;
+  }
+
   .header-top {
     width: 100%;
     max-width: 1200px;

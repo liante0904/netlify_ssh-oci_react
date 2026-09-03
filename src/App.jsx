@@ -88,11 +88,12 @@ function AppContent() {
       <Header
         ref={headerRef}
         isNavVisible={isNavVisible}
+        menuOpen={isTopMenuOpen}
       />
       
       <main 
         id="main-content"
-        className={`main-content ${isMenuOpen ? 'menu-open' : ''}`}
+        className={`main-content ${isTopMenuOpen ? 'menu-open' : ''}`}
         onClick={() => {
           if (window.matchMedia?.('(min-width: 1280px)').matches) return;
           if (isMenuOpen || isTopMenuOpen) {
