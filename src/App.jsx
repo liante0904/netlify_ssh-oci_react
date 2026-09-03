@@ -77,7 +77,7 @@ function AppContent() {
     setSearchQuery(emptySearch);
     setPendingSearch(emptySearch);
     setIsSearchOpen(false);
-    setIsTopMenuOpen(false);
+    if (!window.matchMedia?.('(min-width: 1280px)').matches) setIsTopMenuOpen(false);
     setIsMenuOpen(false);
     setViewerReport(null);
   };
@@ -94,6 +94,7 @@ function AppContent() {
         id="main-content"
         className="main-content" 
         onClick={() => {
+          if (window.matchMedia?.('(min-width: 1280px)').matches) return;
           if (isMenuOpen || isTopMenuOpen) {
             if (isMenuOpen) setIsMenuOpen(false);
             if (isTopMenuOpen) setIsTopMenuOpen(false);
