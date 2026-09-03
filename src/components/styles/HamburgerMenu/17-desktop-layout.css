@@ -1,6 +1,6 @@
 /* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
 @media (min-width: 1280px) {
-  .menu-panel { width: 350px; }
+  .menu-panel { width: clamp(300px, 24vw, 350px); }
   .menu-overlay { background: transparent; pointer-events: none; }
   .menu-overlay .menu-panel { pointer-events: auto; }
 }

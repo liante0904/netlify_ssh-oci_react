@@ -92,7 +92,7 @@ function AppContent() {
       
       <main 
         id="main-content"
-        className="main-content" 
+        className={`main-content ${isMenuOpen ? 'menu-open' : ''}`}
         onClick={() => {
           if (window.matchMedia?.('(min-width: 1280px)').matches) return;
           if (isMenuOpen || isTopMenuOpen) {
