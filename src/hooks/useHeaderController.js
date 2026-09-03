@@ -31,7 +31,7 @@ export function useHeaderController(isNavVisible) {
     else keywordState.openKeywordOverlay();
   };
   const handleNotificationClick = (event) => { triggerRef.current = event.currentTarget; setActivePopover((current) => current === 'notifications' ? null : 'notifications'); };
-  const handleButtonClick = (name) => { if (isTopMenuOpen) toggleMenuTop(); if (isMenuOpen) toggleMenu(); if (name !== 'search') clearSearchState({ navigateHome: false }); if (name === 'recent') setSortBy('time'); if (HEADER_PATHS[name] && name !== 'search') navigate({ pathname: HEADER_PATHS[name] }); if (name === 'search') handleSearchButtonClick(); };
+  const handleButtonClick = (name) => { const isDesktop = window.matchMedia?.('(min-width: 1280px)').matches; if (isTopMenuOpen && !isDesktop) toggleMenuTop(); if (isMenuOpen) toggleMenu(); if (name !== 'search') clearSearchState({ navigateHome: false }); if (name === 'recent') setSortBy('time'); if (HEADER_PATHS[name] && name !== 'search') navigate({ pathname: HEADER_PATHS[name] }); if (name === 'search') handleSearchButtonClick(); };
   useEffect(() => { if (isTopMenuOpen || !isNavVisible) setActivePopover(null); }, [isNavVisible, isTopMenuOpen]);
   return { activePopover, setActivePopover, isTopMenuOpen, toggleMenuTop, telegramUser, boards, activeSearch, theme, themePreference, toggleTheme, keywordState, isAuthenticating, loginWithTelegram, selectedCompanyOrder, closePopover, handleBadge, handleOpenSettings, handleNotificationClick, handleButtonClick, unreadCount, visibleNotifications, isLoadingNotifications, readNotifyIds, markAllAsRead, handleNotificationItemClick, notificationToast, logout, handleCompanyChange, handleBoardChange };
 }

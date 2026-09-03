@@ -34,7 +34,7 @@ export function useNavigationVisibility() {
         menuCloseAccum += Math.abs(delta);
         if (menuCloseAccum > 25) {
           if (isMenuOpenRef.current) setIsMenuOpen(false);
-          if (isTopMenuOpenRef.current) setIsTopMenuOpen(false);
+          if (isTopMenuOpenRef.current && !window.matchMedia?.('(min-width: 1280px)').matches) setIsTopMenuOpen(false);
           menuCloseAccum = 0;
         }
         if (delta > 5) {
