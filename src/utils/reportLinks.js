@@ -8,6 +8,10 @@ export function getArchiveDownloadUrl(reportId, apiBaseUrl = CONFIG.API.REPORT_A
   return `${apiBaseUrl.replace(/\/$/, '')}/reports/${encodeURIComponent(reportId)}/archive-download`;
 }
 
+export function getShareLinkCreateUrl(apiBaseUrl = CONFIG.API.REPORT_API_URL) {
+  return `${apiBaseUrl.replace(/\/$/, '')}/share-links`;
+}
+
 export function isDsReport(report) {
   const { firm, firm_id, sec_firm_order, link, pdf_file_url } = report || {};
   const sourceUrl = pdf_file_url || link || '';

@@ -77,10 +77,36 @@ function buildReportSearchUrl(reportId, env = process.env) {
   return `${reportApiUrl.replace(/\/$/, '')}/search/?report_id=${encodeURIComponent(reportId)}`;
 }
 
+function buildShareResolveUrl(token, env = process.env) {
+  const searchUrl = new URL(buildReportSearchUrl('0', env));
+  searchUrl.pathname = searchUrl.pathname.replace(/\/search\/?$/, `/share-links/${encodeURIComponent(token)}`);
+  searchUrl.search = '';
+  return searchUrl.toString();
+}
+
+async function resolveShareToken(token) {
+  const response = await fetchWithTimeout(buildShareResolveUrl(token));
+  if (!response.ok) return null;
+  const data = await response.json();
+  return Number.isInteger(data?.report_id) && data.report_id > 0 ? data.report_id : null;
+}
+
 export const handler = async (event) => {
-  const { id } = event.queryStringParameters || {};
-  if (!id) {
-    return { statusCode: 400, body: JSON.stringify({ error: 'ID missing' }) };
+  const { id, t: shareToken } = event.queryStringParameters || {};
+  if (!id && !shareToken) {
+    return { statusCode: 400, body: JSON.stringify({ error: 'Share link missing' }) };
+  }
+
+  let reportId = id;
+  if (shareToken) {
+    try {
+      reportId = await resolveShareToken(shareToken);
+    } catch {
+      reportId = null;
+    }
+    if (!reportId) {
+      return { statusCode: 404, body: JSON.stringify({ error: 'Share link is invalid or expired' }) };
+    }
   }
 
   const requestHost = event.headers?.host || 'ssh-oci.netlify.app';
@@ -90,7 +116,7 @@ export const handler = async (event) => {
   const isKakaoTalk = isKakaoTalkBrowser(userAgent);
 
   try {
-    const apiUrl = buildReportSearchUrl(id);
+    const apiUrl = buildReportSearchUrl(reportId);
     
     const response = await fetchWithTimeout(apiUrl);
     const responseText = await response.text();

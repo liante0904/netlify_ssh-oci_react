@@ -17,7 +17,7 @@ const ReportItem = ({ report, isFavorite, isSummaryExpanded, onToggleFavorite, o
   const { id, title, writer, firm, geminiSummary, fnguideSummary, rating, revisionType, reportType, stockTickers, visibleTags, canDownloadArchive, hasSummary, hasFnguideSummary, hasAnySummary, hasUnverifiedValuation, hasDirectSignal, formattedTargetPrice } = viewModel;
   const isSummaryRequested = summaryRequestedIds?.has(id);
   const isSummaryCompleted = summaryCompletedIds?.has(id);
-  const { handleViewerClick, handleArchiveDownload, handlePrefetch, isArchiveDownloading, toast, showToast } = useReportItemActions(report);
+  const { handleViewerClick, handleArchiveDownload, handleSecureShare, handlePrefetch, isArchiveDownloading, isSecureSharing, toast, showToast } = useReportItemActions(report);
   const finalLink = getDirectUrl(report);
 
   return (
@@ -29,7 +29,7 @@ const ReportItem = ({ report, isFavorite, isSummaryExpanded, onToggleFavorite, o
           <ReportItemSummaryButtons id={id} hasSummary={hasSummary} hasFnguideSummary={hasFnguideSummary} expanded={isSummaryExpanded} onToggle={onToggleSummary} />
           <div className="report-footer">
             <p className={`report-writer ${onWriterClick ? 'clickable' : ''}`} onClick={() => onWriterClick?.(writer)}>작성자: {writer} <span className="writer-search-icon">🔍</span></p>
-            <ReportItemActions report={report} id={id} isFavorite={isFavorite} canDownloadArchive={canDownloadArchive} isArchiveDownloading={isArchiveDownloading} handleArchiveDownload={handleArchiveDownload} handleViewerClick={handleViewerClick} handlePrefetch={handlePrefetch} onToggleFavorite={onToggleFavorite} onOpenShareMenu={onOpenShareMenu} />
+            <ReportItemActions report={report} id={id} isFavorite={isFavorite} canDownloadArchive={canDownloadArchive} isArchiveDownloading={isArchiveDownloading} isSecureSharing={isSecureSharing} handleArchiveDownload={handleArchiveDownload} handleSecureShare={handleSecureShare} handleViewerClick={handleViewerClick} handlePrefetch={handlePrefetch} onToggleFavorite={onToggleFavorite} onOpenShareMenu={onOpenShareMenu} />
           </div>
         </div>
       </div>

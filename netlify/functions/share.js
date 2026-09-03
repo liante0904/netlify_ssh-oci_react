@@ -55,6 +55,20 @@ export function buildReportSearchUrl(reportId, env = process.env) {
   return `${reportApiUrl.replace(/\/$/, '')}/search/?report_id=${encodeURIComponent(reportId)}`;
 }
 
+export function buildShareResolveUrl(token, env = process.env) {
+  const searchUrl = new URL(buildReportSearchUrl('0', env));
+  searchUrl.pathname = searchUrl.pathname.replace(/\/search\/?$/, `/share-links/${encodeURIComponent(token)}`);
+  searchUrl.search = '';
+  return searchUrl.toString();
+}
+
+async function resolveShareToken(token) {
+  const response = await fetchWithTimeout(buildShareResolveUrl(token));
+  if (!response.ok) return null;
+  const data = await response.json();
+  return Number.isInteger(data?.report_id) && data.report_id > 0 ? data.report_id : null;
+}
+
 // 카카오톡 인앱 브라우저 UA에도 `KAKAOTALK`가 들어간다. 이를 미리보기
 // 크롤러로 취급하면 로딩 화면을 그릴 기회 없이 PDF로 바로 이동한다.
 // 실제 링크 미리보기 크롤러만 OG 응답을 받도록 명시적인 봇 식별자만 사용한다.
@@ -85,7 +99,7 @@ export function selectOriginalDocumentUrl(report = {}) {
 }
 
 export const handler = async (event) => {
-  const { id, warmup } = event.queryStringParameters || {};
+  const { id, t: shareToken, warmup } = event.queryStringParameters || {};
 
   // 워밍업 요청 대응
   if (warmup) {
@@ -99,7 +113,17 @@ export const handler = async (event) => {
   const isIos = /iPad|iPhone|iPod/i.test(userAgent);
   const isKakaoTalk = isKakaoTalkBrowser(userAgent);
 
-  if (!id) return { statusCode: 400, body: 'ID missing' };
+  if (!id && !shareToken) return { statusCode: 400, body: 'Share link missing' };
+
+  let reportId = id;
+  if (shareToken) {
+    try {
+      reportId = await resolveShareToken(shareToken);
+    } catch {
+      reportId = null;
+    }
+    if (!reportId) return { statusCode: 404, body: 'Share link is invalid or expired' };
+  }
 
   // ★ 변경: 봇이 아닌 일반 사용자에게는 즉시 로딩 페이지를 반환하고,
   //   실제 데이터 처리는 비동기로 진행하여 리다이렉트
@@ -113,13 +137,13 @@ export const handler = async (event) => {
         'Content-Type': 'text/html; charset=utf-8',
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
-      body: generateLoadingPage(id, requestOrigin),
+      body: generateLoadingPage(reportId, shareToken, requestOrigin),
     };
   }
 
   // 봇인 경우: 기존 로직 그대로 실행 (OG 태그 포함 HTML 반환)
   try {
-    const apiUrl = buildReportSearchUrl(id);
+    const apiUrl = buildReportSearchUrl(reportId);
     
     const response = await fetchWithTimeout(apiUrl);
     const responseText = await response.text();
@@ -249,7 +273,7 @@ export const handler = async (event) => {
 /**
  * 로딩 페이지 HTML 생성 (스켈레톤 UI + 자바스크립트로 리다이렉트)
  */
-function generateLoadingPage(reportId, requestOrigin) {
+function generateLoadingPage(reportId, shareToken, requestOrigin) {
   return `<!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -314,9 +338,9 @@ function generateLoadingPage(reportId, requestOrigin) {
     // 모바일 WebView는 즉시 완료된 fetch의 navigation 때문에 스켈레톤을
     // 페인트하기 전에 페이지를 교체할 수 있다.
     (function() {
-      var id = "${reportId}";
+      var shareQuery = "${shareToken ? `t=${encodeURIComponent(shareToken)}` : `id=${encodeURIComponent(reportId)}`}";
       var origin = "${requestOrigin}";
-      var apiUrl = origin + "/.netlify/functions/share-redirect?id=" + encodeURIComponent(id);
+      var apiUrl = origin + "/.netlify/functions/share-redirect?" + shareQuery;
 
       function loadReport() {
         // fetch로 실제 리다이렉트 URL을 받아서 이동

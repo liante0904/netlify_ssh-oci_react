@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { getArchiveDownloadUrl, prefetchPdf } from '../utils/reportLinks';
+import { getArchiveDownloadUrl, getShareLinkCreateUrl, prefetchPdf } from '../utils/reportLinks';
 import { useReport } from '../context/useReport';
 
 export function useReportItemActions(report) {
   const { id, title, firm, pdf_file_url } = report;
   const { setViewerReport } = useReport();
   const [isArchiveDownloading, setIsArchiveDownloading] = useState(false);
+  const [isSecureSharing, setIsSecureSharing] = useState(false);
   const [toast, setToast] = useState({ visible: false, message: '' });
 
   const showToast = (message) => {
@@ -39,6 +40,30 @@ export function useReportItemActions(report) {
     }
   };
 
+  const handleSecureShare = async () => {
+    if (isSecureSharing) return;
+    setIsSecureSharing(true);
+    try {
+      const response = await fetch(getShareLinkCreateUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ report_id: id }),
+      });
+      if (!response.ok) throw new Error('secure share link request failed');
+
+      const data = await response.json();
+      if (!data?.token) throw new Error('secure share token missing');
+
+      const shareUrl = `${window.location.origin}/share?t=${encodeURIComponent(data.token)}`;
+      await navigator.clipboard.writeText(shareUrl);
+      showToast('보안 공유 링크를 복사했습니다.');
+    } catch {
+      showToast('보안 공유 링크를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setIsSecureSharing(false);
+    }
+  };
+
   const handlePrefetch = () => {
     const origin = window.location.origin;
     fetch(`${origin}/.netlify/functions/proxy?warmup=true`, { method: 'HEAD', mode: 'no-cors' }).catch(() => {});
@@ -49,8 +74,10 @@ export function useReportItemActions(report) {
   return {
     handleViewerClick,
     handleArchiveDownload,
+    handleSecureShare,
     handlePrefetch,
     isArchiveDownloading,
+    isSecureSharing,
     toast,
     showToast,
   };

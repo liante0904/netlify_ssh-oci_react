@@ -43,7 +43,6 @@
   from = "/share"
   to = "/.netlify/functions/share"
   status = 200
-  query = {id = ":id"}
 
 [[redirects]]
   from = "/api/admin-status"
