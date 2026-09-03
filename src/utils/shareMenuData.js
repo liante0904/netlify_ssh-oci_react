@@ -1,8 +1,8 @@
-export function buildShareMenuData(report) {
+export function buildShareMenuData(report, shareUrl = report.shareUrl) {
   return {
     title: report.title,
     firm: report.firm,
     writer: report.writer,
-    shareUrl: report.shareUrl,
+    shareUrl,
   };
 }

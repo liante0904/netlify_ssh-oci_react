@@ -30,10 +30,10 @@ export function useSearchPageViewModel() {
 
   useEffect(() => { reset(); resetSummary(); }, [reset, resetSummary, searchQuery, selectedRoute, selectedSort]);
 
-  const handleOpenShareMenu = useCallback((event, report) => {
+  const handleOpenShareMenu = useCallback((event, report, shareUrl) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setMenuPosition({ top: rect.bottom + window.scrollY, left: rect.left + rect.width / 2 + window.scrollX });
-    setSelectedReport(buildShareMenuData(report));
+    setSelectedReport(buildShareMenuData(report, shareUrl));
     setIsShareOpen(true);
   }, []);
   const handleLocalWriterClick = useCallback((writer) => { setCategory('writer'); setSearchTerm(writer); window.scrollTo({ top: 0, behavior: 'smooth' }); }, [setCategory, setSearchTerm]);

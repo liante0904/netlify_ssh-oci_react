@@ -5,9 +5,9 @@ import { buildSearchParams, createTextSearch } from '../utils/searchSelection';
 
 export function useReportListActions({ setShare, handleSearch }) {
   const navigate = useNavigate();
-  const openShare = useCallback((event, report) => {
+  const openShare = useCallback((event, report, shareUrl) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    setShare({ isOpen: true, report: buildShareMenuData(report), position: { top: rect.bottom, left: rect.left + rect.width / 2 } });
+    setShare({ isOpen: true, report: buildShareMenuData(report, shareUrl), position: { top: rect.bottom, left: rect.left + rect.width / 2 } });
   }, [setShare]);
   const handleTagClick = useCallback((keyword, typeOrIsSector) => {
     const category = typeof typeOrIsSector === 'string'
