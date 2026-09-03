@@ -30,6 +30,11 @@ function HamburgerMenu({
     handleHeaderClick(key);
   };
 
+  const handleOverlayClick = (event) => {
+    if (window.matchMedia?.('(min-width: 1280px)').matches) return;
+    if (event.target === event.currentTarget) toggleMenu();
+  };
+
   const handleOpenKeywordOverlay = (event) => {
     event?.preventDefault();
     event?.stopPropagation();
@@ -40,7 +45,7 @@ function HamburgerMenu({
   return (
     <>
       {isOpen && (
-        <div className={`menu-overlay ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
+        <div className={`menu-overlay ${isOpen ? 'open' : ''}`} onClick={handleOverlayClick}>
           <div className={`menu-panel ${isOpen ? 'open' : ''}`} onClick={(e) => e.stopPropagation()}>
             <div className="menu-panel-header">
               <div>
