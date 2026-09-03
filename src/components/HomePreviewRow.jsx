@@ -7,5 +7,5 @@ export default function HomePreviewRow({ item, isFnGuide, route, onRequireAuth, 
     else window.open(getDirectUrl(item.rawReport), '_blank', 'noopener,noreferrer');
   };
 
-  return <button type="button" className="home-preview-row" onClick={handleClick}><span className="home-preview-main"><span className="home-preview-title">{item.title}</span>{item.meta && <span className="home-preview-meta">{item.meta}</span>}<span className="home-preview-subline">{item.author && <span className="home-preview-author">작성자: {item.author}</span>}{item.date && <time className="home-preview-date">{item.date}</time>}</span></span></button>;
+  return <button type="button" className="home-preview-row" onClick={handleClick}><span className="home-preview-main"><span className="home-preview-title">{item.title}</span>{item.meta && <span className="home-preview-meta">{item.meta}</span>}{item.author && <span className="home-preview-author">작성자: {item.author}</span>}</span>{item.date && <time className="home-preview-date">{item.date}</time>}</button>;
 }
