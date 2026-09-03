@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import GridSelectOverlay from './GridSelectOverlay';
 import { useGridOverlay } from '../hooks/useGridOverlay';
@@ -28,10 +28,13 @@ function useFirmOptions() {
     .sort((a, b) => a.order - b.order);
 }
 
-function CompanySelect({ value, onChange, className = '' }) {
+function CompanySelect({ value, onChange, className = '', enableWheelSelect = false }) {
   const { isOpen, searchTerm, setSearchTerm, toggleOverlay, closeOverlay } = useGridOverlay();
   const firms = useFirmOptions();
+  const [wheelCandidate, setWheelCandidate] = useState(null);
+  const wheelTimeoutRef = useRef(null);
   const selectedValue = value === null || value === undefined ? '' : value.toString();
+  const wheelOptions = [{ order: '', name: '전체보기' }, ...firms];
 
   const selectedName = hasGridSelection(value) ? (getFirmNameByOrder(value) || "증권사 필터") : "증권사 필터";
 
@@ -40,7 +43,19 @@ function CompanySelect({ value, onChange, className = '' }) {
     if (nextValue !== selectedValue) {
       onChange({ target: { value: nextValue } });
     }
+    setWheelCandidate(null);
     closeOverlay();
+  };
+
+  const handleWheel = (event) => {
+    if (!enableWheelSelect || !wheelOptions.length) return;
+    event.preventDefault();
+    const currentIndex = Math.max(0, wheelOptions.findIndex((item) => item.order.toString() === selectedValue));
+    const nextIndex = (currentIndex + (event.deltaY > 0 ? 1 : -1) + wheelOptions.length) % wheelOptions.length;
+    const next = wheelOptions[nextIndex];
+    window.clearTimeout(wheelTimeoutRef.current);
+    setWheelCandidate({ ...next, left: Math.min(event.clientX + 14, window.innerWidth - 220), top: Math.min(event.clientY + 14, window.innerHeight - 58) });
+    wheelTimeoutRef.current = window.setTimeout(() => setWheelCandidate(null), 2200);
   };
 
   const filteredFirms = firms.filter(item =>
@@ -81,7 +96,7 @@ function CompanySelect({ value, onChange, className = '' }) {
 
   return (
     <div className={`company-grid-container ${className}`.trim()}>
-      <button type="button" className={`grid-trigger-btn ${hasGridSelection(value) ? 'selected' : ''}`} onClick={toggleOverlay} aria-label="증권사 선택 열기">
+      <button type="button" className={`grid-trigger-btn ${hasGridSelection(value) ? 'selected' : ''}`} onClick={toggleOverlay} onWheel={handleWheel} aria-label="증권사 선택 열기">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
           <path d="M4 11h5V5H4v6zm0 7h5v-6H4v6zm6 0h5v-6h-5v6zm6 0h5v-6h-5v6zm-6-7h5V5h-5v6zm6-6v6h5V5h-5z"/>
         </svg>
@@ -89,6 +104,7 @@ function CompanySelect({ value, onChange, className = '' }) {
       </button>
 
       {isOpen && createPortal(overlay, document.body)}
+      {enableWheelSelect && wheelCandidate && createPortal(<button type="button" className="company-wheel-candidate" style={{ left: wheelCandidate.left, top: wheelCandidate.top }} onClick={() => handleSelect(wheelCandidate.order)}><span>휠 선택</span><strong>{wheelCandidate.name}</strong><small>클릭하여 적용</small></button>, document.body)}
     </div>
   );
 }
