@@ -13,6 +13,7 @@ jest.mock('../../src/context/useReport', () => ({
 jest.mock('../../src/utils/reportLinks', () => ({
   getDirectUrl: jest.fn(() => 'https://example.com/direct'),
   getArchiveDownloadUrl: jest.fn((reportId) => `https://api.example.com/external/api/reports/${reportId}/archive-download`),
+  getShareLinkCreateUrl: jest.fn(() => 'https://api.example.com/external/api/share-links'),
   prefetchPdf: jest.fn()
 }));
 
