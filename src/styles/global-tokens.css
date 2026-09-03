@@ -6,16 +6,16 @@
   --success-color: hsl(145, 80%, 42%);
   --warning-color: hsl(35, 100%, 52%);
   --danger-color: hsl(355, 85%, 55%);
-  --background-color: hsl(240, 20%, 96%);
-  --secondary-background-color: hsl(240, 12%, 90%);
-  --bg-muted: hsl(240, 10%, 94%);
+  --background-color: hsl(240, 20%, 98%);
+  --secondary-background-color: hsl(240, 12%, 94%);
+  --bg-muted: hsl(240, 10%, 97%);
   --card-background-color: hsla(0, 0%, 100%, 0.85);
-  --card-shadow-color: rgba(15, 23, 42, 0.08);
+  --card-shadow-color: rgba(15, 23, 42, 0.06);
   --text-color: hsl(210, 35%, 20%);
-  --text-muted: hsl(210, 15%, 50%);
+  --text-muted: hsl(210, 15%, 57%);
   --glass-bg: hsla(0, 0%, 100%, 0.8);
-  --glass-border: hsla(0, 0%, 0%, 0.08);
-  --glass-shadow: 0 8px 30px hsla(210, 25%, 15%, 0.08);
+  --glass-border: hsla(0, 0%, 0%, 0.06);
+  --glass-shadow: 0 8px 30px hsla(210, 25%, 15%, 0.06);
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
@@ -31,14 +31,14 @@
 }
 
 html[data-theme='dark'] {
-  --background-color: hsl(230, 25%, 8%);
-  --secondary-background-color: hsl(230, 20%, 14%);
-  --bg-muted: hsl(230, 18%, 12%);
-  --card-background-color: hsla(230, 20%, 15%, 0.75);
+  --background-color: hsl(230, 25%, 9%);
+  --secondary-background-color: hsl(230, 20%, 16%);
+  --bg-muted: hsl(230, 18%, 14%);
+  --card-background-color: hsla(230, 20%, 16%, 0.75);
   --card-shadow-color: rgba(0, 0, 0, 0.4);
   --text-color: hsl(210, 40%, 93%);
-  --text-muted: hsl(210, 15%, 65%);
-  --glass-bg: hsla(230, 20%, 12%, 0.75);
+  --text-muted: hsl(210, 15%, 70%);
+  --glass-bg: hsla(230, 20%, 13%, 0.75);
   --glass-border: hsla(210, 40%, 100%, 0.08);
   --glass-shadow: 0 10px 40px hsla(0, 0%, 0%, 0.5);
 }
