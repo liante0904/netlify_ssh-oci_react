@@ -40,8 +40,9 @@ export function useReportItemActions(report) {
     }
   };
 
-  const handleSecureShare = async () => {
+  const handleSecureShare = async (event, onOpenShareMenu) => {
     if (isSecureSharing) return;
+    const shareButton = event?.currentTarget;
     setIsSecureSharing(true);
     try {
       const response = await fetch(getShareLinkCreateUrl(), {
@@ -55,8 +56,7 @@ export function useReportItemActions(report) {
       if (!data?.token) throw new Error('secure share token missing');
 
       const shareUrl = `${window.location.origin}/share?t=${encodeURIComponent(data.token)}`;
-      await navigator.clipboard.writeText(shareUrl);
-      showToast('보안 공유 링크를 복사했습니다.');
+      onOpenShareMenu?.({ currentTarget: shareButton }, { ...report, shareUrl }, shareUrl);
     } catch {
       showToast('보안 공유 링크를 만들지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
