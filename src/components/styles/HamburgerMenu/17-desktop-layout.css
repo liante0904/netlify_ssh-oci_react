@@ -1,10 +1,5 @@
 /* 데스크탑 화면 (최소 너비 1024px 이상일 때) */
 @media (min-width: 1280px) {
-  .menu-overlay { position: relative; top: auto; left: auto; width: 100%; height: auto; min-height: 0; margin-top: var(--header-height, 130px); background: transparent; opacity: 1; display: block; z-index: auto; }
-  .menu-panel { position: relative; top: auto; right: auto; width: min(1200px, calc(100% - 30px)); max-width: 1200px; height: auto; max-height: none; margin: 0 auto; border: 1px solid var(--glass-border); border-radius: var(--radius-lg); box-shadow: none; backdrop-filter: none; -webkit-backdrop-filter: none; opacity: 1; transform: none; transition: none; }
-  .menu-panel.open { opacity: 1; transform: none; }
-  .menu-overlay:not(.open) { display: block; height: 0; margin-top: var(--header-height, 130px); overflow: visible; }
-  .menu-overlay:not(.open) .menu-panel { display: none; }
-  .menu-panel-header { align-items: center; }
-  .menu-mobile-close-btn { display: none !important; }
+  .menu-panel { width: 350px; }
+  .menu-overlay { background: transparent; }
 }
