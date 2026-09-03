@@ -14,11 +14,10 @@
 @import './styles/Header/13-notification-popover.css';
 @import './styles/Header/14-popover-shell.css';
 
-.header-desktop-company-filter { display: none; align-items: center; gap: 6px; }
+.header-desktop-company-filter { display: none; }
 
 @media (min-width: 768px) {
-  .header-desktop-company-filter { display: inline-flex; flex: 0 0 auto; }
+  .header-desktop-company-filter { display: block; flex: 0 0 auto; }
   .header-desktop-company-filter .grid-trigger-btn { max-width: 180px; }
   .header-desktop-company-filter .grid-trigger-btn span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .header-desktop-company-filter small { color: var(--text-muted); font-size: 0.66rem; white-space: nowrap; }
 }

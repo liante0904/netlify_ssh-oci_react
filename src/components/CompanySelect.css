@@ -1,6 +1,1 @@
 @import './styles/GridSelect/grid-select.css';
-
-.company-wheel-candidate { position: fixed; z-index: 6000; display: flex; align-items: flex-start; flex-direction: column; gap: 2px; min-width: 180px; padding: 9px 12px; border: 1px solid color-mix(in srgb, var(--primary-color) 45%, var(--glass-border)); border-radius: var(--radius-md); background: var(--glass-bg); box-shadow: 0 10px 28px color-mix(in srgb, var(--card-shadow-color) 45%, transparent); color: var(--text-color); text-align: left; cursor: pointer; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
-.company-wheel-candidate:hover { background: color-mix(in srgb, var(--primary-color) 10%, var(--glass-bg)); }
-.company-wheel-candidate span, .company-wheel-candidate small { color: var(--text-muted); font-size: 0.68rem; }
-.company-wheel-candidate strong { font-size: 0.86rem; }
