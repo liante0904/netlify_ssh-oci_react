@@ -8,7 +8,6 @@ const ReportList = lazy(() => import('./ReportList'));
 const SearchPageNew = lazy(() => import('./SearchPageNew'));
 const AdminConsole = lazy(() => import('./AdminConsole'));
 const FnGuideList = lazy(() => import('./FnGuideList'));
-const NotificationsPage = lazy(() => import('./NotificationsPage'));
 
 function Protected({ children }) {
   return <RequireAuth>{children}</RequireAuth>;
@@ -22,7 +21,6 @@ export default function AppRoutes({ onWriterClick }) {
     <Route path="/fnguide" element={<Protected><FnGuideList /></Protected>} />
     <Route path="/admin-console" element={<Protected><AdminConsole /></Protected>} />
     <Route path="/search-new" element={<Protected><SearchPageNew /></Protected>} />
-    <Route path="/notifications" element={<Protected><NotificationsPage /></Protected>} />
     <Route path="*" element={<NotFoundPage />} />
   </Routes>;
 }
