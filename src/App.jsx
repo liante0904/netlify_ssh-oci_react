@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect } from 'react';
-import { BrowserRouter as Router, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation, useNavigate } from 'react-router-dom';
 import Header from './components/Header';
 import SearchOverlay from './components/SearchOverlay';
 import AppRoutes from './components/AppRoutes';
@@ -18,6 +18,7 @@ function RouteLoadingFallback() {
 
 function AppContent() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { 
     setIsSearchOpen,
     isMenuOpen, 
@@ -68,7 +69,10 @@ function AppContent() {
   }, []);
 
   const handleWriterSearch = (writer) => {
-    setPendingSearch({ query: writer, category: 'writer' });
+    const nextSearch = { query: writer, category: 'writer', board: null, companyOrder: null };
+    setSearchQuery(nextSearch);
+    setPendingSearch(nextSearch);
+    navigate({ pathname: '/recent', search: `?q=${encodeURIComponent(writer)}&category=writer` });
     setIsSearchOpen(true);
   };
 
